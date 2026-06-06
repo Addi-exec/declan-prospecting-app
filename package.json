@@ -52,8 +52,9 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "YOUR_GITHUB_USERNAME",
-        "repo": "declan-prospecting-app"
+        "owner": "Addi-exec",
+        "repo": "declan-prospecting-app",
+        "releaseType": "release"
       }
     ]
   }
