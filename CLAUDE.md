@@ -19,10 +19,17 @@ work on both; keep any platform-specific code branched on `process.platform`.
   hand-written `renderer/index.html` (HTML + inline CSS + vanilla JS).
 - **exceljs** for native Excel/CSV import/export (pure JS, no native deps).
 - **Local JSON database** for contacts (no SQLite yet — see Roadmap).
-- **electron-updater** is ENABLED: `main.js` runs `autoUpdater.checkForUpdates()`
-  on launch when packaged (silent; no-ops in dev or if no release is reachable).
-  Needs GitHub `publish` config (owner/repo) filled in + releases published via
-  `npm run release`. See README "PUBLISHING UPDATES VIA GITHUB".
+- **Updates** are ENABLED and platform-split (signed Windows can self-install;
+  unsigned macOS cannot, so it does a manual check):
+  - **Windows**: `main.js` runs `autoUpdater.checkForUpdates()` (electron-updater)
+    on launch when packaged (silent; no-ops in dev or if no release is reachable).
+    A found update downloads in the background and offers a restart-to-install.
+  - **macOS**: `main.js` queries the GitHub Releases API directly (built-in
+    `https`, no deps), compares versions, and if newer opens the `.dmg` download
+    in the browser via `shell.openExternal` — the user drags the new app into
+    Applications. Runs silently on launch (packaged) + via the About-page button.
+  Needs GitHub `publish` config (owner/repo — already set) + releases published
+  via `npm run release`. See README "PUBLISHING UPDATES VIA GITHUB".
 
 ## Run / build
 ```
@@ -80,7 +87,9 @@ via the same env vars. Mac signing/notarization: see README (needs Apple Dev acc
 ```
 package.json          app + build config (win nsis + mac dmg targets)
 electron/main.js      BrowserWindow; IPC: contacts load/save, Excel import/export,
-                      app version, update check; auto-update wired but OFF
+                      app version, update check. Update path is platform-split:
+                      Windows = electron-updater auto-install; macOS = manual
+                      (queries GitHub Releases, opens the .dmg download)
 electron/preload.js   contextBridge -> window.api (the only renderer<->main surface)
 renderer/index.html   THE ENTIRE APP (UI, styles, all logic). ~1800 lines.
 assets/               icon.ico (Win), icon.icns (Mac), icon.png/icon_512.png, make_icon.py
@@ -105,7 +114,9 @@ The renderer NEVER touches Node/fs directly. Everything goes through:
 - `saveTextFile(text, suggestedName)` — used for CSV export
 - `importExcel()` -> { ok, sheets:[{name, rows:[{Header:value}]}] }
 - `getVersion()` -> app version string
-- `checkForUpdates()` — currently dormant
+- `checkForUpdates()` — manual update check (wired to the About-page button).
+  Windows: triggers electron-updater. macOS: queries GitHub Releases and offers
+  to open the .dmg download (unsigned apps can't auto-apply on Mac).
 
 ## Data
 - Contacts persist to `<dataDir>/prospecting-data.json`. `dataDir` defaults to
@@ -171,7 +182,7 @@ Follow-up, Nurture.
 1. **Versioning**: feature = bump the decimal (…0.9 -> 0.10 -> 0.11…); bug fix =
    add a third number (e.g. 0.20.1). Update it in THREE places when you ship:
    the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **0.22.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **0.23.0**.
 2. **Theming**: every colour MUST be a CSS variable defined in BOTH `:root` and
    `[data-theme="dark"]`. Never hardcode hex in markup/JS — new UI must work in
    light AND dark automatically. Dark mode is a header toggle, persisted in

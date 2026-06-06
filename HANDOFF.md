@@ -7,24 +7,56 @@ goals, history, and the Mac to-do.)
 
 ---
 
-## 0) How to get this workspace onto your Mac
+## 0) Restoring after a device reset (Mac OR Windows)
 
-Everything (except secrets) is on GitHub. On the Mac:
+Everything (except secrets) is on GitHub: all source code, this HANDOFF, and the
+built installers (on the **Releases** page). Two ways back:
 
+### A) Just reinstall the app (no coding) — fastest
+Go to **https://github.com/Addi-exec/declan-prospecting-app/releases** and download:
+- **Mac**: the latest `*-arm64.dmg`, open it, drag the app into Applications.
+  First launch is blocked by Gatekeeper (unsigned) — **right-click → Open**, or run
+  `xattr -cr "/Applications/Declan Prospecting App.app"` in Terminal once.
+- **Windows**: the latest `*Setup*.exe`, run it (SmartScreen may warn first run →
+  More info → Run anyway, unless the signing cert is trusted on that PC).
+
+Your contacts are NOT in the app bundle, so reinstalling never touches them. If you
+used a cloud-synced data folder (Storage box), just point the new install at the
+same folder again.
+
+> ⚠️ As of v0.23.0 the GitHub release may have **Mac assets only**. To get a
+> Windows v0.23.0 installer you must build + publish it once **on a Windows PC**
+> (see §6). Until then Windows can reinstall the older v0.22.0 `.exe` from the
+> v0.22.0 release and will keep running fine.
+
+### B) Continue development — clone the repo
 ```bash
-# 1. Install Node.js LTS (v22) from https://nodejs.org  (v24 can cause setup quirks)
-# 2. Clone the project:
+# 1. Install Node.js LTS (v22) from https://nodejs.org  (v24 needs the Electron
+#    binary fix below — keep v22 to avoid it)
+# 2. Clone:
 git clone https://github.com/Addi-exec/declan-prospecting-app.git
 cd declan-prospecting-app
 # 3. Install + run:
 npm install
 npm start
 ```
+Then open the folder in Claude Code and paste the prompt in section 7.
 
-Then open this folder in Claude Code on the Mac and paste the prompt in section 7.
+> **Node v24 Electron-install gotcha (seen on this Mac):** on Node v24 the Electron
+> post-install can silently no-op, leaving `node_modules/electron/dist/` with only
+> a license file (no `Electron.app`, no `path.txt`) → `npm start` fails with
+> "Electron failed to install correctly". Fix without changing Node:
+> ```bash
+> rm -rf node_modules/electron/dist && mkdir node_modules/electron/dist
+> unzip -q ~/Library/Caches/electron/electron-v<VER>-darwin-arm64.zip \
+>   -d node_modules/electron/dist
+> printf 'Electron.app/Contents/MacOS/Electron' > node_modules/electron/path.txt
+> ```
+> (Use `printf`, NOT `echo` — a trailing newline in path.txt breaks the launch.)
+> Best fix overall: use Node LTS v22.
 
 > NOTE: the Windows code-signing certificate (`signing/`) is intentionally NOT in
-> the repo (private key). Mac uses Apple signing instead — see section 5.
+> the repo (private key). Mac is unsigned (no Apple account) — see section 5.
 
 ---
 
@@ -55,13 +87,20 @@ Main process: `electron/main.js`. Secure bridge: `electron/preload.js`.
   `data:useDefault` IPC; it adopts an existing file in the folder or migrates.)
 - **Windows code signing**: self-signed cert (in `signing/`, gitignored) wired via
   `CSC_LINK` / `CSC_KEY_PASSWORD`. Installer is signed + trusted on Declan's PC.
-- **Auto-update via GitHub**: enabled (`electron-updater` checks on launch).
-  Public repo, signed **v0.22.0** baseline release published.
+- **Auto-update via GitHub**: enabled on **Windows** (`electron-updater` checks on
+  launch; signed app self-installs). Public repo, signed v0.22.0 Windows baseline
+  release published.
+- **Mac manual updates (v0.23.0)**: an unsigned Mac app can't auto-apply updates,
+  so Mac uses a manual path instead — a **"Check for updates"** button on the About
+  page (plus a silent check on launch) queries GitHub Releases and, if a newer
+  version exists, opens the `.dmg` download in the browser. The user drags the new
+  app into Applications; contacts are untouched. No new dependencies (built-in
+  `https`). Implemented in `electron/main.js` (`macUpdateCheck`/`fetchLatestRelease`).
 - **Data privacy**: contacts NEVER go to GitHub. They live outside the repo, and
   `.gitignore` hard-blocks `prospecting-data.json`, `app-config.json`, and any
   `*.csv` / `*.xlsx` even if they land in the folder. Verified.
 
-Current version: **0.22.0**. Repo: https://github.com/Addi-exec/declan-prospecting-app
+Current version: **0.23.0**. Repo: https://github.com/Addi-exec/declan-prospecting-app
 
 ---
 
@@ -103,11 +142,14 @@ Same family as the Windows binary issue. Fixes in order:
 ### c) Build needs Xcode tools
 `npm run build:mac` may need: `xcode-select --install` (one time).
 
-### d) Auto-update does NOT work on Mac unless the app is Apple-signed
-macOS only applies auto-updates to **signed + notarized** apps. So on Mac:
-- Without an Apple Developer account ($99/yr): the app runs fine (via the
-  right-click-Open trick) but updates are **manual** (re-download the .dmg).
-- With an Apple Developer ID: it auto-updates like Windows. See section 5.
+### d) Auto-update does NOT work on Mac unless the app is Apple-signed — handled in v0.23.0
+macOS only auto-applies updates to **signed + notarized** apps. Since there's no
+Apple account, v0.23.0 added an **in-app manual update** instead: the About page's
+"Check for updates" button (and a silent launch check) detects a newer GitHub
+release and opens the `.dmg` download — you drag the new app into Applications.
+So Mac users are notified and one click from the download; the install itself is
+manual (drag-replace). With an Apple Developer ID later, you could switch Mac back
+to true auto-update (see section 5).
 
 ### e) Mac auto-update also needs a Mac build published
 The current GitHub release only has Windows assets. For Mac auto-update you must
@@ -179,7 +221,8 @@ To ship a new version:
 | Thing | Value |
 |------|-------|
 | Repo | https://github.com/Addi-exec/declan-prospecting-app (public) |
-| Current version | 0.22.0 |
+| Current version | 0.23.0 |
+| Reinstall after reset | Download installer from the Releases page (see §0A) |
 | Default data path (Mac) | `~/Library/Application Support/Declan Prospecting App/prospecting-data.json` |
 | Default data path (Win) | `%APPDATA%\Declan Prospecting App\prospecting-data.json` |
 | Share data | App → Contacts → Storage → "Use a shared folder…" (same cloud folder on each machine) |

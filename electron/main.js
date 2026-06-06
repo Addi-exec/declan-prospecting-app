@@ -1,8 +1,13 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const https = require('https');
 const ExcelJS = require('exceljs');
 const { autoUpdater } = require('electron-updater');
+
+// GitHub repo that hosts releases (must match build.publish in package.json).
+const GH_OWNER = 'Addi-exec';
+const GH_REPO = 'declan-prospecting-app';
 
 let mainWin = null;
 let manualCheck = false; // true when the user clicked "Check for updates"
@@ -83,12 +88,98 @@ function wireAutoUpdate() {
   });
 }
 
+/* ---------------- Mac manual update (unsigned app) ----------------
+   On macOS an unsigned app cannot auto-apply updates (Squirrel.Mac needs a
+   code signature), so instead of electron-updater we ask GitHub for the latest
+   release, compare versions, and offer to open the .dmg download. The user then
+   drags the new app into Applications. Contacts live outside the app bundle, so
+   nothing is lost. No extra dependencies — just the built-in https client. */
+function fetchLatestRelease() {
+  return new Promise((resolve, reject) => {
+    const req = https.request({
+      hostname: 'api.github.com',
+      path: '/repos/' + GH_OWNER + '/' + GH_REPO + '/releases/latest',
+      method: 'GET',
+      headers: { 'User-Agent': GH_REPO, 'Accept': 'application/vnd.github+json' }
+    }, (res) => {
+      if (res.statusCode !== 200) { res.resume(); reject(new Error('GitHub returned ' + res.statusCode)); return; }
+      let body = '';
+      res.on('data', (d) => { body += d; });
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(body);
+          const version = String(json.tag_name || json.name || '').replace(/^v/i, '');
+          const dmg = (json.assets || []).find((a) => /\.dmg$/i.test(a.name));
+          resolve({ version, htmlUrl: json.html_url, dmgUrl: dmg ? dmg.browser_download_url : null });
+        } catch (e) { reject(e); }
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(10000, () => req.destroy(new Error('Update check timed out')));
+    req.end();
+  });
+}
+
+// Compare dotted versions; true if remote > local.
+function isNewer(remote, local) {
+  const a = String(remote).split('.').map((n) => parseInt(n, 10) || 0);
+  const b = String(local).split('.').map((n) => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    const d = (a[i] || 0) - (b[i] || 0);
+    if (d !== 0) return d > 0;
+  }
+  return false;
+}
+
+async function macUpdateCheck(manual) {
+  try {
+    const rel = await fetchLatestRelease();
+    if (rel.version && isNewer(rel.version, app.getVersion())) {
+      const r = await dialog.showMessageBox(mainWin, {
+        type: 'info',
+        buttons: ['Download', 'Later'],
+        defaultId: 0,
+        cancelId: 1,
+        title: 'Update available',
+        message: 'Version ' + rel.version + ' is available',
+        detail: 'You have v' + app.getVersion() + '. Click Download to get the new version, then open the .dmg '
+          + 'and drag the app into your Applications folder (replacing the old one). Your contacts are kept safe.'
+      });
+      if (r.response === 0) shell.openExternal(rel.dmgUrl || rel.htmlUrl);
+      return { ok: true, handled: true, updateAvailable: true, version: rel.version };
+    }
+    if (manual) {
+      await dialog.showMessageBox(mainWin, {
+        type: 'info',
+        message: 'You’re up to date',
+        detail: 'You already have the latest version (v' + app.getVersion() + ').'
+      });
+    }
+    return { ok: true, handled: true, updateAvailable: false };
+  } catch (e) {
+    if (manual) {
+      await dialog.showMessageBox(mainWin, {
+        type: 'error',
+        message: 'Update check failed',
+        detail: 'Could not reach GitHub to check for updates. Please try again later.\n\n' + String(e)
+      });
+    }
+    return { ok: false, handled: true, error: String(e) };
+  }
+}
+
 app.whenReady().then(() => {
   createWindow();
-  wireAutoUpdate();
-  // Auto-update via GitHub Releases. Silent on launch; only acts if an update is found.
-  // No-ops cleanly in dev (not packaged) and if no release/repo is reachable.
-  if (app.isPackaged) autoUpdater.checkForUpdates().catch(() => {});
+  if (process.platform === 'darwin') {
+    // Mac: unsigned build can't auto-apply, so silently check GitHub on launch and
+    // only prompt (with a Download button) if a newer version exists.
+    if (app.isPackaged) macUpdateCheck(false);
+  } else {
+    wireAutoUpdate();
+    // Auto-update via GitHub Releases (Windows is signed, so it can self-install).
+    // Silent on launch; no-ops cleanly in dev or if no release/repo is reachable.
+    if (app.isPackaged) autoUpdater.checkForUpdates().catch(() => {});
+  }
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
@@ -102,6 +193,8 @@ app.on('window-all-closed', () => {
 ipcMain.handle('app:getVersion', () => app.getVersion());
 
 ipcMain.handle('update:check', async () => {
+  // Mac: query GitHub directly and offer a manual download (works in dev too).
+  if (process.platform === 'darwin') return macUpdateCheck(true);
   if (!app.isPackaged) return { ok: false, dev: true };
   manualCheck = true;
   try { await autoUpdater.checkForUpdates(); return { ok: true }; }
