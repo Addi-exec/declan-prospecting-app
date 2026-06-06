@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Declan Addison — Cold Calling Scripts</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    color-scheme: light;
+    --bg:#f7f6f2; --surface:#ffffff; --surface2:#f2f1ed;
+    --border:#e2e0d8; --border2:#d0cec6;
+    --text:#1a1916; --text2:#6b6960; --text3:#9b9a94;
+    --blue:#1a5fb4; --blue-bg:#e8f0fb;
+    --teal:#0f6e56; --teal-bg:#e1f5ee;
+    --amber:#854f0b; --amber-bg:#faeeda;
+    --coral:#993c1d; --coral-bg:#faece7;
+    --purple:#3c3489; --purple-bg:#eeedfe;
+    --green:#3b6d11; --green-bg:#eaf3de; --green-border:#d0e8d0;
+    --pink:#72243e; --pink-bg:#fbeaf0;
+    --danger:#c0392b; --danger-bg:#fdecea; --danger-soft:#fff5f4; --danger-border:#f3c9c3; --hot-strong:#7b1d10;
+    --warm:#7a4f00; --warm-bg:#fef9ec;
+    --cold:#1e3a8a; --cold-bg:#e8f0ff;
+    --sms-bubble:#0b7adb; --tip-strong:#412402;
+  }
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --bg:#15151a; --surface:#1e1e25; --surface2:#27272f;
+    --border:#35353e; --border2:#474750;
+    --text:#ececf1; --text2:#a8a7a0; --text3:#76766f;
+    --blue:#74acef; --blue-bg:#1b2c47;
+    --teal:#54c8a6; --teal-bg:#133430;
+    --amber:#e3ad4f; --amber-bg:#372d16;
+    --coral:#e89072; --coral-bg:#392318;
+    --purple:#a89ef2; --purple-bg:#272340;
+    --green:#93c95a; --green-bg:#23311a; --green-border:#33503090;
+    --pink:#e692ad; --pink-bg:#341f2a;
+    --danger:#f2917b; --danger-bg:#3a1f1b; --danger-soft:#2d1b18; --danger-border:#5c302b; --hot-strong:#f4a896;
+    --warm:#e6bb5e; --warm-bg:#322a15;
+    --cold:#90adeb; --cold-bg:#1b2742;
+    --sms-bubble:#2f8fe6; --tip-strong:#f3ddab;
+  }
+  body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0; }
+  body, header, nav, .panel, .script-block, .tag, .tip-box, .objection-a, .xyz-card, .email-card, button { transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .header-left h1 { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+  .header-left p { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .layout { display: flex; min-height: calc(100vh - 65px); }
+  nav { width: 220px; min-width: 220px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; position: sticky; top: 65px; height: calc(100vh - 65px); overflow-y: auto; }
+  .nav-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); padding: 0 16px; margin-bottom: 6px; margin-top: 16px; }
+  .nav-section-label:first-child { margin-top: 0; }
+  nav a { display: flex; align-items: center; gap: 9px; padding: 8px 16px; font-size: 13px; color: var(--text2); text-decoration: none; border-left: 2px solid transparent; transition: all 0.12s; cursor: pointer; }
+  nav a:hover { background: var(--surface2); color: var(--text); }
+  nav a.active { background: var(--blue-bg); color: var(--blue); border-left-color: var(--blue); font-weight: 500; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  main { flex: 1; padding: 32px; max-width: 780px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .panel-header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; text-transform: uppercase; }
+  .panel-header h2 { font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; margin-bottom: 6px; }
+  .panel-header p { font-size: 13.5px; color: var(--text2); line-height: 1.6; }
+  .script-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin: 20px 0 6px; }
+  .script-block { background: var(--surface2); border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; padding: 14px 18px; font-size: 14px; line-height: 1.75; color: var(--text); margin-bottom: 4px; }
+  .tags { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 11px; background: var(--green-bg); color: var(--green); border-radius: 4px; padding: 3px 9px; font-weight: 500; }
+  .tip-box { background: var(--amber-bg); border-radius: 8px; padding: 12px 16px; margin-top: 18px; font-size: 13px; color: var(--amber); line-height: 1.6; }
+  .tip-box strong { color: var(--tip-strong); }
+  .objection-item { border-top: 1px solid var(--border); padding: 14px 0; }
+  .objection-item:first-child { border-top: none; padding-top: 0; }
+  .objection-q { font-size: 13px; color: var(--text2); font-style: italic; margin-bottom: 6px; display: flex; align-items: flex-start; gap: 6px; }
+  .objection-q::before { content: "→"; color: var(--text3); font-style: normal; flex-shrink: 0; }
+  .objection-a { font-size: 13.5px; color: var(--text); line-height: 1.7; background: var(--surface2); border-left: 3px solid var(--border2); border-radius: 0 8px 8px 0; padding: 10px 14px; }
+  .xyz-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 16px 0; }
+  .xyz-row { display: flex; gap: 16px; align-items: flex-start; padding: 16px 20px; border-top: 1px solid var(--border); }
+  .xyz-row:first-child { border-top: none; }
+  .xyz-letter { font-size: 22px; font-weight: 700; min-width: 32px; line-height: 1; padding-top: 2px; }
+  .xyz-row h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .xyz-row p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .sms-bubble { background: var(--sms-bubble); color: white; border-radius: 18px 18px 4px 18px; padding: 11px 16px; font-size: 13px; line-height: 1.65; display: inline-block; max-width: 88%; margin: 10px 0 4px; }
+  .sms-label { font-size: 10px; color: var(--text3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .seq-item { display: flex; gap: 16px; padding: 16px 0; border-top: 1px solid var(--border); align-items: flex-start; }
+  .seq-item:first-child { border-top: none; padding-top: 0; }
+  .seq-day { font-size: 11px; font-weight: 700; color: var(--blue); background: var(--blue-bg); border-radius: 6px; padding: 4px 8px; min-width: 52px; text-align: center; flex-shrink: 0; }
+  .seq-content h4 { font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
+  .seq-content p { font-size: 13px; color: var(--text2); margin-bottom: 8px; line-height: 1.6; }
+  .email-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-top: 8px; }
+  .email-header { background: var(--surface2); padding: 8px 14px; font-size: 12px; color: var(--text2); border-bottom: 1px solid var(--border); }
+  .email-header span { font-weight: 600; color: var(--text); }
+  .email-body { padding: 12px 14px; font-size: 13px; line-height: 1.75; color: var(--text); }
+  .tab-bar-mobile { display: none; overflow-x: auto; gap: 6px; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); -webkit-overflow-scrolling: touch; }
+  .tab-btn { white-space: nowrap; font-size: 12px; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.12s; }
+  .tab-btn.active { background: var(--blue-bg); color: var(--blue); border-color: transparent; font-weight: 500; }
+  @media (max-width: 640px) { nav { display: none; } .tab-bar-mobile { display: flex; } main { padding: 20px 16px; } }
+  @media print { header { position: static; } .layout { display: block; } nav { display: none; } main { max-width: 100%; padding: 20px; } .panel { display: block !important; page-break-before: always; } .panel:first-child { page-break-before: avoid; } }
+
+  /* ===== Contact tracker ===== */
+  .crm-section { margin-bottom: 26px; }
+  .crm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 560px) { .crm-grid { grid-template-columns: 1fr; } }
+  .crm-field { display: flex; flex-direction: column; gap: 4px; }
+  .crm-field label { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text3); }
+  .crm-field input, .crm-field select, .crm-field textarea { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; font-size: 14px; color: var(--text); font-family: inherit; width: 100%; }
+  .crm-field input:focus, .crm-field select:focus, .crm-field textarea:focus { outline: 2px solid var(--blue); outline-offset: 0; border-color: transparent; }
+  .crm-btn { border: none; border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background-color .15s, color .15s, border-color .15s; }
+  .crm-btn-primary { background: var(--blue); color: #fff; }
+  .crm-btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .crm-btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger-border); }
+  .crm-btn-sm { padding: 5px 10px; font-size: 12px; }
+  .crm-btn:hover { filter: brightness(0.97); }
+  .method-chip { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 20px; display: inline-block; white-space: nowrap; }
+  .due-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; flex-wrap: wrap; }
+  .due-card.overdue { border-color: var(--danger-border); background: var(--danger-soft); }
+  .due-left { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .due-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .due-meta { font-size: 12.5px; color: var(--text2); }
+  .due-when { font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+  .due-when.overdue { background: var(--danger-bg); color: var(--danger); }
+  .due-when.today { background: var(--amber-bg); color: var(--amber); }
+  .due-when.soon { background: var(--blue-bg); color: var(--blue); }
+  .due-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .crm-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+  .crm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .crm-table th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--text3); padding: 9px 11px; border-bottom: 1px solid var(--border); background: var(--surface2); white-space: nowrap; }
+  .crm-table td { padding: 9px 11px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+  .crm-table tr:last-child td { border-bottom: none; }
+  .crm-empty { background: var(--surface2); border-radius: 10px; padding: 22px; text-align: center; color: var(--text2); font-size: 13px; }
+  .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filter-chip { font-size: 12px; padding: 6px 13px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; }
+  .filter-chip.active { background: var(--blue-bg); color: var(--blue); border-color: transparent; font-weight: 600; }
+  .log-call-btn { margin-top: 12px; background: var(--surface2); color: var(--text2); border: 1px dashed var(--border2); border-radius: 8px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .log-call-btn:hover { background: var(--blue-bg); color: var(--blue); border-color: transparent; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Declan Addison — Cold Calling Scripts</h1>
+    <p>Neighbourhood prospecting · Just sold · Just listed · Buyer database · Steal listings &nbsp;·&nbsp; <span id="app-version" onclick="showPanel('about')" title="What's new" style="color:var(--text3);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">v0.22.0</span></p>
+  </div>
+  <button id="theme-toggle" onclick="toggleTheme()" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:12.5px;cursor:pointer;font-weight:500;white-space:nowrap;">🌙 Dark</button>
+</header>
+
+<div class="tab-bar-mobile">
+  <button class="tab-btn active" onclick="showPanel('contacts',this)">Contacts</button>
+  <button class="tab-btn" onclick="showPanel('justsold',this)">Just sold street</button>
+  <button class="tab-btn" onclick="showPanel('listed',this)">Just listed</button>
+  <button class="tab-btn" onclick="showPanel('buyerdb',this)">Buyer database</button>
+  <button class="tab-btn" onclick="showPanel('steallist',this)">Steal listings</button>
+  <button class="tab-btn" onclick="showPanel('about',this)">About</button>
+</div>
+
+<div class="layout">
+<nav>
+  <div class="nav-section-label">Tracker</div>
+  <a onclick="showPanel('contacts',this)" class="active"><span class="dot" style="background:var(--amber)"></span>Contacts &amp; follow-ups</a>
+  <div class="nav-section-label">Prospect methods</div>
+  <a onclick="showPanel('justsold',this)"><span class="dot" style="background:var(--blue)"></span>Just sold street</a>
+  <a onclick="showPanel('listed',this)"><span class="dot" style="background:var(--green)"></span>Just listed</a>
+  <a onclick="showPanel('buyerdb',this)"><span class="dot" style="background:var(--teal)"></span>Buyer database</a>
+  <a onclick="showPanel('steallist',this)"><span class="dot" style="background:var(--danger)"></span>Steal listings</a>
+  <div class="nav-section-label">App</div>
+  <a onclick="showPanel('about',this)"><span class="dot" style="background:var(--text3)"></span>About &amp; what's new</a>
+</nav>
+
+<main>
+
+<!-- ===================== CONTACTS & FOLLOW-UPS ===================== -->
+<div id="contacts" class="panel active">
+  <div class="panel-header">
+    <div class="badge" style="background:var(--amber-bg);color:var(--amber)">Contact tracker</div>
+    <h2>Contacts &amp; follow-ups</h2>
+    <p>Log a contact after each call. The tracker reminds you when each person is due for their next follow-up or nurture touch, based on the date you called. Export to Excel anytime — one sheet per prospect method.</p>
+  </div>
+
+  <div id="storage-card" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:22px;">
+    <div style="font-size:12.5px;color:var(--text2);line-height:1.5;"><span style="font-weight:600;color:var(--text);">Storage:</span> Contacts are saved automatically to a database file. To use the same contacts on another computer, put that file in a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) and choose it on each computer.</div>
+    <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text3);">Saving to</span>
+      <code id="data-location" style="font-size:12px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:3px 8px;word-break:break-all;">—</code>
+      <span id="data-shared-badge" style="display:none;font-size:11px;font-weight:600;background:var(--green-bg);color:var(--green);border-radius:20px;padding:2px 9px;">☁ Shared folder</span>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="chooseDataFolder()">☁ Use a shared folder…</button>
+      <button id="data-default-btn" class="crm-btn crm-btn-ghost crm-btn-sm" style="display:none;" onclick="useDefaultDataFolder()">Use this computer only</button>
+    </div>
+  </div>
+
+  <div class="crm-section">
+    <div class="script-label">Log a contact</div>
+    <div class="crm-grid">
+      <div class="crm-field"><label>Prospect method</label>
+        <select id="f-method">
+          <option value="justsold">Just sold street</option>
+          <option value="listed">Just listed</option>
+          <option value="buyerdb">Buyer database</option>
+          <option value="steallist">Steal listings</option>
+        </select>
+      </div>
+      <div class="crm-field"><label>Call date</label><input type="date" id="f-callDate"></div>
+      <div class="crm-field" style="grid-column:1/-1;"><label>Call outcome — sets the follow-up reminders</label>
+        <select id="f-outcome">
+          <option value="noanswer">📵 No answer — left voicemail / will retry</option>
+          <option value="interested">👍 Answered — interested</option>
+          <option value="notinterested">👋 Answered — not interested</option>
+        </select>
+      </div>
+      <div class="crm-field"><label>First name</label><input id="f-first" placeholder="First name"></div>
+      <div class="crm-field"><label>Last name</label><input id="f-last" placeholder="Last name"></div>
+      <div class="crm-field"><label>Mobile</label><input id="f-mobile" placeholder="04xx xxx xxx" inputmode="tel"></div>
+      <div class="crm-field"><label>Email (optional)</label><input id="f-email" placeholder="name@email.com" inputmode="email"></div>
+      <div class="crm-field" style="grid-column:1/-1;"><label>Address (optional)</label><input id="f-address" placeholder="12 Example St, Suburb"></div>
+      <div class="crm-field" style="grid-column:1/-1;"><label>Notes (optional)</label><textarea id="f-notes" rows="2" placeholder="Anything worth remembering from the call..."></textarea></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="crm-btn crm-btn-primary" onclick="crmAdd()">＋ Add contact</button>
+      <button class="crm-btn crm-btn-ghost" onclick="crmClearForm()">Clear</button>
+    </div>
+    <div id="f-msg" style="font-size:12.5px;color:var(--teal);margin-top:8px;min-height:16px;"></div>
+  </div>
+
+  <div class="crm-section">
+    <div class="script-label">Due now &amp; overdue</div>
+    <div id="due-list"></div>
+  </div>
+
+  <div class="crm-section">
+    <div class="script-label">All contacts</div>
+    <div class="filter-bar" id="filter-bar"></div>
+    <div style="position:relative;margin-bottom:12px;">
+      <input id="crm-search" oninput="crmDoSearch(this.value)" placeholder="Search name, mobile, email, address or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 32px 9px 11px;font-size:14px;color:var(--text);font-family:inherit;">
+      <span id="crm-search-clear" onclick="crmClearSearch()" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text3);font-size:16px;line-height:1;">✕</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmExportXlsx()">⬇ Export Excel (.xlsx)</button>
+      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmExportCsv()">⬇ Export CSV (offline)</button>
+      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmImport()">⬆ Import file</button>
+    </div>
+    <div id="table-wrap"></div>
+  </div>
+</div>
+
+<!-- ===================== JUST SOLD STREET ===================== -->
+<div id="justsold" class="panel">
+  <div class="panel-header">
+    <div class="badge" style="background:var(--blue-bg);color:var(--blue)">Prospect method</div>
+    <h2>Just sold street</h2>
+    <p>You've just sold a property on their street. That result is your reason to call every neighbour. Full call flow from opener to close, plus follow-up for every scenario.</p>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+    <button class="js-tab active" onclick="showJsTab('js-openers',this)" style="padding:8px 18px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:var(--blue-bg);color:var(--blue);">Openers</button>
+    <button class="js-tab" onclick="showJsTab('js-objections',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Objections</button>
+    <button class="js-tab" onclick="showJsTab('js-closes',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Closes</button>
+    <button class="js-tab" onclick="showJsTab('js-followup',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Follow-up</button>
+    <button class="js-tab" onclick="showJsTab('js-nurture',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Nurture</button>
+  </div>
+
+  <!-- JS OPENERS -->
+  <div id="js-openers" class="js-track">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:22px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">The 7-second framework — what research says</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="font-size:12.5px;color:var(--text2);line-height:1.6;"><span style="font-weight:600;color:var(--text);">0–1s</span> — Use their name correctly</div>
+        <div style="font-size:12.5px;color:var(--text2);line-height:1.6;"><span style="font-weight:600;color:var(--text);">1–3s</span> — Gently acknowledge it's out of the blue</div>
+        <div style="font-size:12.5px;color:var(--text2);line-height:1.6;"><span style="font-weight:600;color:var(--text);">3–5s</span> — Give them a reason to listen</div>
+        <div style="font-size:12.5px;color:var(--text2);line-height:1.6;"><span style="font-weight:600;color:var(--text);">5–7s</span> — Connect to their specific world</div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">Source: Gong analysis of 300M+ calls · Cold Call Genius framework · Cialdini's Pre-Suasion principles</div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">1 — The warm reach-out</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;"><span style="font-size:11px;background:var(--danger-bg);color:var(--danger);border-radius:4px;padding:2px 8px;font-weight:500;">🔬 11.18% success rate</span><span style="font-size:11px;background:var(--green-bg);color:var(--green);border-radius:4px;padding:2px 8px;font-weight:500;">Best all-round opener</span></div>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], it's Declan here — I'm one of the local agents around [suburb]. We haven't met, so I'll keep this genuine and quick. I just helped some of your neighbours sell their place on [street], and I'm personally letting a few people nearby know how it went before word gets around. Is now an okay moment for a quick one?"</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> Naming that you haven't met — warmly, not apologetically — builds instant honesty and likeability (Cialdini's liking principle) without the defensiveness of announcing "a cold call." Framing it as letting them know "before word gets around" makes the call feel like a favour, and the soft "is now okay?" earns a small yes (micro-commitment) rather than forcing a pitch. A tracked study found ~30% of prospects stayed past 30 seconds with a genuine, permission-led opener vs 14% for a standard pitch.</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Cialdini — liking (genuine honesty)</span><span class="tag">Favour framing</span><span class="tag">Micro-commitment ask</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">2 — The curiosity gap</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;"><span style="font-size:11px;background:var(--purple-bg);color:var(--purple);border-radius:4px;padding:2px 8px;font-weight:500;">🧠 Open loop psychology</span><span style="font-size:11px;background:var(--green-bg);color:var(--green);border-radius:4px;padding:2px 8px;font-weight:500;">Best for engaged streets</span></div>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], it's Declan — I'm a local agent here in [suburb]. I won't keep you long, but something just happened on your street that I reckon you'd genuinely want to know about. Have you got thirty seconds for me to explain?"</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> Telling them there's something worth knowing — without saying what yet — creates an "open loop" the brain is wired to want closed, so they stay on to hear it. Keeping it warm and specific to "your street" makes the curiosity feel personal rather than like a gimmick.</div>
+        <div style="margin-top:10px;font-size:13px;color:var(--text2);"><span style="font-weight:600;color:var(--text);">If they say yes:</span></div>
+        <div class="script-block" style="border-left-color:var(--purple);margin-top:6px;">"So [address] just sold — and the result was well above what most people in the street would have guessed. Based on that, your property is probably sitting at [range]. I can give you a more accurate number in about 20 minutes if you ever wanted to know."</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Open loop / curiosity gap</span><span class="tag">Warm + personal</span><span class="tag">Information gap theory</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">3 — Permission + context</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;"><span style="font-size:11px;background:var(--danger-bg);color:var(--danger);border-radius:4px;padding:2px 8px;font-weight:500;">🔬 11.24% — #1 by data</span></div>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], Declan here — I know you weren't expecting my call. I sold [address] just recently and I'm reaching out to a few of the neighbours directly. If it's not relevant, just say the word and I'll leave you to it. Worth 20 seconds?"</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> The permission ask creates a micro-commitment — once someone says "sure", they've psychologically opted in (self-determination theory). Offering a clean exit lowers resistance.</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Self-determination theory</span><span class="tag">Micro-commitment</span><span class="tag">Low exit friction</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">4 — Reciprocity + social proof</div>
+        <span style="font-size:11px;background:var(--teal-bg);color:var(--teal);border-radius:4px;padding:2px 8px;font-weight:500;">Best for warm streets</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], Declan here. I just sold [address] — went in [X days, $X above reserve] — and a couple of neighbours flagged me down in the street and asked what it meant for their place. I figured rather than let rumour do the work, I'd just call a few people directly and share the data. Takes two minutes and I'm not here to sell you anything today."</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> Leading with free data triggers Cialdini's reciprocity principle. Social proof from neighbours validates curiosity as a normal response. "Not here to sell you anything today" disarms resistance before it forms.</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Cialdini — reciprocity</span><span class="tag">Cialdini — social proof</span><span class="tag">Pre-suasion — disarm first</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">5 — The loss aversion hook</div>
+        <span style="font-size:11px;background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:2px 8px;font-weight:500;">⚡ Most powerful trigger</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], Declan here — quick one. I've got a buyer who missed out on [address] last week and they're still in the market specifically for [suburb]. I don't want to assume, but I'd feel bad not at least asking — is selling something that's ever crossed your mind? Even down the track?"</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> People feel the pain of missing out roughly twice as strongly as gaining something equivalent (Kahneman). "I'd feel bad not asking" shifts the dynamic — it's now them potentially missing out if they say no too quickly.</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Loss aversion — Kahneman</span><span class="tag">Cialdini — scarcity</span><span class="tag">FOMO trigger</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">6 — The unity / in-group opener</div>
+        <span style="font-size:11px;background:var(--purple-bg);color:var(--purple);border-radius:4px;padding:2px 8px;font-weight:500;">🤝 Cialdini's 7th principle</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], Declan here. I've been working in [suburb] for a while now and I like to personally call the street after every sale — I'd rather people hear the result from me than read some generic flyer in the letterbox. You're a [suburb] local, so I wanted to make sure you had the actual number."</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> People are far more influenced by those they see as part of their community. Positioning yourself as the local agent activates in-group belonging. "You're a local" makes them feel seen, not targeted.</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Cialdini — unity</span><span class="tag">Community identity</span><span class="tag">Anti-pitch positioning</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">7 — The XYZ data opener</div>
+        <span style="font-size:11px;background:var(--teal-bg);color:var(--teal);border-radius:4px;padding:2px 8px;font-weight:500;">Situation → Action → Result</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], Declan here. Quick one — the market in [suburb] has been moving fast: [X homes sold in 60 days, median up X%]. I just sold [address] — ran a full campaign, had [X] buyer groups through, ended up with competing offers. Sold in [X days] for [result]. I'm calling the neighbours because that result affects your value too, and I've got a few buyers still looking. Worth 20 minutes to find out what your place is sitting at?"</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> Specific numbers are nearly impossible to ignore. Vague claims like "the market's hot" lose people — but "sold in 9 days, 4% above asking" creates instant authority and FOMO. Pull your actual data before each session.</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">XYZ — situation action result</span><span class="tag">Authority via specifics</span><span class="tag">Data-led credibility</span></div>
+      </div>
+    </div>
+
+    <div style="background:var(--danger-soft);border:1px solid var(--danger-border);border-radius:10px;padding:14px 16px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--danger);margin-bottom:10px;">❌ Never open with these</div>
+      <div style="display:grid;gap:8px;">
+        <div style="font-size:13px;color:var(--text2);"><span style="font-weight:600;color:var(--danger);">"Did I catch you at a bad time?"</span> — Gong data: drops success by 40%. Invites a "yes" that ends the call.</div>
+        <div style="font-size:13px;color:var(--text2);"><span style="font-weight:600;color:var(--danger);">"How are you today?"</span> — Screams script. Brain enters "polite rejection mode" immediately.</div>
+        <div style="font-size:13px;color:var(--text2);"><span style="font-weight:600;color:var(--danger);">"I just wanted to quickly..."</span> — Signals you know you're unwanted. Kills authority instantly.</div>
+        <div style="font-size:13px;color:var(--text2);"><span style="font-weight:600;color:var(--danger);">"I'm calling about your property..."</span> — Telegraphs the pitch. Brain closes before the sentence finishes.</div>
+      </div>
+    </div>
+    <div class="tip-box"><strong>Timing:</strong> Wed &amp; Thu outperform all other days. Best windows 8–9 AM and 4–5 PM — lifts connect rates by 40–70% over midday.</div>
+  </div>
+
+  <!-- JS OBJECTIONS -->
+  <div id="js-objections" class="js-track" style="display:none;">
+    <div class="objection-item" style="padding-top:0;border-top:none;">
+      <div class="objection-q">"We're not interested in selling."</div>
+      <div class="objection-a">"Not interested in selling? Completely fine — I'm not here to push anything. I actually just wanted to share what [address] sold for while it's relevant. Would you be curious to know what that sale means for the value of your place?"</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"We already have an agent."</div>
+      <div class="objection-a">"You've got someone you work with — that's great. I'm not looking to step on toes. I did want to mention we had some buyers from that last sale who didn't get across the line. Would it be worth knowing who those buyers are, just in case?"</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"This isn't a good time."</div>
+      <div class="objection-a">"Not a good time — I hear you. Can I just leave you with this: I'll send through what [address] sold for and a rough street comparison by text. No follow-up unless you want it. What's the best mobile for you?"</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"How did you get my number?"</div>
+      <div class="objection-a">"Fair question — it's from the public property register. I call the streets I've sold in to keep neighbours in the loop. I can remove you from my list if you prefer — no hard feelings."</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"Just send me something in the mail."</div>
+      <div class="objection-a">"Happy to. I'll include the recent comparable sales so it's actually useful. What's the best address?"</div>
+    </div>
+    <div class="tip-box"><strong>Mirroring (Chris Voss):</strong> Repeat their last 2–3 words back as a question. "Not interested?" Gets them talking instead of shutting down.</div>
+  </div>
+
+  <!-- JS CLOSES -->
+  <div id="js-closes" class="js-track" style="display:none;">
+    <div class="script-label">Soft assumptive close</div>
+    <div class="script-block">"Look, I'm in [suburb] this week anyway — it'd take me 20 minutes to walk through and give you a rough number on what your place would sell for right now. Would Tuesday morning or Wednesday afternoon suit you better?"</div>
+    <div class="script-label">Alternative close (if hesitant)</div>
+    <div class="script-block">"Even if you're not thinking of selling, having a current figure is useful — for insurance, planning, whatever. No cost, no obligation. Which works better, early or later in the week?"</div>
+    <div class="script-label">The text close (low-commitment exit)</div>
+    <div class="script-block">"No worries at all — can I send you the recent sold data for your street by text? Just so you've got it. What's the best mobile?"</div>
+    <div class="tags"><span class="tag">Assumptive close</span><span class="tag">Either/or — removes 'no'</span><span class="tag">Low-commitment text exit</span></div>
+    <div class="tip-box"><strong>Data point:</strong> 80% of sales happen after the 5th contact. Most agents give up after 2. The text close keeps the door open.</div>
+  </div>
+
+  <!-- JS FOLLOW-UP -->
+  <div id="js-followup" class="js-track" style="display:none;">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches what happened on the call. Each one is a ready-made sequence of calls and texts.</div>
+
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+      <button class="jsf-tab active" onclick="showJsfTab('jsf-noanswer',this)" style="padding:7px 14px;border-radius:20px;border:none;cursor:pointer;font-size:12.5px;font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">📵 No answer</button>
+      <button class="jsf-tab" onclick="showJsfTab('jsf-interested',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">👍 Answered — interested</button>
+      <button class="jsf-tab" onclick="showJsfTab('jsf-notinterested',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">👋 Answered — not interested</button>
+    </div>
+
+    <!-- NO ANSWER -->
+    <div id="jsf-noanswer" class="jsf-track">
+      <div style="background:var(--surface2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;">They didn't pick up. Alternate voicemail + SMS with text-only touches. Five attempts over 12 days — most agents stop at two.</div>
+      <div class="seq-item">
+        <div class="seq-day">Day 1</div>
+        <div class="seq-content">
+          <h4>Voicemail + SMS</h4>
+          <div class="sms-label">Voicemail</div>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], it's Declan — I'm a local agent in [suburb]. I just helped your neighbours on [street] sell and wanted to share how it went, as it's good news for the area. Give me a call back when you get a sec on [number] — that's [number]. Cheers, [Name]."</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
+          <div class="sms-bubble">Hi [Name], Declan here — just left you a quick voicemail 😊 Just helped your neighbours on [street] sell and had a result worth sharing. Happy to chat whenever suits 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 3</div>
+        <div class="seq-content">
+          <h4>SMS only — give value</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. In case it's handy — [address] just sold for [$X / X% above reserve] in [X days]. Based on that, places like yours in [suburb] are sitting around [price range]. No need to reply — just thought you'd want to know 😊</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 6</div>
+        <div class="seq-content">
+          <h4>Voicemail + SMS</h4>
+          <div class="sms-label">Voicemail</div>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan again — no stress at all, just wanted to put a friendly voice to the texts. If you'd ever like a quick, no-obligation idea of what your place is worth, I'm happy to help. [number] whenever suits."</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
+          <div class="sms-bubble">Hi [Name], Declan here — left you another quick voicemail 😊 No pressure at all. Just here if you ever want a chat about the street or your place. 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 9</div>
+        <div class="seq-content">
+          <h4>SMS only — soft check in</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. Just checking in — happy to answer anything about the [suburb] market or what your place might be worth. No rush at all 😊</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 12</div>
+        <div class="seq-content">
+          <h4>Final SMS — hand to nurture</h4>
+          <div class="sms-bubble">Hi [Name], Declan here — I won't keep pestering you 😊 If you ever think about selling, even down the track, I'd love to be the first you call. I'll drop you the odd [suburb] market update so you stay in the loop. Happy to stop anytime — just say the word 👍</div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>The long game:</strong> 80% of listings come after the 5th contact — most agents quit after 2. After Day 12, move them into the COLD nurture track.</div>
+    </div>
+
+    <!-- ANSWERED — INTERESTED -->
+    <div id="jsf-interested" class="jsf-track" style="display:none;">
+      <div style="background:var(--green-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:14px;line-height:1.6;"><strong>They picked up and were warm</strong> — keen to know their value, open to an appraisal, or said "maybe". Move steadily toward booking the appraisal.</div>
+      <div class="seq-item">
+        <div class="seq-day">Same day</div>
+        <div class="seq-content">
+          <h4>Recap SMS — confirm the next step</h4>
+          <div class="sms-bubble">Hi [Name], great chatting just now 😊 As promised I'll [send the sold figures / lock in a time to swing past]. Really no obligation at all — just want you to have a clear picture. Talk soon! — Declan</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 1</div>
+        <div class="seq-content">
+          <h4>SMS — deliver the data you promised</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. Here's that result: [address] sold for [$X] in [X days]. For a place like yours I'd estimate roughly [range] — though I'd give you a sharper number in person. Want me to pop by this week? 😊</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 3</div>
+        <div class="seq-content">
+          <h4>Call — lock in the appraisal</h4>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan here — just following up on my text. I'm in [suburb] this week anyway, so it'd be easy to swing past and give you an accurate figure. Would Tuesday morning or Wednesday afternoon suit better?"</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS if no answer</div>
+          <div class="sms-bubble">Hi [Name], Declan here — tried to give you a quick call 😊 Happy to pop past this week for that no-obligation figure. Which works better — Tues morning or Weds arvo? 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day before appraisal</div>
+        <div class="seq-content">
+          <h4>SMS — confirm the appointment</h4>
+          <div class="sms-bubble">Hi [Name], Declan here — looking forward to seeing you tomorrow at [time] 😊 I'll bring the recent [street] sales so you've got the full picture. See you then! 👍</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">After appraisal</div>
+        <div class="seq-content">
+          <h4>SMS — thank you + soft next step</h4>
+          <div class="sms-bubble">Hi [Name], great to meet you today and thanks for your time 😊 I'll send through everything we discussed. No rush on anything — whenever you're ready to take the next step, I'm here and happy to help. — Declan</div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>Tip:</strong> Always leave with a concrete next step before you hang up the first call. A booked time converts far better than "I'll think about it" — and the day-before text dramatically cuts no-shows.</div>
+    </div>
+
+    <!-- ANSWERED — NOT INTERESTED -->
+    <div id="jsf-notinterested" class="jsf-track" style="display:none;">
+      <div style="background:var(--danger-soft);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--danger);margin-bottom:14px;line-height:1.6;"><strong>They picked up but weren't interested</strong> — "not selling", "happy here", "not right now". Stay gracious, give value, leave the door wide open. No pushing.</div>
+      <div class="seq-item">
+        <div class="seq-day">Same day</div>
+        <div class="seq-content">
+          <h4>Gracious SMS — send the data anyway</h4>
+          <div class="sms-bubble">Hi [Name], thanks for taking my call 😊 Totally understand it's not the right time. In case it's ever handy: [address] sold for [$X] in [X days]. No need to reply — just wanted you to have it. All the best! — Declan</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 7</div>
+        <div class="seq-content">
+          <h4>SMS — light value, zero pressure</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. No agenda at all — just thought you'd like to know the [suburb] market's been [trending well / very active] lately. Happy to keep you posted now and then if that's useful. Hope you're well! 👋</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 30</div>
+        <div class="seq-content">
+          <h4>SMS — permission to stay in touch → nurture</h4>
+          <div class="sms-bubble">Hi [Name], Declan here 😊 I won't crowd your inbox — would it be alright if I sent the occasional [suburb] update so you've always got the numbers if anything ever changes? Totally fine to say no 👍</div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>Tip:</strong> A "no" today is rarely a "no" forever. The agent who stays warm and useful without pushing is the one they call when life changes. From here, move them into the WARM or COLD nurture track.</div>
+    </div>
+  </div>
+
+  <!-- JS NURTURE -->
+  <div id="js-nurture" class="js-track" style="display:none;">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">For anyone who didn't convert in the 12-day sequence. No pressure, no agenda — just staying warm so you're the first name they think of when the time comes. Pick the track that matches their temperature.</div>
+
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+      <button class="jsn-tab active" onclick="showJsnTab('jsn-hot',this)" style="padding:7px 14px;border-radius:20px;border:none;cursor:pointer;font-size:12.5px;font-weight:600;background:var(--danger-bg);color:var(--danger);">🔥 HOT</button>
+      <button class="jsn-tab" onclick="showJsnTab('jsn-warm',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">🌤 WARM</button>
+      <button class="jsn-tab" onclick="showJsnTab('jsn-cold',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">🧊 COLD</button>
+    </div>
+
+    <div id="jsn-hot" class="jsn-track">
+      <div style="background:var(--danger-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--hot-strong);margin-bottom:14px;line-height:1.6;"><strong>HOT</strong> — showed clear interest, said "good timing", "maybe", or asked questions. Move fast.</div>
+      <div class="sms-label">SMS 1 — same day</div>
+      <div class="sms-bubble">Hey [Name]! Really glad we connected 😊 Would it be worth catching up for 20 mins this week so I can give you a proper picture of what your place is worth right now? Totally no obligation. What does your week look like?</div>
+      <div class="sms-label" style="margin-top:12px;">SMS 2 — 24hrs no reply</div>
+      <div class="sms-bubble">Hi [Name], Declan here — just following up 😊 Happy to work around you completely — even a quick call over lunch works. Let me know what suits!</div>
+      <div class="sms-label" style="margin-top:12px;">SMS 3 — Day 3, add urgency</div>
+      <div class="sms-bubble">Hey [Name], one of the buyers from [suburb] is still looking and hasn't found anything yet. If the timing worked for you it could be a really smooth process. Worth a quick 10 min call? 🙏</div>
+      <div class="tip-box"><strong>HOT tip:</strong> Speed is everything. A hot lead that doesn't hear back within hours cools fast. Send SMS 1 within the hour.</div>
+    </div>
+
+    <div id="jsn-warm" class="jsn-track" style="display:none;">
+      <div style="background:var(--warm-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--warm);margin-bottom:14px;line-height:1.6;"><strong>WARM</strong> — said "maybe down the track", "not right now", "possibly next year". Not a no — needs time and gentle presence.</div>
+      <div class="sms-label">Month 1 — low pressure value</div>
+      <div class="sms-bubble">Hi [Name], Declan here — no rush on anything at all, just wanted to send a quick snapshot of what's been selling in [suburb] lately in case it's useful. The market's tracking really well. Here whenever you want to chat!</div>
+      <div class="sms-label" style="margin-top:12px;">Month 2 — market update</div>
+      <div class="sms-bubble">Hey [Name]! Declan here. Just had another sale in [suburb] — [result]. Thought of you and figured you'd want to know. Hope things are going well 😊</div>
+      <div class="sms-label" style="margin-top:12px;">Month 3 — check in with question</div>
+      <div class="sms-bubble">Hi [Name], Declan. Has anything changed, or are you still thinking more towards [timeframe]? Either way totally fine — just like to stay in touch 😊</div>
+      <div class="sms-label" style="margin-top:12px;">Month 6 — seasonal touch</div>
+      <div class="sms-bubble">Hey [Name]! Hope you've had a great [season]. [suburb] market is looking really interesting heading into [upcoming season] — if you want the latest numbers just say the word. Hope everything's going well!</div>
+      <div class="tip-box"><strong>WARM tip:</strong> Stay present with something useful every 3–4 weeks. Going quiet then reappearing with a pitch is the biggest mistake agents make.</div>
+    </div>
+
+    <div id="jsn-cold" class="jsn-track" style="display:none;">
+      <div style="background:var(--cold-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--cold);margin-bottom:14px;line-height:1.6;"><strong>COLD</strong> — no reply at all, or very disinterested. Space it out, keep it short, keep it warm. One day something will land at the right moment.</div>
+      <div class="sms-label">Month 1 — friendly re-intro</div>
+      <div class="sms-bubble">Hi [Name], Declan here — tried to reach you a while back about a sale in your street. No stress at all. I keep an eye on [suburb] and I'm always happy to chat if you want the latest. Hope you're well! 😊</div>
+      <div class="sms-label" style="margin-top:12px;">Month 2 — pure value, no ask</div>
+      <div class="sms-bubble">Hey [Name], Declan here. [address nearby] just sold for [result] — a really strong result for your street. No reply needed, just keeping you in the loop 👋</div>
+      <div class="sms-label" style="margin-top:12px;">Month 4 — ultra short check-in</div>
+      <div class="sms-bubble">Hey [Name]! Declan here — just a quick hi. Still keeping an eye on [suburb] for you. Here if you ever need anything 👍</div>
+      <div class="sms-label" style="margin-top:12px;">Month 9+ — quarterly keepalive</div>
+      <div class="sms-bubble">Hey [Name]! Declan here — quick quarterly hello 😄 [suburb] update: [one line stat]. Still here if you ever want a chat. Hope all's well!</div>
+      <div class="tip-box"><strong>COLD tip:</strong> Cold contacts often convert months or years later. You just need to be the agent who never disappeared.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== JUST LISTED ===================== -->
+<div id="listed" class="panel">
+  <div class="panel-header">
+    <div class="badge" style="background:var(--green-bg);color:var(--green)">Prospect method</div>
+    <h2>Just listed</h2>
+    <p>Call the 20–30 closest homes before the listing hits the portals. Neighbours often know a buyer — or become one. One of the easiest ways to generate your next appraisal for free.</p>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+    <button class="jl-tab active" onclick="showJlTab('jl-openers',this)" style="padding:8px 18px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:var(--green-bg);color:var(--green);">Openers</button>
+    <button class="jl-tab" onclick="showJlTab('jl-objections',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Objections</button>
+    <button class="jl-tab" onclick="showJlTab('jl-closes',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Closes</button>
+    <button class="jl-tab" onclick="showJlTab('jl-followup',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Follow-up</button>
+    <button class="jl-tab" onclick="showJlTab('jl-nurture',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Nurture</button>
+  </div>
+
+  <!-- JL OPENERS -->
+  <div id="jl-openers" class="jl-track">
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">1 — The exclusive heads up</div>
+        <span style="font-size:11px;background:var(--green-bg);color:var(--green);border-radius:4px;padding:2px 8px;font-weight:500;">Start here</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], it's Declan — I'm actually calling before this hits realestate.com.au. I've just listed [address] and I always give the neighbours a heads up first. Sometimes the best buyer for a home in a street is someone who already loves the area."</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> "Before it hits the portals" triggers exclusivity (Cialdini's scarcity) and positions you as doing them a favour. It reframes the call from a pitch to a privilege.</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Cialdini — scarcity</span><span class="tag">Exclusivity framing</span><span class="tag">Community positioning</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">2 — The referral ask</div>
+        <span style="font-size:11px;background:var(--purple-bg);color:var(--purple);border-radius:4px;padding:2px 8px;font-weight:500;">Best for finding buyers</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], Declan here. I've just listed [address] and before it goes public I like to call the street — do you have any family or friends who've been trying to get into [suburb]? I'd much rather place it with someone from the community than put it straight online."</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Referral angle — low pressure</span><span class="tag">Community framing</span><span class="tag">Liking — not about commission</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">3 — The double pivot</div>
+        <span style="font-size:11px;background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:2px 8px;font-weight:500;">Best for potential sellers</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], Declan here. I've just listed [address] — not on the market yet, going live soon. Two quick things: do you know anyone looking in [suburb]? And on your own end — have you ever thought about upsizing, downsizing, or a change of scenery? If the timing ever lined up, I could show you through before anyone else gets a look."</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Dual purpose — buyer + seller</span><span class="tag">Private preview — FOMO</span><span class="tag">Reciprocity — doing them a favour</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">4 — The neighbours-only preview invite</div>
+        <span style="font-size:11px;background:var(--danger-bg);color:var(--danger);border-radius:4px;padding:2px 8px;font-weight:500;">⚡ Highest engagement</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], Declan here. I've just listed [address] and I'm doing a neighbours-only preview the morning before the first open — just a private walk-through for people in the street before the public comes through. Would you like to come along? It's [day] at [time], completely informal."</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> In-person engagement converts far higher than a call. People who walk through may realise they want to sell. "Neighbours only" uses unity and exclusivity together.</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">In-person — highest conversion</span><span class="tag">Cialdini — unity + scarcity</span><span class="tag">Inner circle framing</span></div>
+      </div>
+    </div>
+    <div class="tip-box"><strong>Pro move:</strong> Call the morning before the first open, not a week out. Recency creates urgency. Always have a market update for their street ready — someone who came through out of curiosity will ask what their own place is worth on the way out.</div>
+  </div>
+
+  <!-- JL OBJECTIONS -->
+  <div id="jl-objections" class="jl-track" style="display:none;">
+    <div class="objection-item" style="padding-top:0;border-top:none;">
+      <div class="objection-q">"We're not interested in buying."</div>
+      <div class="objection-a">"Not looking to buy? Totally fine — I actually wanted to check if you knew anyone who might be. And just while I've got you — have you ever thought about what your own place might be worth in today's market? I can give you a rough figure, no obligation."</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"We're happy where we are."</div>
+      <div class="objection-a">"That's great to hear — honestly the best outcome. I just like to keep the neighbours in the loop when something comes up in the street. Would it be okay if I kept you on my list? That way if anything comes up before it hits the portals, you hear first."</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"Just put it online, we'll look there."</div>
+      <div class="objection-a">"Fair enough — it'll be up soon. I just wanted to give the street first dibs before it goes public. A lot of the time the best result comes from someone who already knows and loves the area. Either way, I'll make sure you're on the list."</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"We already have an agent."</div>
+      <div class="objection-a">"No worries at all — I'm not here about your place today. I just listed [address] and wanted to let the neighbours know before it went live. Is there anyone in your network who's been looking in [suburb]?"</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"How much is it listed for?"</div>
+      <div class="objection-a">"Great question — we're taking it to market at [price guide]. It's [brief description]. If you'd like to come through before the first open, I'm doing a quick neighbours preview on [day]. Want me to pencil you in?"</div>
+    </div>
+    <div class="tip-box"><strong>Tip:</strong> The price question is a buying signal. Always follow it with an invitation to the private preview.</div>
+  </div>
+
+  <!-- JL CLOSES -->
+  <div id="jl-closes" class="jl-track" style="display:none;">
+    <div class="script-label">Close 1 — list building</div>
+    <div class="script-block">"Either way — would it be alright if I kept you on my list for this street? That way if anything else comes up before it goes to market, you hear about it first. What's the best number to reach you on?"</div>
+    <div class="script-label">Close 2 — private preview invite</div>
+    <div class="script-block">"I'm doing a quick neighbours-only walk-through before the first open on [day] at [time]. Totally informal — would you like to come along? No obligation, just a chance to see it before the public does."</div>
+    <div class="script-label">Close 3 — seller pivot</div>
+    <div class="script-block">"On your end — I'm in the street this week anyway. It'd take me 20 minutes to give you a rough idea of what your place would sell for right now. No obligation. Would [day] or [day] work?"</div>
+    <div class="script-label">Close 4 — referral close</div>
+    <div class="script-block">"If you do think of anyone who might be interested, I'd really appreciate you passing on my number. What's the best way to send you the listing details?"</div>
+    <div class="tags"><span class="tag">List building</span><span class="tag">Private preview invite</span><span class="tag">Seller pivot</span><span class="tag">Referral close</span></div>
+    <div class="tip-box"><strong>Data point:</strong> Neighbours who attend a private preview are 3x more likely to refer a buyer than those who only receive a flyer.</div>
+  </div>
+
+  <!-- JL FOLLOW-UP -->
+  <div id="jl-followup" class="jl-track" style="display:none;">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches the call. The just-listed window is short — move fast.</div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+      <button class="jlf-tab active" onclick="showJsfTab('jlf-noanswer',this)" style="padding:7px 14px;border-radius:20px;cursor:pointer;font-size:12.5px;font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">📵 No answer</button>
+      <button class="jlf-tab" onclick="showJsfTab('jlf-interested',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">👍 Answered — interested</button>
+      <button class="jlf-tab" onclick="showJsfTab('jlf-notinterested',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">👋 Answered — not interested</button>
+    </div>
+
+    <div id="jlf-noanswer" class="jlf-track">
+      <div style="background:var(--surface2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;">They didn't pick up. Alternate voicemail + SMS with text-only touches around the open and the sale.</div>
+      <div class="seq-item">
+        <div class="seq-day">Day 1</div>
+        <div class="seq-content">
+          <h4>Voicemail + SMS</h4>
+          <div class="sms-label">Voicemail</div>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], it's Declan — I'm a local agent in [suburb]. I've just listed [address] and I always give the neighbours first look before it goes public. Give me a quick call on [number] — that's [number]. Cheers, [Name]."</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
+          <div class="sms-bubble">Hi [Name], Declan here — just left a voicemail 😊 Just listed [address] and giving the street first look before it goes online. Happy to chat whenever suits 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 2</div>
+        <div class="seq-content">
+          <h4>SMS — preview invite</h4>
+          <div class="sms-bubble">Hey [Name]! Declan here. I'm doing a quick neighbours-only walk-through of [address] on [day] at [time] before the public open. Would you like to come along? No obligation — just first dibs 😊</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 4</div>
+        <div class="seq-content">
+          <h4>Voicemail + SMS</h4>
+          <div class="sms-label">Voicemail</div>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan again — no stress at all. The first open at [address] is this weekend. If you or anyone you know might be interested, I'd love to get you in early. [number] whenever suits."</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
+          <div class="sms-bubble">Hi [Name], Declan here — left you another quick voicemail 😊 Open at [address] is this weekend. Happy to get you (or a friend) in early if that helps 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Post-open</div>
+        <div class="seq-content">
+          <h4>SMS — result update</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. We had [X] groups through the open at [address] — great interest in the street! If you ever want to know what your own place would fetch right now, I'm happy to give you a quick number. No obligation 😊</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Post-sale</div>
+        <div class="seq-content">
+          <h4>Final SMS — sold result → nurture</h4>
+          <div class="sms-bubble">Hi [Name]! Declan here — great news, [address] just sold for [result]. Really strong outcome for the street 💪 If you'd like to know what that means for your place, happy to chat anytime.</div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>The long game:</strong> People who brushed you off on the first call often re-engage when they see a strong result land. After the sale, move them into the WARM or COLD nurture track.</div>
+    </div>
+
+    <div id="jlf-interested" class="jlf-track" style="display:none;">
+      <div style="background:var(--green-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:14px;line-height:1.6;"><strong>They picked up and were warm</strong> — want a look, know a buyer, or are curious about their own value. Get them to the preview, then pivot to their place.</div>
+      <div class="seq-item">
+        <div class="seq-day">Same day</div>
+        <div class="seq-content">
+          <h4>Recap SMS — confirm next step</h4>
+          <div class="sms-bubble">Hi [Name], great chatting just now 😊 As promised I'll [send the listing details / lock in the preview]. Looking forward to it — talk soon! — Declan</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 1</div>
+        <div class="seq-content">
+          <h4>SMS — preview invite with time</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. The neighbours-only preview of [address] is [day] at [time]. I'll have you on the list — does that time still work? Happy to send the listing details through too 😊</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 2</div>
+        <div class="seq-content">
+          <h4>Call — confirm / qualify their buyer</h4>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan here — just confirming you're right for the preview on [day]. And if that family member or friend you mentioned is keen, I'm happy to line them up too. What are they after?"</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS if no answer</div>
+          <div class="sms-bubble">Hi [Name], Declan here — tried you just now 😊 Just confirming the preview on [day] at [time], and happy to line up anyone you know who's looking. See you there? 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Post-open</div>
+        <div class="seq-content">
+          <h4>SMS — result + soft pivot</h4>
+          <div class="sms-bubble">Hi [Name], thanks for coming through [address]! Big interest on the day. By the way — if you're ever curious what your own place would go for in this market, I'd be glad to give you a no-obligation figure 😊</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Post-sale</div>
+        <div class="seq-content">
+          <h4>SMS — sold result + appraisal offer</h4>
+          <div class="sms-bubble">Hi [Name]! [address] just sold for [result] 💪 A great sign for your street. If you'd like, I can pop by and give you an accurate figure on your place — no obligation at all. Would [day] suit?</div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>Tip:</strong> Get them physically to the preview — people who walk through are far more likely to refer a buyer or realise they'd like to sell themselves.</div>
+    </div>
+
+    <div id="jlf-notinterested" class="jlf-track" style="display:none;">
+      <div style="background:var(--danger-soft);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--danger);margin-bottom:14px;line-height:1.6;"><strong>They picked up but weren't interested</strong> — not buying, happy where they are. Stay gracious, get them on the list, share the result later.</div>
+      <div class="seq-item">
+        <div class="seq-day">Same day</div>
+        <div class="seq-content">
+          <h4>Gracious SMS — get them on the list</h4>
+          <div class="sms-bubble">Hi [Name], thanks for taking my call 😊 All good — I'll just keep you in the loop on the street. If anything comes up before it hits the portals, you'll hear first. All the best! — Declan</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Post-sale</div>
+        <div class="seq-content">
+          <h4>SMS — share the result, no pressure</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. Just so you've got it — [address] sold for [result]. A strong outcome for [street]. No need to reply, just keeping you posted 👋</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 30</div>
+        <div class="seq-content">
+          <h4>SMS — permission → nurture</h4>
+          <div class="sms-bubble">Hi [Name], Declan here 😊 Would it be alright if I sent the occasional [suburb] update so you've always got the numbers if anything ever changes? Totally fine to say no 👍</div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>Tip:</strong> A neighbour who said no today is still your warmest future listing on that street. From here, move them into the WARM or COLD nurture track.</div>
+    </div>
+  </div>
+
+  <!-- JL NURTURE -->
+  <div id="jl-nurture" class="jl-track" style="display:none;">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">For neighbours who didn't convert. They've seen your signs and know your name — keep them warm and you're the obvious call when the time comes. Pick the track that matches their temperature.</div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+      <button class="jln-tab active" onclick="showJsnTab('jln-hot',this)" style="padding:7px 14px;border-radius:20px;border:none;cursor:pointer;font-size:12.5px;font-weight:600;background:var(--danger-bg);color:var(--danger);">🔥 HOT</button>
+      <button class="jln-tab" onclick="showJsnTab('jln-warm',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">🌤 WARM</button>
+      <button class="jln-tab" onclick="showJsnTab('jln-cold',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">🧊 COLD</button>
+    </div>
+
+    <div id="jln-hot" class="jln-track">
+      <div style="background:var(--danger-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--hot-strong);margin-bottom:14px;line-height:1.6;"><strong>HOT</strong> — keen to know their value, asked about selling, or loved the preview. Move fast.</div>
+    <div class="script-label">SMS 1 — same day</div>
+    <div class="sms-bubble">Hey [Name]! Really glad we connected at [address] 😊 Would it be worth 20 mins this week for me to give you a proper figure on your own place? No obligation at all — what does your week look like?</div>
+    <div class="script-label" style="margin-top:14px;">SMS 2 — 24hrs no reply</div>
+    <div class="sms-bubble">Hi [Name], Declan here — just following up 😊 Happy to work around you — even a quick call over lunch works. Let me know what suits!</div>
+    <div class="script-label" style="margin-top:14px;">SMS 3 — Day 3, buyer angle</div>
+    <div class="sms-bubble">Hey [Name], a couple of the buyers chasing [street] missed out on [address]. If the timing ever worked for you, it could be a really smooth sale. Worth a quick 10 min chat? 🙏</div>
+      <div class="tip-box"><strong>HOT tip:</strong> Speed wins. Send SMS 1 within the hour while the preview/sale is fresh in their mind.</div>
+    </div>
+
+    <div id="jln-warm" class="jln-track" style="display:none;">
+      <div style="background:var(--warm-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--warm);margin-bottom:14px;line-height:1.6;"><strong>WARM</strong> — "maybe down the track", "not right now". Stay present and useful, no pressure.</div>
+    <div class="script-label">Month 1 — low-pressure value</div>
+    <div class="sms-bubble">Hi [Name], Declan here — no rush on anything, just a quick snapshot of what's been selling around [suburb] in case it's handy. Market's tracking really well. Here whenever you want to chat!</div>
+    <div class="script-label" style="margin-top:14px;">Month 2 — market update</div>
+    <div class="sms-bubble">Hey [Name]! Another sale in [suburb] just went through — [result]. Thought of you and figured you'd want to know. Hope things are going well 😊</div>
+    <div class="script-label" style="margin-top:14px;">Month 3 — check in with a question</div>
+    <div class="sms-bubble">Hi [Name], Declan. Has anything changed, or are you still thinking more towards [timeframe]? Either way totally fine — just like to stay in touch 😊</div>
+    <div class="script-label" style="margin-top:14px;">Month 6 — seasonal touch</div>
+    <div class="sms-bubble">Hey [Name]! Hope you've had a great [season]. [suburb] is looking really interesting heading into [upcoming season] — say the word if you'd like the latest numbers. Hope all's well!</div>
+      <div class="tip-box"><strong>WARM tip:</strong> Something useful every 3–4 weeks. Going quiet then reappearing with a pitch is the biggest mistake agents make.</div>
+    </div>
+
+    <div id="jln-cold" class="jln-track" style="display:none;">
+      <div style="background:var(--cold-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--cold);margin-bottom:14px;line-height:1.6;"><strong>COLD</strong> — no reply, or clearly not now. Space it out, keep it short and warm.</div>
+    <div class="script-label">Month 1 — friendly re-intro</div>
+    <div class="sms-bubble">Hi [Name], Declan here — I listed and sold [address] on your street a while back. No stress at all, just keeping an eye on [suburb] and happy to help if you ever want the latest. Hope you're well! 😊</div>
+    <div class="script-label" style="margin-top:14px;">Month 2 — pure value, no ask</div>
+    <div class="sms-bubble">Hey [Name], Declan here. [address nearby] just sold for [result] — a really strong result for your street. No reply needed, just keeping you in the loop 👋</div>
+    <div class="script-label" style="margin-top:14px;">Month 4 — ultra short check-in</div>
+    <div class="sms-bubble">Hey [Name]! Declan here — quick hi. Still keeping an eye on [suburb] for you. Here if you ever need anything 👍</div>
+    <div class="script-label" style="margin-top:14px;">Month 9+ — quarterly keepalive</div>
+    <div class="sms-bubble">Hey [Name]! Declan here — quick quarterly hello 😄 [suburb] update: [one line stat]. Still here whenever you want a chat. Hope all's well!</div>
+      <div class="tip-box"><strong>COLD tip:</strong> Cold neighbours convert months or years later. Be the agent who never disappeared.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== BUYER DATABASE ===================== -->
+<div id="buyerdb" class="panel">
+  <div class="panel-header">
+    <div class="badge" style="background:var(--teal-bg);color:var(--teal)">Prospect method</div>
+    <h2>Buyer database</h2>
+    <p>People who registered at your opens 1–5+ years ago. You have no idea if they bought, rented, or are still looking. Diagnose first, pitch second.</p>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+    <button class="bd-tab active" onclick="showBdTab('bd-openers',this)" style="padding:8px 18px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:var(--teal-bg);color:var(--teal);">Openers</button>
+    <button class="bd-tab" onclick="showBdTab('bd-objections',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Objections</button>
+    <button class="bd-tab" onclick="showBdTab('bd-closes',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Closes</button>
+    <button class="bd-tab" onclick="showBdTab('bd-followup',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Follow-up</button>
+    <button class="bd-tab" onclick="showBdTab('bd-nurture',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Nurture</button>
+  </div>
+
+  <!-- BD OPENERS -->
+  <div id="bd-openers" class="bd-track">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Diagnose before you pitch</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;">You have zero context. Their answer to the first question tells you everything. Branch to the right script from there.</p>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">The diagnostic opener — use every time</div>
+        <span style="font-size:11px;background:var(--green-bg);color:var(--green);border-radius:4px;padding:2px 8px;font-weight:500;">Start here</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], it's Declan here — I know this might be a little out of the blue. You came through one of my open homes in [suburb] a while back, and I just wanted to touch base and see how things ended up for you. Did you manage to find something in the area, or is the search still ongoing?"</div>
+        <div style="background:var(--blue-bg);border-radius:8px;padding:10px 14px;margin-top:12px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--blue);margin-bottom:6px;">Branch guide</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:6px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">"Yes, we bought"</span> → Branch A below</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:6px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">"Still looking"</span> → Branch B below</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;"><span style="font-weight:600;color:var(--text);">"Gave up / staying put"</span> → Branch C below</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;"><div style="font-size:13px;font-weight:600;color:var(--text);">Branch A — "Yes we bought" → Seller pivot</div></div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Oh that's great — whereabouts did you end up? ... Nice. How have you found it? ... That's really good to hear. I ask because the market around there has been moving really well lately. Sometimes once people settle in and life moves on, the idea of upsizing or moving on comes up again. Is that something that's crossed your mind at all, even down the track?"</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Cialdini — liking</span><span class="tag">Soft pivot</span><span class="tag">Open question</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;"><div style="font-size:13px;font-weight:600;color:var(--text);">Branch B — "Still looking" → Re-engage buyer</div></div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Oh really — still on the hunt? That's actually why I'm calling. The [suburb] market has shifted quite a bit and I've had a couple of properties come through recently that didn't even make it to realestate.com.au. What's changed for you in terms of what you're looking for?"</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Exclusivity — off-market</span><span class="tag">Re-qualify</span><span class="tag">Reciprocity</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;"><div style="font-size:13px;font-weight:600;color:var(--text);">Branch C — "Gave up / staying put" → Life events re-open</div></div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Oh totally understandable — the market's been a lot. I just wanted to check in because things have actually changed quite a bit since [year]. Has anything shifted for you since then — family, work, space? Sometimes the reason people were looking comes back around in a different way."</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Empathy first</span><span class="tag">Life events trigger</span><span class="tag">No pressure re-open</span></div>
+      </div>
+    </div>
+    <div class="tip-box"><strong>Data point:</strong> 68% of real estate agents report receiving successful follow-up after cold calling past open home attendees. The diagnostic first question is what most agents skip.</div>
+  </div>
+
+  <!-- BD OBJECTIONS -->
+  <div id="bd-objections" class="bd-track" style="display:none;">
+    <div class="objection-item" style="padding-top:0;border-top:none;">
+      <div class="objection-q">"I don't remember coming to your open."</div>
+      <div class="objection-a">"No worries at all — it was a while back. I keep all my open home registrations so I can stay in touch with people who were interested in the area. You had a look at [suburb] — I just wanted to check in and see if your situation had changed."</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"We're happy where we are."</div>
+      <div class="objection-a">"That's great to hear — honestly that's the best outcome. I just like to check in with people I've met, especially when the market in your area is doing something interesting. Would it be alright if I sent through a quick market update every now and then? Completely no-obligation."</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"We're working with another agent."</div>
+      <div class="objection-a">"Absolutely, I wouldn't dream of stepping on that. I just wanted to reconnect and say hi. If anything ever changes or you want a second opinion on the market, I'm always happy to help."</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"We bought years ago, why are you calling now?"</div>
+      <div class="objection-a">"Fair question — I keep in touch with people I've met in the market because sometimes the next chapter comes around sooner than expected. Just wanted to check in and see how things were going. No agenda at all."</div>
+    </div>
+    <div class="tip-box"><strong>Tone tip:</strong> These calls feel more like a genuine check-in than a cold pitch — because they are. Lead with warmth and you'll disarm 80% of resistance before it starts.</div>
+  </div>
+
+  <!-- BD CLOSES -->
+  <div id="bd-closes" class="bd-track" style="display:none;">
+    <div class="script-label">Close 1 — appraisal for the buyer who bought</div>
+    <div class="script-block">"You've been in the property a couple of years now — it'd be interesting to know what it's worth today compared to what you paid. I can give you a rough number in 20 minutes, no cost, no obligation. Would that be useful? I'm in [suburb] this week."</div>
+    <div class="script-label">Close 2 — off-market match for the buyer still looking</div>
+    <div class="script-block">"I've got a couple of properties that haven't gone to market yet and won't for a few weeks. If they're in the right range for you, I'd rather call you first than put them online. Can I send you through the details?"</div>
+    <div class="script-label">Close 3 — market update for long-term nurture</div>
+    <div class="script-block">"Can I drop you a market update for [suburb] every quarter by text? It's just a quick summary of what's sold and what things are worth. That way if the idea ever comes up again, you've already got the data. What's the best mobile?"</div>
+    <div class="script-label">Close 4 — straight appraisal ask</div>
+    <div class="script-block">"Would it be worth 20 minutes for me to come through and give you an accurate figure on what your place would sell for today? No pitch, no pressure. I'd just like to put a number in front of you and let you decide what to do with it."</div>
+    <div class="tags"><span class="tag">Assumptive but low pressure</span><span class="tag">Off-market exclusivity</span><span class="tag">Text close — long game</span></div>
+  </div>
+
+  <!-- BD FOLLOW-UP -->
+  <div id="bd-followup" class="bd-track" style="display:none;">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches the call. Always lead with value, never a pitch.</div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+      <button class="bdf-tab active" onclick="showJsfTab('bdf-noanswer',this)" style="padding:7px 14px;border-radius:20px;cursor:pointer;font-size:12.5px;font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">📵 No answer</button>
+      <button class="bdf-tab" onclick="showJsfTab('bdf-interested',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">👍 Answered — interested</button>
+      <button class="bdf-tab" onclick="showJsfTab('bdf-notinterested',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">👋 Answered — not interested</button>
+    </div>
+
+    <div id="bdf-noanswer" class="bdf-track">
+      <div style="background:var(--surface2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;">They didn't pick up. Alternate voicemail + SMS with value touches over two weeks.</div>
+      <div class="seq-item">
+        <div class="seq-day">Day 1</div>
+        <div class="seq-content">
+          <h4>Voicemail + SMS</h4>
+          <div class="sms-label">Voicemail</div>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], it's Declan — you came through one of my open homes in [suburb] a while back, and I just wanted to check in and see how your search ended up. Give me a call when you get a sec on [number] — that's [number]. Cheers."</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
+          <div class="sms-bubble">Hi [Name], Declan here — just left a voicemail 😊 You looked through [suburb] with me a while back; just checking in to see how things ended up. No rush at all 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 4</div>
+        <div class="seq-content">
+          <h4>SMS — give value</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. In case it's handy — [suburb] has shifted a fair bit since you were looking: [Recent sale 1], [Recent sale 2], median now around [X]. No need to reply, just thought you'd want to know 😊</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 8</div>
+        <div class="seq-content">
+          <h4>Voicemail + SMS</h4>
+          <div class="sms-label">Voicemail</div>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan again — no stress at all. I've actually had a couple of places come up that didn't make it online. If you're still keeping an eye on [suburb], I'd be happy to share them. [number] whenever suits."</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
+          <div class="sms-bubble">Hi [Name], Declan here — left you another quick voicemail 😊 Had a couple of off-market places in [suburb] I thought of you for. Happy to share anytime 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 12</div>
+        <div class="seq-content">
+          <h4>SMS — soft check in</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. Just checking in — happy to help whether you're still looking or just curious what your situation's worth these days. No pressure at all 😊</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 14</div>
+        <div class="seq-content">
+          <h4>Final SMS — hand to nurture</h4>
+          <div class="sms-bubble">Hi [Name], Declan here — I won't keep pestering you 😊 I'll just drop you the odd [suburb] update so you've got the numbers if anything ever changes. Happy to stop anytime — just say the word 👍</div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>Key insight:</strong> These are warm contacts — they raised their hand once. A genuine "how did it end up?" reopens far more doors than a pitch.</div>
+    </div>
+
+    <div id="bdf-interested" class="bdf-track" style="display:none;">
+      <div style="background:var(--green-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:14px;line-height:1.6;"><strong>They picked up and were warm</strong> — still looking, open to a chat, or curious what they'd get for a place they bought. Re-qualify and add value.</div>
+      <div class="seq-item">
+        <div class="seq-day">Same day</div>
+        <div class="seq-content">
+          <h4>Reconnect SMS</h4>
+          <div class="sms-bubble">Hi [Name], great to catch up today 😊 As promised, I'll keep an eye on [suburb] for you and send anything that fits. Here whenever you need me — Declan</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 3</div>
+        <div class="seq-content">
+          <h4>Market data SMS</h4>
+          <div class="sms-bubble">Hi [Name], Declan here — quick [suburb] snapshot: [Recent sale 1], [Recent sale 2], median around [X]. Based on that, [personalise — e.g. "places in your range are moving in X days" or "your place would be roughly X"]. Happy to chat anytime 👍</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 7</div>
+        <div class="seq-content">
+          <h4>Call — was the data useful?</h4>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan — I sent through some [suburb] numbers earlier in the week. Did you get a chance to look? Any questions, or anything you'd like me to keep an eye out for?"</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS if no answer</div>
+          <div class="sms-bubble">Hi [Name], Declan here — gave you a quick call 😊 No rush, just wanted to check you got the [suburb] numbers and see what you're after. Happy to chat whenever suits 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 14</div>
+        <div class="seq-content">
+          <h4>SMS — soft close</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. If you'd ever like to grab a coffee and a proper chat about [suburb] — whether buying or selling — I'm happy to make the time. No pressure at all 😊</div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>Tip:</strong> Re-qualify before you pitch — what they wanted years ago may have changed. Let them tell you, then match it.</div>
+    </div>
+
+    <div id="bdf-notinterested" class="bdf-track" style="display:none;">
+      <div style="background:var(--danger-soft);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--danger);margin-bottom:14px;line-height:1.6;"><strong>They picked up but weren't interested</strong> — bought already and happy, or out of the market. Stay gracious, leave the door open.</div>
+      <div class="seq-item">
+        <div class="seq-day">Same day</div>
+        <div class="seq-content">
+          <h4>Gracious SMS</h4>
+          <div class="sms-bubble">Hi [Name], thanks for taking my call 😊 Glad it all worked out for you. I'll leave you be — but I'm always here if anything ever changes or you'd like a second opinion down the track. All the best! — Declan</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 14</div>
+        <div class="seq-content">
+          <h4>SMS — light value</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. No agenda at all — just thought you'd like to know [suburb] has been [trending well / very active] lately. Happy to keep you posted now and then if that's useful 👋</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 30</div>
+        <div class="seq-content">
+          <h4>SMS — permission → nurture</h4>
+          <div class="sms-bubble">Hi [Name], Declan here 😊 Would it be alright if I sent the occasional [suburb] update? That way if life ever changes, you've already got the numbers. Totally fine to say no 👍</div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>Tip:</strong> People's next move often comes around sooner than they expect. Warmth now is what earns the call later. Move them into WARM or COLD nurture.</div>
+    </div>
+  </div>
+
+  <!-- BD NURTURE -->
+  <div id="bd-nurture" class="bd-track" style="display:none;">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Long-term nurture for buyer-database contacts who didn't convert. Slow burns — stay warm, stay useful, stay patient. Pick the track that matches their temperature.</div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+      <button class="bdn-tab active" onclick="showJsnTab('bdn-hot',this)" style="padding:7px 14px;border-radius:20px;border:none;cursor:pointer;font-size:12.5px;font-weight:600;background:var(--danger-bg);color:var(--danger);">🔥 HOT</button>
+      <button class="bdn-tab" onclick="showJsnTab('bdn-warm',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">🌤 WARM</button>
+      <button class="bdn-tab" onclick="showJsnTab('bdn-cold',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">🧊 COLD</button>
+    </div>
+
+    <div id="bdn-hot" class="bdn-track">
+      <div style="background:var(--danger-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--hot-strong);margin-bottom:14px;line-height:1.6;"><strong>HOT</strong> — still actively looking, or keen to know what they'd get for their place. Move fast.</div>
+    <div class="script-label">SMS 1 — same day</div>
+    <div class="sms-bubble">Hey [Name]! Really glad we reconnected 😊 Want me to set you up with anything new in [suburb] as it comes — including off-market? Just tell me what you're after and I'll keep an eye out.</div>
+    <div class="script-label" style="margin-top:14px;">SMS 2 — 24hrs no reply</div>
+    <div class="sms-bubble">Hi [Name], Declan here — following up 😊 Happy to tailor it exactly to what you want. What's the must-have and the budget range?</div>
+    <div class="script-label" style="margin-top:14px;">SMS 3 — Day 3, create momentum</div>
+    <div class="sms-bubble">Hey [Name], a couple of places are about to come up in [suburb] that haven't hit the portals yet. Want me to send them your way before they go public? 🙏</div>
+      <div class="tip-box"><strong>HOT tip:</strong> Off-market and "before it's public" framing is your edge with database buyers — it makes them feel like insiders.</div>
+    </div>
+
+    <div id="bdn-warm" class="bdn-track" style="display:none;">
+      <div style="background:var(--warm-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--warm);margin-bottom:14px;line-height:1.6;"><strong>WARM</strong> — "maybe", "down the track". Stay present with useful, no-pressure touches.</div>
+    <div class="script-label">Month 1 — first check-in</div>
+    <div class="sms-bubble">Hi [Name], it's Declan — we spoke a little while back about [suburb]. Just checking in to see how you're going. No agenda, just staying in touch 😊</div>
+    <div class="script-label" style="margin-top:14px;">Month 2 — market update</div>
+    <div class="sms-bubble">Hi [Name], Declan here. Another place in [suburb] just sold for [result]. Market's still moving in your area. Happy to chat anytime, no rush 👋</div>
+    <div class="script-label" style="margin-top:14px;">Month 4 — friendly check-in</div>
+    <div class="sms-bubble">Hi [Name], Declan here — just a quick hello, hope things are going well. Still keeping an eye on [suburb] for you. Here whenever you need anything 😊</div>
+    <div class="script-label" style="margin-top:14px;">Month 6 — gentle re-engagement</div>
+    <div class="sms-bubble">Hey [Name]! [suburb] has shifted a fair bit lately — happy to send you the latest if it's useful, or a rough figure on your place. No pressure at all 👍</div>
+      <div class="tip-box"><strong>WARM tip:</strong> A useful touch every few weeks keeps you top of mind without ever feeling like a pitch.</div>
+    </div>
+
+    <div id="bdn-cold" class="bdn-track" style="display:none;">
+      <div style="background:var(--cold-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--cold);margin-bottom:14px;line-height:1.6;"><strong>COLD</strong> — no reply, or out of the market for now. Space it out, keep it short and warm.</div>
+    <div class="script-label">Month 1 — friendly re-intro</div>
+    <div class="sms-bubble">Hi [Name], Declan here — you looked through [suburb] with me a while back. No stress at all, just keeping an eye on the area and happy to help if you ever want the latest. Hope you're well! 😊</div>
+    <div class="script-label" style="margin-top:14px;">Month 2 — pure value, no ask</div>
+    <div class="sms-bubble">Hey [Name], Declan here. [address] in [suburb] just sold for [result]. No reply needed — just keeping you in the loop 👋</div>
+    <div class="script-label" style="margin-top:14px;">Month 4 — ultra short check-in</div>
+    <div class="sms-bubble">Hey [Name]! Declan here — quick hi. Still keeping an eye on [suburb] for you. Here if you ever need anything 👍</div>
+    <div class="script-label" style="margin-top:14px;">Month 12 — one year on</div>
+    <div class="sms-bubble">Hi [Name], Declan here 😊 Hard to believe it's been about a year since we chatted! [suburb] has had a real run — median's moved from [X] to [X]. Still here whenever you want a chat. Hope the year's treated you well 🙌</div>
+      <div class="tip-box"><strong>COLD tip:</strong> Database contacts often resurface years later. Be the name they already trust when they do.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== STEAL LISTINGS ===================== -->
+<div id="steallist" class="panel">
+  <div class="panel-header">
+    <div class="badge" style="background:var(--danger-bg);color:var(--danger)">Prospect method</div>
+    <h2>Steal listings</h2>
+    <p>Two targets: stale listings (frustrated vendor) and fresh listings (plant the seed early). The opener reads the room first — then you choose your approach.</p>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+    <button class="sl-tab active" onclick="showSlTab('sl-openers',this)" style="padding:8px 18px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:var(--danger-bg);color:var(--danger);">Openers</button>
+    <button class="sl-tab" onclick="showSlTab('sl-objections',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Objections</button>
+    <button class="sl-tab" onclick="showSlTab('sl-closes',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Closes</button>
+    <button class="sl-tab" onclick="showSlTab('sl-followup',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Follow-up</button>
+    <button class="sl-tab" onclick="showSlTab('sl-nurture',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:500;background:transparent;color:var(--text2);">Nurture</button>
+  </div>
+
+  <!-- SL OPENERS -->
+  <div id="sl-openers" class="sl-track">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:18px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">The golden rule — read the room first</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;">The opener reads their frustration level. Their answer tells you whether to go direct (frustrated) or soft (neutral/positive). Never pitch before you've diagnosed.</p>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">Universal opener — use every time</div>
+        <span style="font-size:11px;background:var(--green-bg);color:var(--green);border-radius:4px;padding:2px 8px;font-weight:500;">Start here</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Hi [Name], it's Declan — I hope I'm not interrupting. I noticed your property at [address] is currently on the market and I just wanted to reach out. How are you finding the whole process so far?"</div>
+        <div style="background:var(--blue-bg);border-radius:8px;padding:10px 14px;margin-top:12px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--blue);margin-bottom:6px;">Branch guide</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:6px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Frustrated / venting</span> → Go <strong>direct</strong> below</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:6px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Positive / confident</span> → Go <strong>soft / seed</strong> below</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;"><span style="font-weight:600;color:var(--text);">Neutral / unsure</span> → Use the <strong>data angle</strong> below</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border:2px solid var(--danger-border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--danger-soft);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--danger);">Stale listing — direct (frustrated vendor)</div>
+        <span style="font-size:11px;background:var(--danger-bg);color:var(--danger);border-radius:4px;padding:2px 8px;font-weight:500;">45+ days on market</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="border-left-color:var(--danger);margin-top:0;">"I hear you — it can be really frustrating when a home doesn't move the way you expected. I want to be upfront: I'm not here to bag your current agent. But I have sold [X properties] in [suburb] in the last [timeframe], and I think I know why some properties sit and others fly. Would you be open to a quick conversation about what might make the difference? No commitment — just a second perspective."</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Empathy first</span><span class="tag">Authority — your results</span><span class="tag">Low commitment ask</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">Stale listing — soft (neutral vendor)</div>
+        <span style="font-size:11px;background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:2px 8px;font-weight:500;">30–60 days</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"That's good to hear. I won't take up much of your time — I just wanted to introduce myself. I work this area closely and I've had a few buyers through recently who couldn't find quite the right thing. I'm not suggesting anything about your current campaign — I'd just love to keep your property in mind. Would it be okay if I gave you a call in a few weeks to see where things are at?"</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Seed planting</span><span class="tag">Follow-up permission</span><span class="tag">Non-threatening</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--green-border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--green-bg);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <div style="font-size:13px;font-weight:600;color:var(--green);">Fresh listing — plant the seed</div>
+        <span style="font-size:11px;background:var(--green-bg);color:var(--green);border-radius:4px;padding:2px 8px;font-weight:500;">New to market</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="border-left-color:var(--green);margin-top:0;">"That's great — sounds like you're off to a good start. Look, I'll be completely transparent — I'm not calling to poach your listing. I just wanted to introduce myself as someone who works this area closely. Sometimes campaigns take unexpected turns and vendors end up wanting a fresh perspective. I'd just love to be someone you've already met if that moment ever came. Is it okay if I check in with you in a few weeks?"</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Radical honesty — builds trust</span><span class="tag">Insurance policy framing</span><span class="tag">Check-in permission</span></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surface2);padding:10px 16px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">Fresh listing — data angle (neutral vendor)</div>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="script-block" style="margin-top:0;">"Glad to hear it. I do just want to share one thing — I've been tracking the [suburb] market closely and there are a couple of comparable sales from the last 30 days that are really relevant to your campaign. I'm not suggesting anything — but would you find it useful to have that data? I can send it through, no strings attached."</div>
+        <div class="tags" style="margin-top:10px;"><span class="tag">Cialdini — reciprocity</span><span class="tag">Authority — market data</span><span class="tag">No strings</span></div>
+      </div>
+    </div>
+    <div class="tip-box"><strong>Timing:</strong> For stale listings, reach out within 24 hours of expiry — vendors are still emotionally engaged. For active listings, call around week 3–4 when early optimism starts to fade.</div>
+  </div>
+
+  <!-- SL OBJECTIONS -->
+  <div id="sl-objections" class="sl-track" style="display:none;">
+    <div class="objection-item" style="padding-top:0;border-top:none;">
+      <div class="objection-q">"I'm happy with my current agent."</div>
+      <div class="objection-a">"Completely fine — and I hope they get you a great result. I just wanted to introduce myself so if you ever want a second opinion or things don't go to plan, you've already got someone in your corner. Would you mind if I checked in with you in a few weeks?"</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"Why should I switch agents?"</div>
+      <div class="objection-a">"I'm not asking you to — not yet. What I am asking is whether you'd be open to hearing a different perspective on why it might not have moved yet. Sometimes it's price, sometimes presentation, sometimes the wrong buyer pool. I'd just like 20 minutes to walk you through what I'd do differently. If nothing resonates, you've lost nothing."</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"We've had a lot of agents call us."</div>
+      <div class="objection-a">"I bet you have — and I'm sure most of them were pretty pushy. I'm not going to do that. What I will say is I've sold [X] properties in [suburb] in the last [timeframe] and I have a specific view on what's holding this one back. Would it be worth a quick conversation — not to commit to anything, just to hear it?"</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"Our contract doesn't expire for X weeks."</div>
+      <div class="objection-a">"Completely understand — I'm not asking you to do anything about that. I'd just love to stay in touch and make sure when the time comes, you've got options. Can I check back in with you in [X weeks] once that wraps up?"</div>
+    </div>
+    <div class="objection-item">
+      <div class="objection-q">"The price is the problem, not the agent."</div>
+      <div class="objection-a">"You might be right — and that's worth exploring. Sometimes it's pricing strategy, sometimes it's how the property's being presented to justify the price. I'd love to look at both with you. Would it be worth a conversation about what comparable sales are telling us right now?"</div>
+    </div>
+    <div class="tip-box"><strong>Mirroring tip:</strong> When vendors are frustrated, let them vent. Repeat their last 3 words as a question — "Not moving at all?" — and they'll keep going. The more they talk, the more you learn.</div>
+  </div>
+
+  <!-- SL CLOSES -->
+  <div id="sl-closes" class="sl-track" style="display:none;">
+    <div class="script-label">Close 1 — the appraisal ask (stale listing)</div>
+    <div class="script-block">"You've been on the market for [X weeks] and I think you deserve a second set of eyes. I'm not asking for the listing. I'm asking for 20 minutes to walk through what I'd do differently, show you some comparable sales, and give you my honest take on price. If nothing resonates, you've lost nothing. Would [day] or [day] work?"</div>
+    <div class="script-label">Close 2 — the check-in lock (fresh listing)</div>
+    <div class="script-block">"I'll leave you to it — I genuinely hope your campaign goes amazingly. Can I just put a note in my calendar to check in with you in [3–4 weeks]? Not to push anything — just to see how things are tracking."</div>
+    <div class="script-label">Close 3 — the contract expiry close</div>
+    <div class="script-block">"I completely respect your commitment to your current agent. Can I ask — when does your agency agreement expire? ... Perfect. I'd love to have a proper conversation with you around that time. Would you be open to a meeting the week it expires, just to explore your options before you decide what's next?"</div>
+    <div class="script-label">Close 4 — the fresh perspective close</div>
+    <div class="script-block">"Let me put together a full marketing comparison and a pricing analysis based on the last 60 days of sales in [suburb]. No charge, no obligation. If it tells you nothing new, fair enough. If it shows something your current campaign is missing, at least you'll know. Can I send it through?"</div>
+    <div class="tags"><span class="tag">No commitment ask</span><span class="tag">Check-in permission</span><span class="tag">Contract expiry timing</span><span class="tag">Value before ask</span></div>
+    <div class="tip-box"><strong>The long game:</strong> Most vendors on fresh listings won't switch agents for 4–6 weeks minimum. Your goal on the first call is simply to be remembered warmly.</div>
+  </div>
+
+  <!-- SL FOLLOW-UP -->
+  <div id="sl-followup" class="sl-track" style="display:none;">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches the call. The agreement-expiry window is everything — time your run to it.</div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+      <button class="slf-tab active" onclick="showJsfTab('slf-noanswer',this)" style="padding:7px 14px;border-radius:20px;cursor:pointer;font-size:12.5px;font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">📵 No answer</button>
+      <button class="slf-tab" onclick="showJsfTab('slf-interested',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">👍 Answered — interested</button>
+      <button class="slf-tab" onclick="showJsfTab('slf-notinterested',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">👋 Answered — not interested</button>
+    </div>
+
+    <div id="slf-noanswer" class="slf-track">
+      <div style="background:var(--surface2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;">The vendor didn't pick up. Alternate voicemail + SMS, building toward the expiry conversation.</div>
+      <div class="seq-item">
+        <div class="seq-day">Day 1</div>
+        <div class="seq-content">
+          <h4>Voicemail + SMS</h4>
+          <div class="sms-label">Voicemail</div>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], it's Declan — a local agent in [suburb]. I noticed your place at [address] is on the market and I just wanted to introduce myself, no agenda. Give me a call back on [number] if you'd ever like a second opinion — that's [number]. Cheers."</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
+          <div class="sms-bubble">Hi [Name], Declan here — just left a voicemail 😊 I'm local to [suburb] and noticed [address] is on the market. No agenda — just here if you'd ever like a second set of eyes 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 3</div>
+        <div class="seq-content">
+          <h4>SMS — comparable sales</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. In case it's useful — a couple of recent comparable sales near [address]: [Sale 1 — result, days], [Sale 2 — result, days]. No strings, just thought the data might help your campaign 😊</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 10</div>
+        <div class="seq-content">
+          <h4>Voicemail + SMS</h4>
+          <div class="sms-label">Voicemail</div>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan again — no pressure at all. I know how frustrating it can be when a campaign doesn't move the way you'd hoped. If you'd ever value a fresh perspective on what might make the difference, I'm happy to share. [number] whenever suits."</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
+          <div class="sms-bubble">Hi [Name], Declan here — left you another quick voicemail 😊 No pressure — just here with a fresh perspective if your campaign ever stalls. Happy to help 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Week 3–4</div>
+        <div class="seq-content">
+          <h4>Call — the check-in</h4>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan here — I said I'd keep an eye on things. How's the campaign tracking? Any offers come through yet?"</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS if no answer</div>
+          <div class="sms-bubble">Hi [Name], Declan here — tried you just now 😊 Just checking how the campaign's going. No pressure — here for a chat or a second opinion anytime 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Expiry week</div>
+        <div class="seq-content">
+          <h4>Call — the expiry conversation</h4>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan — I believe your agreement with [agent] is wrapping up around now. Before you decide what's next, would you be open to a quick meeting so I can show you what I'd do differently?"</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS if no answer</div>
+          <div class="sms-bubble">Hi [Name], Declan here — tried to reach you 😊 I know your agreement is wrapping up around now. Before you decide what's next, I'd love 20 mins to show you what I'd do differently. No obligation at all 🙏</div></div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>Expiry timing is everything:</strong> Be the first to call the day the agreement expires. The window is short and the first agent through the door usually wins the listing.</div>
+    </div>
+
+    <div id="slf-interested" class="slf-track" style="display:none;">
+      <div style="background:var(--green-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:14px;line-height:1.6;"><strong>They picked up and were open</strong> — frustrated, curious, or keen for a second opinion. Give value and position yourself for the expiry.</div>
+      <div class="seq-item">
+        <div class="seq-day">Same day</div>
+        <div class="seq-content">
+          <h4>Recap SMS — confirm next step</h4>
+          <div class="sms-bubble">Hi [Name], great chatting just now 😊 As promised I'll [send those comparable sales / put together a quick marketing comparison]. No obligation at all — just want you to have the full picture. Talk soon — Declan</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 2</div>
+        <div class="seq-content">
+          <h4>SMS — comparables / marketing comparison</h4>
+          <div class="sms-bubble">Hi [Name], Declan here — here's what I mentioned: [Sale 1 — result, days], [Sale 2 — result, days]. There are a couple of things I'd genuinely do differently with the campaign. Worth a proper sit-down? 😊</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 3</div>
+        <div class="seq-content">
+          <h4>Call — book the sit-down</h4>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan here — did you get a chance to look at those comparables? I'd love 20 minutes to walk you through my full plan for [address]. Would [day] or [day] suit?"</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS if no answer</div>
+          <div class="sms-bubble">Hi [Name], Declan here — tried you just now 😊 Keen to walk you through my plan for [address] whenever suits. Would [day] or [day] work for a quick sit-down? 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Week 3–4</div>
+        <div class="seq-content">
+          <h4>Call — position for expiry</h4>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan — just checking how the campaign's tracking. If things aren't where you'd hoped by the time your agreement's up, I'd be ready to step in straight away."</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS if no answer</div>
+          <div class="sms-bubble">Hi [Name], Declan here — tried you just now 😊 Just checking how the campaign's going. Whenever your agreement's up, I'm ready to step in if you'd like a fresh run at it 👍</div></div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Expiry week</div>
+        <div class="seq-content">
+          <h4>Call — the switch conversation</h4>
+          <div class="script-block" style="font-size:13px;">"Hi [Name], Declan — I believe your agreement is wrapping up. I'd love to put my full plan and pricing in front of you before you commit to anything next. Can we meet this week?"</div>
+          <div style="margin-top:8px;"><div class="sms-label">SMS if no answer</div>
+          <div class="sms-bubble">Hi [Name], Declan here — tried to reach you 😊 I know your agreement's wrapping up. Before you decide what's next, let me show you my full plan for [address]. When suits this week? 🙏</div></div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>Tip:</strong> Lead with genuine value — comparables, a marketing critique — not a pitch to switch. Earn the meeting and the listing follows.</div>
+    </div>
+
+    <div id="slf-notinterested" class="slf-track" style="display:none;">
+      <div style="background:var(--danger-soft);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--danger);margin-bottom:14px;line-height:1.6;"><strong>They picked up but weren't interested</strong> — happy with their current agent. Be gracious, plant the seed, time a light touch to the expiry.</div>
+      <div class="seq-item">
+        <div class="seq-day">Same day</div>
+        <div class="seq-content">
+          <h4>Gracious SMS — leave the door open</h4>
+          <div class="sms-bubble">Hi [Name], thanks for taking my call 😊 I hope your current campaign goes brilliantly. I'll just introduce myself so you've got a name if you ever want a second opinion. All the best — Declan</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Day 30</div>
+        <div class="seq-content">
+          <h4>SMS — market shift value</h4>
+          <div class="sms-bubble">Hi [Name], Declan here. No agenda — just thought you'd want to know [suburb] has [shifted / picked up] recently: [one line stat]. Hope the campaign's going well 👋</div>
+        </div>
+      </div>
+      <div class="seq-item">
+        <div class="seq-day">Expiry week</div>
+        <div class="seq-content">
+          <h4>SMS — gentle expiry touch → nurture</h4>
+          <div class="sms-bubble">Hi [Name], Declan here 😊 I know your agreement may be wrapping up around now. If it has and you'd ever like a fresh perspective — no pressure at all — I'm here. Either way, hope it all went well 👍</div>
+        </div>
+      </div>
+      <div class="tip-box"><strong>Tip:</strong> "Happy with my agent" often changes by expiry if results don't land. Stay warm and be the name they already know. Move them into WARM or COLD nurture.</div>
+    </div>
+  </div>
+
+  <!-- SL NURTURE -->
+  <div id="sl-nurture" class="sl-track" style="display:none;">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">For vendors who re-listed with their current agent or withdrew from market. They'll likely be back — be the obvious choice when they are. Pick the track that matches their temperature.</div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+      <button class="sln-tab active" onclick="showJsnTab('sln-hot',this)" style="padding:7px 14px;border-radius:20px;border:none;cursor:pointer;font-size:12.5px;font-weight:600;background:var(--danger-bg);color:var(--danger);">🔥 HOT</button>
+      <button class="sln-tab" onclick="showJsnTab('sln-warm',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">🌤 WARM</button>
+      <button class="sln-tab" onclick="showJsnTab('sln-cold',this)" style="padding:7px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;background:transparent;color:var(--text2);">🧊 COLD</button>
+    </div>
+
+    <div id="sln-hot" class="sln-track">
+      <div style="background:var(--danger-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--hot-strong);margin-bottom:14px;line-height:1.6;"><strong>HOT</strong> — frustrated, agreement nearly up, open to switching. Move fast and decisively.</div>
+    <div class="script-label">SMS 1 — same day</div>
+    <div class="sms-bubble">Hi [Name], Declan here 😊 Given where things are at with the campaign, I'd genuinely love 20 minutes to show you exactly what I'd do differently with [address]. No obligation — when could you do this week?</div>
+    <div class="script-label" style="margin-top:14px;">SMS 2 — Day 2</div>
+    <div class="sms-bubble">Hi [Name], Declan here — happy to come to you, after hours if easier. I'll bring a full marketing plan and pricing view for [address]. Worth a look before you decide what's next? 🙏</div>
+    <div class="script-label" style="margin-top:14px;">SMS 3 — Day 3, expiry urgency</div>
+    <div class="sms-bubble">Hi [Name], Declan here. If your agreement's wrapping up, the days right after are the best time to relaunch with fresh momentum. I'd love to be ready to go for you. Quick chat? 👍</div>
+      <div class="tip-box"><strong>HOT tip:</strong> The days right after an agreement expires are gold — a frustrated vendor and a clean slate. Be first and be ready.</div>
+    </div>
+
+    <div id="sln-warm" class="sln-track" style="display:none;">
+      <div style="background:var(--warm-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--warm);margin-bottom:14px;line-height:1.6;"><strong>WARM</strong> — re-listed for now, or "maybe after this run". Stay present and useful without pushing.</div>
+    <div class="script-label">Month 1 — post-expiry check-in</div>
+    <div class="sms-bubble">Hi [Name], Declan here — I know you're [back on with your agent / taking a break]. Completely fair. I'll keep an eye on [suburb] and check in when the time feels right. No pressure at all 😊</div>
+    <div class="script-label" style="margin-top:14px;">Month 2 — market update</div>
+    <div class="sms-bubble">Hey [Name]! Declan here. [address nearby] just sold for [result] — conditions in [suburb] are [trending well / picking up]. Happy to chat whenever you're thinking about next steps 👋</div>
+    <div class="script-label" style="margin-top:14px;">Month 3 — soft check-in</div>
+    <div class="sms-bubble">Hi [Name], Declan here — hope things have settled. No pressure at all, just checking how you're going and whether anything's changed with [address] 😊</div>
+    <div class="script-label" style="margin-top:14px;">Month 6 — gentle re-engagement</div>
+    <div class="sms-bubble">Hi [Name], Declan here — the [suburb] market has shifted a fair bit and conditions look more favourable than they were. If you ever think about giving it another go, I'd love to share what I'm seeing. No obligation 👍</div>
+      <div class="tip-box"><strong>WARM tip:</strong> A useful, no-agenda touch every few weeks keeps you front of mind for the day they're ready to try again.</div>
+    </div>
+
+    <div id="sln-cold" class="sln-track" style="display:none;">
+      <div style="background:var(--cold-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--cold);margin-bottom:14px;line-height:1.6;"><strong>COLD</strong> — withdrawn or gone quiet. Space it out, keep it short and warm.</div>
+    <div class="script-label">Month 1 — friendly re-intro</div>
+    <div class="sms-bubble">Hi [Name], Declan here — we spoke a while back about [address]. No stress at all, just keeping an eye on [suburb] and here if you ever want a fresh perspective. Hope you're well! 😊</div>
+    <div class="script-label" style="margin-top:14px;">Month 2 — pure value, no ask</div>
+    <div class="sms-bubble">Hey [Name], Declan here. [address nearby] just sold for [result] — strong conditions in [suburb] right now. No reply needed, just keeping you in the loop 👋</div>
+    <div class="script-label" style="margin-top:14px;">Month 4 — ultra short check-in</div>
+    <div class="sms-bubble">Hey [Name]! Declan here — quick hi. Still keeping an eye on [suburb] for you. Here if you ever want a chat 👍</div>
+    <div class="script-label" style="margin-top:14px;">Month 9+ — quarterly keepalive</div>
+    <div class="sms-bubble">Hey [Name]! Declan here — quick quarterly hello 😄 [suburb] update: [one line stat]. Whenever you're ready to give [address] another go, I'm here. Hope all's well!</div>
+      <div class="tip-box"><strong>COLD tip:</strong> Withdrawn vendors still need to sell eventually — they just had a bad run. Your patience is what earns the second chance.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===================== ABOUT & WHAT'S NEW ===================== -->
+<div id="about" class="panel">
+  <div class="panel-header">
+    <div class="badge" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border2);">App</div>
+    <h2>About &amp; what's new</h2>
+    <p>Your prospecting scripts and contact tracker, in one file.</p>
+  </div>
+
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:22px;">
+    <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">You're running</div>
+    <div id="about-version" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Version 0.22.0</div>
+  </div>
+
+  <div style="background:var(--blue-bg);border-radius:10px;padding:14px 16px;margin-bottom:22px;">
+    <div style="font-size:13px;font-weight:600;color:var(--blue);margin-bottom:6px;">How updates work</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;">The installed app now <strong style="color:var(--text);">checks for updates automatically</strong> each time you open it. When a new version is published, it downloads quietly in the background and asks if you'd like to restart to finish — your contacts are never touched. (If you run from the launcher in dev mode instead, just replace <strong style="color:var(--text);">renderer/index.html</strong> with the new file.) This page always shows the version you currently have.</div>
+  </div>
+
+  <div class="script-label">Version history</div>
+  <div style="margin-top:4px;"><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.22</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Share your contacts across computers: point the tracker at a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) from the Storage box, then choose the same folder on your other computer. Also turned on automatic updates (via GitHub) so new versions can install themselves.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.21</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Windows support is back: the app now installs and runs on Windows as well as Mac. Added a Windows installer build (<strong style="color:var(--text);">npm run build:win</strong>) and double-click launchers, and fixed a first-time setup issue where the app engine sometimes didn't finish installing.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.20.1</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Brought Just listed, Buyer database and Steal listings up to the same standard as Just sold — branched follow-ups (no answer / interested / not interested) and HOT / WARM / COLD nurture tracks.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.18</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Rebuilt as a cross-platform desktop app (Electron) with a local database and native Excel/CSV export &amp; import — no browser, no sandbox.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.17</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added a call-outcome option (no answer / interested / not interested) when logging a contact, so the follow-up reminders use the right branch. You can also change a contact's outcome later and the schedule restarts from that day.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.16</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added this About &amp; what's new page, with version history.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.15</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Renamed to a stable filename so data survives updates; added optional project-folder data file (auto-saves to prospecting-data.json on Chrome/Edge).</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.14</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Split the Just sold follow-up into three branches: no answer (voicemail + SMS), answered &amp; interested, answered &amp; not interested.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.13</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Rewrote the Just sold openers to feel warmer and more genuine — dropped the "this is a cold call" line while keeping the research behind each one.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.12</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added a search box to the contact tracker.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.11</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Built the contact tracker: quick logging, automatic due/overdue reminders from each call date, and Excel export/import (one sheet per method).</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.10</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added dark mode with a light/dark toggle and a full themed colour system.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.9</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Gave each prospect method its own openers, objections, closes, follow-up and nurture; removed the old shared sections. Stripped all email steps — calls and messages only.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.8</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Moved Just listed into the prospect methods with its own openers, objections and closes.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.7</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Consolidated the core openers, objections and closes into the Just sold street method.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.6</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added two new prospect methods: Buyer database and Steal listings.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.5</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Reorganised into prospect methods and a special opens section.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.4</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Rebuilt the openers around proven psychology and cold-calling data.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.3</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added the HOT / WARM / COLD SMS nurture tracks.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.2</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added voicemail scripts, the follow-up sequence and the no-answer nurture.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.1</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">First downloadable version with the core just-sold scripts.</div></div></div>
+</div>
+
+</main>
+</div>
+
+<script>
+  (function(){
+    try { if (localStorage.getItem('declan-theme') === 'dark') document.documentElement.setAttribute('data-theme','dark'); } catch(e){}
+  })();
+  function toggleTheme(){
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark){ document.documentElement.removeAttribute('data-theme'); } else { document.documentElement.setAttribute('data-theme','dark'); }
+    try { localStorage.setItem('declan-theme', isDark ? 'light' : 'dark'); } catch(e){}
+    updateToggleLabel();
+  }
+  function updateToggleLabel(){
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var btn = document.getElementById('theme-toggle');
+    if (btn) btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+  }
+  document.addEventListener('DOMContentLoaded', updateToggleLabel);
+  function makeTabFn(trackClass, tabClass, activeStyle) {
+    return function(id, el) {
+      document.querySelectorAll('.' + trackClass).forEach(t => t.style.display = 'none');
+      document.querySelectorAll('.' + tabClass).forEach(t => {
+        t.style.background = 'transparent'; t.style.border = '1px solid var(--border)';
+        t.style.color = 'var(--text2)'; t.style.fontWeight = '500';
+      });
+      document.getElementById(id).style.display = 'block';
+      Object.assign(el.style, activeStyle);
+    };
+  }
+
+  var showJsTab  = makeTabFn('js-track',  'js-tab',  {background:'var(--blue-bg)', color:'var(--blue)', border:'none', fontWeight:'600'});
+  var showJlTab  = makeTabFn('jl-track',  'jl-tab',  {background:'var(--green-bg)', color:'var(--green)', border:'none', fontWeight:'600'});
+  var showBdTab  = makeTabFn('bd-track',  'bd-tab',  {background:'var(--teal-bg)', color:'var(--teal)', border:'none', fontWeight:'600'});
+  var showSlTab  = makeTabFn('sl-track',  'sl-tab',  {background:'var(--danger-bg)', color:'var(--danger)', border:'none', fontWeight:'600'});
+
+  function showJsfTab(id, el) {
+    var g = id.substring(0, id.indexOf('-'));
+    var which = id.substring(id.indexOf('-')+1);
+    document.querySelectorAll('.'+g+'-track').forEach(function(t){ t.style.display='none'; });
+    document.querySelectorAll('.'+g+'-tab').forEach(function(t){
+      t.style.background='transparent'; t.style.border='1px solid var(--border)';
+      t.style.color='var(--text2)'; t.style.fontWeight='500';
+    });
+    document.getElementById(id).style.display='block';
+    el.style.fontWeight='600';
+    if(which==='noanswer'){ el.style.background='var(--surface2)'; el.style.color='var(--text)'; el.style.border='1px solid var(--border2)'; }
+    if(which==='interested'){ el.style.background='var(--green-bg)'; el.style.color='var(--green)'; el.style.border='none'; }
+    if(which==='notinterested'){ el.style.background='var(--danger-bg)'; el.style.color='var(--danger)'; el.style.border='none'; }
+  }
+
+  function showJsnTab(id, el) {
+    var g = id.substring(0, id.indexOf('-'));
+    var which = id.substring(id.indexOf('-')+1);
+    document.querySelectorAll('.'+g+'-track').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('.'+g+'-tab').forEach(t => {
+      t.style.background = 'transparent'; t.style.border = '1px solid var(--border)';
+      t.style.color = 'var(--text2)'; t.style.fontWeight = '500';
+    });
+    document.getElementById(id).style.display = 'block';
+    if (which==='hot')  { el.style.background='var(--danger-bg)'; el.style.color='var(--danger)'; }
+    if (which==='warm') { el.style.background='var(--warm-bg)'; el.style.color='var(--warm)'; }
+    if (which==='cold') { el.style.background='var(--cold-bg)'; el.style.color='var(--cold)'; }
+    el.style.border = 'none'; el.style.fontWeight = '600';
+  }
+
+  function showPanel(id, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav a, .tab-btn').forEach(a => a.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (el) el.classList.add('active');
+    document.querySelectorAll('nav a').forEach(a => {
+      if (a.getAttribute('onclick') && a.getAttribute('onclick').includes("'" + id + "'")) a.classList.add('active');
+    });
+  }
+</script>
+
+<script>
+/* ===== Contact tracker engine ===== */
+var METHODS = {
+  justsold:{ label:'Just sold street', sheet:'Just Sold Street', chipBg:'var(--blue-bg)', chipFg:'var(--blue)', ms:{
+    noanswer:[{d:1,t:'Voicemail + SMS'},{d:3,t:'SMS — value'},{d:6,t:'Voicemail + SMS'},{d:9,t:'SMS — check in'},{d:12,t:'Final SMS → nurture'},{d:60,t:'Nurture touch'},{d:120,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
+    interested:[{d:0,t:'Recap SMS'},{d:1,t:'Deliver data SMS'},{d:3,t:'Call — lock in appraisal'},{d:6,t:'Confirm appointment SMS'},{d:8,t:'Post-appraisal thank-you SMS'}],
+    notinterested:[{d:0,t:'Gracious SMS + data'},{d:7,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:90,t:'Nurture touch'},{d:180,t:'Nurture touch'}]
+  }},
+  listed:{ label:'Just listed', sheet:'Just Listed', chipBg:'var(--green-bg)', chipFg:'var(--green)', ms:{
+    noanswer:[{d:1,t:'Voicemail + SMS'},{d:2,t:'Preview invite SMS'},{d:5,t:'SMS — value'},{d:9,t:'SMS — check in'},{d:12,t:'Final SMS → nurture'},{d:60,t:'Nurture touch'},{d:120,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
+    interested:[{d:0,t:'Recap SMS'},{d:1,t:'Preview invite SMS'},{d:3,t:'Call — confirm preview / buyer'},{d:7,t:'Post-open result SMS'},{d:21,t:'Post-sale result SMS'}],
+    notinterested:[{d:0,t:'Gracious SMS'},{d:7,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:90,t:'Nurture touch'},{d:180,t:'Nurture touch'}]
+  }},
+  buyerdb:{ label:'Buyer database', sheet:'Buyer Database', chipBg:'var(--teal-bg)', chipFg:'var(--teal)', ms:{
+    noanswer:[{d:1,t:'Voicemail + SMS'},{d:4,t:'SMS — value'},{d:8,t:'Voicemail + SMS'},{d:12,t:'SMS — check in'},{d:14,t:'Final SMS → nurture'},{d:60,t:'Nurture touch'},{d:120,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
+    interested:[{d:0,t:'Reconnect SMS'},{d:3,t:'Market data SMS'},{d:7,t:'Call — was it useful'},{d:14,t:'Soft close SMS'}],
+    notinterested:[{d:0,t:'Gracious SMS'},{d:14,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:120,t:'Nurture touch'},{d:240,t:'Nurture touch'}]
+  }},
+  steallist:{ label:'Steal listings', sheet:'Steal Listings', chipBg:'var(--danger-bg)', chipFg:'var(--danger)', ms:{
+    noanswer:[{d:1,t:'Intro SMS'},{d:3,t:'Comparable sales SMS'},{d:10,t:'Follow-up SMS'},{d:24,t:'Check-in call'},{d:45,t:'Expiry SMS'},{d:90,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
+    interested:[{d:0,t:'Intro SMS'},{d:3,t:'Comparable sales SMS'},{d:24,t:'Week 3–4 check-in call'},{d:45,t:'Expiry conversation call'}],
+    notinterested:[{d:0,t:'Polite SMS'},{d:30,t:'Market shift SMS'},{d:90,t:'Re-engagement SMS'},{d:180,t:'Nurture touch'}]
+  }}
+};
+var OUTCOMES={ noanswer:'No answer', interested:'Answered — interested', notinterested:'Answered — not interested' };
+var CRM_KEY = 'declan-crm-contacts';
+var CRM_CACHE = [];
+var crmFilter = 'all';
+var crmSearch = '';
+
+function crmLoad(){ return CRM_CACHE; }
+function crmSave(arr){ CRM_CACHE = arr; if(window.api && window.api.saveContacts) window.api.saveContacts(arr); }
+function crmUid(){ return 'c' + Date.now() + Math.floor(Math.random()*1000); }
+function pad(n){ return n<10 ? '0'+n : ''+n; }
+function todayISO(){ var d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function parseDate(s){ if(!s) return null; if(s instanceof Date) return s; var p=String(s).slice(0,10).split('-'); if(p.length===3) return new Date(+p[0], +p[1]-1, +p[2]); var d=new Date(s); return isNaN(d)?null:d; }
+function addDays(date, n){ var d=new Date(date.getTime()); d.setDate(d.getDate()+n); return d; }
+function startOfToday(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
+function fmtDate(date){ if(!date) return ''; var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return date.getDate()+' '+mo[date.getMonth()]+' '+date.getFullYear(); }
+
+function sinceDate(c){ return parseDate(c.branchDate || c.callDate); }
+function schedFor(c){ var m=METHODS[c.method]; if(!m||!m.ms) return null; var o=c.outcome||'noanswer'; return m.ms[o]||m.ms.noanswer; }
+function nextMilestone(c){
+  if(c.archived) return null;
+  var sched=schedFor(c); if(!sched) return null;
+  var steps=c.stepsDone||0;
+  if(steps>=sched.length) return null;
+  var cd=sinceDate(c); if(!cd) return null;
+  var ms=sched[steps];
+  return { index:steps, label:ms.t, due:addDays(cd, ms.d) };
+}
+
+function crmAdd(){
+  var first=val('f-first'), last=val('f-last'), mobile=val('f-mobile');
+  var method=val('f-method'), callDate=val('f-callDate')||todayISO();
+  if(!first && !last && !mobile){ msg('f-msg','Add at least a name or mobile number.', true); return; }
+  var arr=crmLoad();
+  arr.push({ id:crmUid(), method:method, outcome:val('f-outcome')||'noanswer', first:first, last:last, address:val('f-address'), mobile:mobile, email:val('f-email'), callDate:callDate, stepsDone:0, archived:false, notes:val('f-notes') });
+  crmSave(arr);
+  crmClearForm();
+  msg('f-msg', '✓ '+(first||last||mobile)+' added to '+METHODS[method].label+'.', false);
+  crmRenderAll();
+}
+function crmClearForm(){ ['f-first','f-last','f-address','f-mobile','f-email','f-notes'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; }); document.getElementById('f-callDate').value=todayISO(); var o=document.getElementById('f-outcome'); if(o) o.value='noanswer'; }
+function val(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
+function msg(id, text, isErr){ var e=document.getElementById(id); if(!e) return; e.textContent=text; e.style.color = isErr ? 'var(--danger)' : 'var(--teal)'; if(text){ setTimeout(function(){ if(e.textContent===text) e.textContent=''; }, 4000); } }
+
+function crmMarkDone(id){
+  var arr=crmLoad();
+  var c=arr.find(function(x){return x.id===id;}); if(!c) return;
+  var sched=schedFor(c)||[];
+  c.stepsDone=(c.stepsDone||0)+1;
+  if(c.stepsDone>=sched.length) c.archived=true;
+  crmSave(arr); crmRenderAll();
+}
+function crmSetOutcome(id, value){
+  var arr=crmLoad(); var c=arr.find(function(x){return x.id===id;}); if(!c) return;
+  c.outcome=value; c.stepsDone=0; c.archived=false; c.branchDate=todayISO();
+  crmSave(arr); crmRenderAll();
+}
+function crmArchive(id){
+  var arr=crmLoad(); var c=arr.find(function(x){return x.id===id;}); if(!c) return;
+  c.archived=!c.archived; crmSave(arr); crmRenderAll();
+}
+function crmDelete(id){
+  if(!confirm('Delete this contact permanently?')) return;
+  crmSave(crmLoad().filter(function(x){return x.id!==id;})); crmRenderAll();
+}
+
+function crmRenderDue(){
+  var arr=crmLoad(); var today=startOfToday(); var items=[];
+  arr.forEach(function(c){
+    var nm=nextMilestone(c); if(!nm) return;
+    var diff=Math.round((nm.due - today)/86400000);
+    if(diff<=7){ items.push({c:c, nm:nm, diff:diff}); }
+  });
+  items.sort(function(a,b){ return a.diff-b.diff; });
+  var el=document.getElementById('due-list');
+  if(!items.length){ el.innerHTML='<div class="crm-empty">Nothing due in the next 7 days. Nice work staying on top of it. 👌</div>'; return; }
+  el.innerHTML = items.map(function(it){
+    var c=it.c, nm=it.nm, diff=it.diff, m=METHODS[c.method];
+    var name=(c.first+' '+c.last).trim()||c.mobile||'(no name)';
+    var whenCls, whenTxt;
+    if(diff<0){ whenCls='overdue'; whenTxt=(-diff)+' day'+(diff===-1?'':'s')+' overdue'; }
+    else if(diff===0){ whenCls='today'; whenTxt='Due today'; }
+    else { whenCls='soon'; whenTxt='In '+diff+' day'+(diff===1?'':'s'); }
+    return '<div class="due-card '+(diff<0?'overdue':'')+'">'+
+      '<div class="due-left">'+
+        '<span class="due-name">'+esc(name)+' <span class="method-chip" style="background:'+m.chipBg+';color:'+m.chipFg+';">'+m.label+'</span></span>'+
+        '<span class="due-meta">'+esc(nm.label)+(c.mobile?' · '+esc(c.mobile):'')+' · due '+fmtDate(nm.due)+'</span>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'+
+        '<span class="due-when '+whenCls+'">'+whenTxt+'</span>'+
+        '<div class="due-actions">'+
+          '<button class="crm-btn crm-btn-primary crm-btn-sm" onclick="crmMarkDone(\''+c.id+'\')">✓ Done</button>'+
+          '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmArchive(\''+c.id+'\')">Stop</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function crmRenderFilters(){
+  var bar=document.getElementById('filter-bar');
+  var opts=[['all','All']].concat(Object.keys(METHODS).map(function(k){return [k, METHODS[k].label];}));
+  bar.innerHTML=opts.map(function(o){ return '<button class="filter-chip '+(crmFilter===o[0]?'active':'')+'" onclick="crmSetFilter(\''+o[0]+'\')">'+o[1]+'</button>'; }).join('');
+}
+function crmSetFilter(f){ crmFilter=f; crmRenderFilters(); crmRenderTable(); }
+
+function crmRenderTable(){
+  var arr=crmLoad();
+  if(crmFilter!=='all') arr=arr.filter(function(c){return c.method===crmFilter;});
+  if(crmSearch){
+    var q=crmSearch.toLowerCase();
+    arr=arr.filter(function(c){
+      return [c.first,c.last,c.mobile,c.email,c.address,c.notes].some(function(v){ return String(v||'').toLowerCase().indexOf(q)>-1; });
+    });
+  }
+  arr.sort(function(a,b){ return (parseDate(b.callDate)||0) - (parseDate(a.callDate)||0); });
+  var wrap=document.getElementById('table-wrap');
+  if(!arr.length){ wrap.innerHTML='<div class="crm-empty">'+((crmSearch||crmFilter!=='all')?'No contacts match your search or filter.':'No contacts yet. Log your first one above. 📇')+'</div>'; return; }
+  var rows=arr.map(function(c){
+    var m=METHODS[c.method]; var nm=nextMilestone(c);
+    var name=(c.first+' '+c.last).trim()||'—';
+    var next = c.archived ? '<span style="color:var(--text3);">Archived</span>' : (nm ? esc(nm.label)+'<br><span style="color:var(--text3);font-size:11.5px;">'+fmtDate(nm.due)+'</span>' : '<span style="color:var(--text3);">Complete</span>');
+    return '<tr>'+
+      '<td><span class="method-chip" style="background:'+m.chipBg+';color:'+m.chipFg+';">'+m.label+'</span></td>'+
+      '<td>'+esc(name)+(c.notes?'<br><span style="color:var(--text3);font-size:11.5px;">'+esc(c.notes)+'</span>':'')+'</td>'+
+      '<td>'+esc(c.mobile||'—')+(c.email?'<br><span style="color:var(--text3);font-size:11.5px;">'+esc(c.email)+'</span>':'')+'</td>'+
+      '<td>'+esc(c.address||'—')+'</td>'+
+      '<td>'+fmtDate(parseDate(c.callDate))+'</td>'+
+      '<td>'+outcomeSelect(c)+'</td>'+
+      '<td>'+next+'</td>'+
+      '<td style="white-space:nowrap;"><button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmArchive(\''+c.id+'\')">'+(c.archived?'Reopen':'Stop')+'</button> <button class="crm-btn crm-btn-danger crm-btn-sm" onclick="crmDelete(\''+c.id+'\')">Delete</button></td>'+
+    '</tr>';
+  }).join('');
+  wrap.innerHTML='<div class="crm-table-wrap"><table class="crm-table"><thead><tr><th>Method</th><th>Name</th><th>Mobile / Email</th><th>Address</th><th>Call date</th><th>Outcome</th><th>Next action</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+
+function crmDoSearch(v){
+  crmSearch = (v||'').trim();
+  var clr=document.getElementById('crm-search-clear'); if(clr) clr.style.display = crmSearch ? 'block' : 'none';
+  crmRenderTable();
+}
+function crmClearSearch(){
+  crmSearch=''; var i=document.getElementById('crm-search'); if(i) i.value='';
+  var clr=document.getElementById('crm-search-clear'); if(clr) clr.style.display='none';
+  crmRenderTable();
+}
+function outcomeSelect(c){
+  var cur=c.outcome||'noanswer';
+  var opts=Object.keys(OUTCOMES).map(function(k){ return '<option value="'+k+'"'+(k===cur?' selected':'')+'>'+OUTCOMES[k]+'</option>'; }).join('');
+  return '<select onchange="crmSetOutcome(\''+c.id+'\', this.value)" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-size:12px;color:var(--text);max-width:160px;">'+opts+'</select>';
+}
+function crmRenderAll(){ crmRenderDue(); crmRenderFilters(); crmRenderTable(); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ----- Export / Import ----- */
+function exportRows(method){
+  return crmLoad().filter(function(c){return c.method===method;}).map(function(c){
+    var nm=nextMilestone(c);
+    return {
+      'First Name':c.first||'', 'Last Name':c.last||'', 'Mobile':c.mobile||'', 'Email':c.email||'',
+      'Address':c.address||'', 'Call Date':c.callDate||'',
+      'Outcome': (typeof OUTCOMES!=='undefined' && OUTCOMES[c.outcome||'noanswer']) || 'No answer',
+      'Next Action': c.archived?'Archived':(nm?nm.label:'Complete'),
+      'Next Due': c.archived?'':(nm?(nm.due.getFullYear()+'-'+pad(nm.due.getMonth()+1)+'-'+pad(nm.due.getDate())):''),
+      'Notes':c.notes||'', 'Steps Done':c.stepsDone||0, 'ID':c.id
+    };
+  });
+}
+function crmExportXlsx(){
+  if(!window.api){ alert('Run this inside the desktop app to export Excel.'); return; }
+  var header=['First Name','Last Name','Mobile','Email','Address','Call Date','Outcome','Next Action','Next Due','Notes','Steps Done','ID'];
+  var sheets=Object.keys(METHODS).map(function(m){
+    var rows=exportRows(m).map(function(r){ return header.map(function(h){ return r[h]; }); });
+    return { name: METHODS[m].sheet, header: header, rows: rows };
+  });
+  window.api.exportExcel(sheets, 'Declan_Contacts_'+todayISO()+'.xlsx').then(function(res){ if(res && res.ok) alert('Saved to '+res.path); });
+}
+function crmExportCsv(){
+  var headers=['Method','First Name','Last Name','Mobile','Email','Address','Call Date','Outcome','Next Action','Next Due','Notes','Steps Done','ID'];
+  var lines=[headers.join(',')];
+  Object.keys(METHODS).forEach(function(m){
+    exportRows(m).forEach(function(r){
+      var row=[METHODS[m].label,r['First Name'],r['Last Name'],r['Mobile'],r['Email'],r['Address'],r['Call Date'],r['Outcome'],r['Next Action'],r['Next Due'],r['Notes'],r['Steps Done'],r['ID']];
+      lines.push(row.map(csvCell).join(','));
+    });
+  });
+  if(!window.api){ alert('Run this inside the desktop app to export.'); return; }
+  window.api.saveTextFile(lines.join('\n'), 'Declan_Contacts_'+todayISO()+'.csv').then(function(res){ if(res && res.ok) alert('Saved to '+res.path); });
+}
+function csvCell(v){ v=String(v==null?'':v); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
+
+var SHEET_TO_METHOD={}; Object.keys(METHODS).forEach(function(k){ SHEET_TO_METHOD[METHODS[k].sheet.toLowerCase()]=k; });
+function crmImport(){
+  if(!window.api){ alert('Run this inside the desktop app to import.'); return; }
+  if(!confirm('Importing will REPLACE all current contacts in this tracker. Continue?')) return;
+  window.api.importExcel().then(function(res){
+    if(!res || !res.ok){ if(res && res.error) alert(res.error); return; }
+    var out=[];
+    res.sheets.forEach(function(sh){
+      var method=SHEET_TO_METHOD[String(sh.name).toLowerCase()]||'justsold';
+      sh.rows.forEach(function(r){
+        var method2 = r.Method ? (SHEET_TO_METHOD[String(r.Method).toLowerCase()]||method) : method;
+        var first=r['First Name']||'', last=r['Last Name']||'', mobile=r['Mobile']||'';
+        if(!first && !last && !mobile) return;
+        var cd=r['Call Date']; if(cd instanceof Date){ cd=cd.getFullYear()+'-'+pad(cd.getMonth()+1)+'-'+pad(cd.getDate()); } else { cd=String(cd).slice(0,10); }
+        var oc='noanswer'; var ocRaw=String(r.Outcome||'').toLowerCase(); if(ocRaw.indexOf('not interested')>-1) oc='notinterested'; else if(ocRaw.indexOf('interested')>-1) oc='interested';
+        out.push({ id:r.ID||crmUid(), method:method2, outcome:oc, first:String(first), last:String(last), address:String(r.Address||''), mobile:String(mobile), email:String(r.Email||''), callDate:cd||todayISO(), stepsDone:parseInt(r['Steps Done'],10)||0, archived:String(r['Next Action']).toLowerCase()==='archived', notes:String(r.Notes||'') });
+      });
+    });
+    crmSave(out); crmRenderAll();
+    alert('Imported '+out.length+' contact'+(out.length===1?'':'s')+'.');
+  });
+}
+
+/* ----- "Log a call" buttons inside each method panel ----- */
+function openContactsFor(method){
+  showPanel('contacts');
+  var sel=document.getElementById('f-method'); if(sel) sel.value=method;
+  document.getElementById('f-callDate').value=todayISO();
+  var f=document.getElementById('f-first'); if(f){ f.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(function(){ f.focus(); }, 300); }
+}
+function injectLogButtons(){
+  Object.keys(METHODS).forEach(function(m){
+    var panel=document.getElementById(m); if(!panel) return;
+    var header=panel.querySelector('.panel-header'); if(!header || header.querySelector('.log-call-btn')) return;
+    var btn=document.createElement('button');
+    btn.className='log-call-btn';
+    btn.textContent='＋ Log a '+METHODS[m].label+' call';
+    btn.setAttribute('onclick', "openContactsFor('"+m+"')");
+    header.appendChild(btn);
+  });
+}
+
+/* ----- Shared data folder (sync contacts across computers via a cloud folder) ----- */
+function refreshDataLocation(){
+  if(!(window.api && window.api.getDataLocation)) return;
+  window.api.getDataLocation().then(function(info){
+    if(!info) return;
+    var el=document.getElementById('data-location'); if(el) el.textContent=info.path;
+    var badge=document.getElementById('data-shared-badge'); if(badge) badge.style.display=info.custom?'inline-block':'none';
+    var dbtn=document.getElementById('data-default-btn'); if(dbtn) dbtn.style.display=info.custom?'inline-block':'none';
+  }).catch(function(){});
+}
+function chooseDataFolder(){
+  if(!(window.api && window.api.setDataLocation)){ alert('Open the desktop app to change where contacts are saved.'); return; }
+  window.api.setDataLocation().then(function(res){
+    if(!res || !res.ok){ if(res && res.error) alert('Could not switch folder: '+res.error); return; }
+    return window.api.loadContacts().then(function(rows){
+      CRM_CACHE = rows || []; crmRenderAll(); refreshDataLocation();
+      alert((res.adopted ? 'Loaded the contacts already in that folder.\n\n' : 'Your contacts are now saved to:\n'+res.path+'\n\n') +
+            'To share across computers: make sure this folder syncs (Dropbox / iCloud / OneDrive / Google Drive), then choose the SAME folder on your other computer.');
+    });
+  }).catch(function(){});
+}
+function useDefaultDataFolder(){
+  if(!(window.api && window.api.useDefaultDataLocation)) return;
+  if(!confirm('Switch back to storing contacts only on this computer?')) return;
+  window.api.useDefaultDataLocation().then(function(res){
+    if(!res || !res.ok) return;
+    return window.api.loadContacts().then(function(rows){ CRM_CACHE=rows||[]; crmRenderAll(); refreshDataLocation(); });
+  }).catch(function(){});
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var cd=document.getElementById('f-callDate'); if(cd) cd.value=todayISO();
+  injectLogButtons();
+  refreshDataLocation();
+  if(window.api && window.api.loadContacts){
+    window.api.loadContacts().then(function(rows){ CRM_CACHE = rows || []; crmRenderAll(); }).catch(function(){ crmRenderAll(); });
+  } else { crmRenderAll(); }
+});
+</script>
+
+
+<script>
+/* ===== Version display + manual update check (desktop only) ===== */
+function checkForUpdates(){
+  if(!(window.api && window.api.checkForUpdates)){ alert('Updates run in the installed desktop app.'); return; }
+  window.api.checkForUpdates().then(function(r){
+    if(r && r.dev){ alert('You\'re running in development mode (npm start). Auto-update only works in the installed app.'); }
+    else if(r && r.ok){ /* result shown via app dialog */ }
+    else if(r && r.error){ alert('Update check failed: '+r.error); }
+  }).catch(function(){});
+}
+document.addEventListener('DOMContentLoaded', function(){
+  if(window.api && window.api.getVersion){
+    window.api.getVersion().then(function(v){
+      if(!v) return;
+      var h=document.getElementById('app-version'); if(h) h.textContent='v'+v;
+      var a=document.getElementById('about-version'); if(a) a.textContent='Version '+v;
+    }).catch(function(){});
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+{
+  "name": "declan-prospecting-app",
+  "version": "0.22.0",
+  "description": "Prospecting scripts and contact tracker for real estate cold calling.",
+  "author": "Declan Addison",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "release": "electron-builder --publish always"
+  },
+  "devDependencies": {
+    "electron": "^31.3.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "electron-updater": "^6.3.9"
+  },
+  "build": {
+    "appId": "com.declanaddison.prospecting",
+    "productName": "Declan Prospecting App",
+    "files": [
+      "electron/**/*",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.business",
+      "icon": "assets/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Declan Prospecting App"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "YOUR_GITHUB_USERNAME",
+        "repo": "declan-prospecting-app"
+      }
+    ]
+  }
+}
