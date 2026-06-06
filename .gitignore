@@ -10,3 +10,11 @@ signing/
 
 # Local editor / tooling state
 .claude/
+
+# NEVER publish contacts data or exports, even if they end up in this folder
+prospecting-data.json
+app-config.json
+Declan_Contacts_*.xlsx
+Declan_Contacts_*.csv
+*.xlsx
+*.csv
