@@ -3,6 +3,10 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('api', {
   loadContacts: () => ipcRenderer.invoke('contacts:load'),
   saveContacts: (arr) => ipcRenderer.invoke('contacts:save', arr),
+  loadBuyers: () => ipcRenderer.invoke('buyers:load'),
+  saveBuyers: (arr) => ipcRenderer.invoke('buyers:save', arr),
+  loadProperties: () => ipcRenderer.invoke('properties:load'),
+  saveProperties: (arr) => ipcRenderer.invoke('properties:save', arr),
   getDataLocation: () => ipcRenderer.invoke('data:getLocation'),
   setDataLocation: () => ipcRenderer.invoke('data:setLocation'),
   useDefaultDataLocation: () => ipcRenderer.invoke('data:useDefault'),

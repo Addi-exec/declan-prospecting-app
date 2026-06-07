@@ -25,6 +25,24 @@ function updateConfig(mutate) { const cfg = readConfig(); mutate(cfg); writeConf
 function dataDir() { const c = readConfig(); return (c.dataDir && fs.existsSync(c.dataDir)) ? c.dataDir : app.getPath('userData'); }
 function dataFile() { return path.join(dataDir(), DATA_FILENAME); }
 
+// The data file holds three collections. Older versions stored a bare ARRAY of
+// contacts, so migrate that shape on read. Always read-modify-write the whole
+// object so saving one collection never clobbers the others.
+function readData() {
+  try {
+    const p = dataFile();
+    if (!fs.existsSync(p)) return { contacts: [], buyers: [], properties: [] };
+    const raw = JSON.parse(fs.readFileSync(p, 'utf8') || '{}');
+    if (Array.isArray(raw)) return { contacts: raw, buyers: [], properties: [] };
+    return { contacts: raw.contacts || [], buyers: raw.buyers || [], properties: raw.properties || [] };
+  } catch (e) { return { contacts: [], buyers: [], properties: [] }; }
+}
+function updateData(mutate) {
+  const d = readData(); mutate(d);
+  fs.writeFileSync(dataFile(), JSON.stringify(d, null, 2));
+  return d;
+}
+
 function createWindow() {
   mainWin = new BrowserWindow({
     width: 1200,
@@ -214,6 +232,8 @@ const GS_REDIRECT_PORT = 42813;
 const GS_REDIRECT_URI = 'http://localhost:' + GS_REDIRECT_PORT;
 const GS_SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const CONTACT_HEADERS = ['id','method','outcome','first','last','address','mobile','email','callDate','stepsDone','branchDate','archived','notes'];
+const BUYER_HEADERS = ['id','first','last','mobile','email','buyerType','budgetMin','budgetMax','types','bedsMin','bathsMin','carMin','landMin','suburbs','enquiries','archived','notes'];
+const PROPERTY_HEADERS = ['id','status','archiveReason','address','suburb','postcode','type','price','priceType','priceMax','beds','baths','car','land','salePrice','saleDate','listingUrl','listedDate','notes'];
 // Per-request timeout so a hung network never freezes contacts:load / contacts:save —
 // the callers all fall back to the local JSON file when a Sheets call rejects.
 const GS_REQ_OPTS = { timeout: 20000 };
@@ -243,75 +263,115 @@ function getAuthClient() {
   return makeOAuth2Client(cfg);
 }
 
-async function gsLoadFromSheet(auth, sheetId) {
+/* Generalized per-tab read/write. Array fields (types/suburbs/enquiries) live in a
+   single comma-separated cell; numeric/boolean fields are coerced back on load.
+   gsLoadTab THROWS on a missing tab or API error so callers fall back to local
+   data instead of mirroring an empty result over it. */
+const GS_TABS = ['Contacts', 'Buyers', 'Properties'];
+const GS_ARRAY_FIELDS = { types: 1, suburbs: 1, enquiries: 1 };
+const GS_NUM_FIELDS = { stepsDone:1, budgetMin:1, budgetMax:1, bedsMin:1, bathsMin:1, carMin:1, landMin:1, price:1, priceMax:1, beds:1, baths:1, car:1, land:1, salePrice:1 };
+const GS_BOOL_FIELDS = { archived: 1 };
+
+async function gsLoadTab(auth, sheetId, tab) {
   const api = gsApi(auth);
-  const res = await api.spreadsheets.values.get({ spreadsheetId: sheetId, range: 'Contacts!A:N' }, GS_REQ_OPTS);
+  const res = await api.spreadsheets.values.get({ spreadsheetId: sheetId, range: tab + '!A:ZZ' }, GS_REQ_OPTS);
   const rows = res.data.values || [];
   if (rows.length < 2) return [];
-  const header = rows[0].map((h) => String(h).trim());
+  const hdr = rows[0].map((h) => String(h).trim());
   return rows.slice(1)
     .filter((r) => r.some((v) => v != null && v !== ''))
     .map((r) => {
-      const obj = {};
-      header.forEach((h, i) => { obj[h] = r[i] != null ? String(r[i]) : ''; });
-      obj.stepsDone = parseInt(obj.stepsDone, 10) || 0;
-      obj.archived = obj.archived === 'true';
-      return obj;
+      const o = {};
+      hdr.forEach((h, i) => {
+        const v = r[i] != null ? String(r[i]) : '';
+        if (GS_ARRAY_FIELDS[h]) o[h] = v ? v.split(',').map((s) => s.trim()).filter(Boolean) : [];
+        else if (GS_NUM_FIELDS[h]) o[h] = v === '' ? '' : (parseFloat(v) || 0);
+        else if (GS_BOOL_FIELDS[h]) o[h] = v === 'true';
+        else o[h] = v;
+      });
+      return o;
     });
 }
 
-async function gsSaveToSheet(auth, sheetId, contacts) {
+async function gsSaveTab(auth, sheetId, tab, headers, rows) {
   const api = gsApi(auth);
   const values = [
-    CONTACT_HEADERS,
-    ...contacts.map((c) => CONTACT_HEADERS.map((h) => (c[h] == null ? '' : String(c[h]))))
+    headers,
+    ...(rows || []).map((rec) => headers.map((h) => {
+      const v = rec[h];
+      if (v == null) return '';
+      if (Array.isArray(v)) return v.join(',');
+      return String(v);
+    }))
   ];
-  await api.spreadsheets.values.clear({ spreadsheetId: sheetId, range: 'Contacts!A:N' }, GS_REQ_OPTS);
+  await api.spreadsheets.values.clear({ spreadsheetId: sheetId, range: tab + '!A:ZZ' }, GS_REQ_OPTS);
   await api.spreadsheets.values.update({
-    spreadsheetId: sheetId, range: 'Contacts!A1',
+    spreadsheetId: sheetId, range: tab + '!A1',
     valueInputOption: 'RAW', requestBody: { values }
   }, GS_REQ_OPTS);
 }
 
-/* ---------------- Contacts: load / save (local + optional Google Sheets) ---------------- */
-ipcMain.handle('contacts:load', async () => {
-  try {
-    const cfg = readConfig();
-    if (cfg.gTokens && cfg.gSheetId) {
-      const auth = getAuthClient();
-      if (auth) {
-        try {
-          const contacts = await gsLoadFromSheet(auth, cfg.gSheetId);
-          // Keep a local mirror so the app still works offline; a failed mirror write
-          // shouldn't hide the freshly-fetched contacts, but it's worth surfacing.
-          try { fs.writeFileSync(dataFile(), JSON.stringify(contacts, null, 2)); }
-          catch(e) { console.warn('Could not write local contacts mirror:', String(e)); }
-          return contacts;
-        } catch(e) { /* fall through to local file */ }
-      }
-    }
-    const p = dataFile();
-    if (!fs.existsSync(p)) return [];
-    return JSON.parse(fs.readFileSync(p, 'utf8') || '[]');
-  } catch (e) { return []; }
-});
+// Make sure all three tabs exist (sheets created before v0.25 only had 'Contacts').
+async function ensureTabs(auth, sheetId) {
+  const api = gsApi(auth);
+  const meta = await api.spreadsheets.get({ spreadsheetId: sheetId }, GS_REQ_OPTS);
+  const have = new Set((meta.data.sheets || []).map((s) => s.properties.title));
+  const missing = GS_TABS.filter((t) => !have.has(t));
+  if (missing.length) {
+    await api.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: missing.map((t) => ({ addSheet: { properties: { title: t } } })) }
+    }, GS_REQ_OPTS);
+  }
+}
 
-ipcMain.handle('contacts:save', async (_e, arr) => {
-  try {
-    fs.writeFileSync(dataFile(), JSON.stringify(arr, null, 2));
-    const cfg = readConfig();
-    if (cfg.gTokens && cfg.gSheetId) {
-      const auth = getAuthClient();
-      if (auth) {
-        try {
-          await gsSaveToSheet(auth, cfg.gSheetId, arr);
-          return { ok: true, synced: true };
-        } catch(e) { return { ok: true, synced: false, syncError: String(e) }; }
+/* ---------------- Collections: contacts / buyers / properties ----------------
+   Each is a slice of the data object {contacts,buyers,properties}. Saving one slice
+   never touches the others (read-modify-write via updateData). When Google Sheets is
+   connected, each slice syncs to its own tab, local-first: a sync failure returns
+   {ok:true, synced:false} and never loses local data. */
+function makeCollectionHandlers(key, tab, headers) {
+  ipcMain.handle(key + ':load', async () => {
+    try {
+      const cfg = readConfig();
+      if (cfg.gTokens && cfg.gSheetId) {
+        const auth = getAuthClient();
+        if (auth) {
+          try {
+            const rows = await gsLoadTab(auth, cfg.gSheetId, tab);
+            // Mirror to the local file so the app still works offline.
+            try { updateData((d) => { d[key] = rows; }); }
+            catch(e) { console.warn('Could not write local ' + key + ' mirror:', String(e)); }
+            return rows;
+          } catch(e) { /* tab missing or sync error → fall back to local */ }
+        }
       }
-    }
-    return { ok: true };
-  } catch (err) { return { ok: false, error: String(err) }; }
-});
+      return readData()[key] || [];
+    } catch (e) { return []; }
+  });
+
+  ipcMain.handle(key + ':save', async (_e, arr) => {
+    try {
+      updateData((d) => { d[key] = Array.isArray(arr) ? arr : []; });
+      const cfg = readConfig();
+      if (cfg.gTokens && cfg.gSheetId) {
+        const auth = getAuthClient();
+        if (auth) {
+          try {
+            await ensureTabs(auth, cfg.gSheetId);
+            await gsSaveTab(auth, cfg.gSheetId, tab, headers, arr || []);
+            return { ok: true, synced: true };
+          } catch(e) { return { ok: true, synced: false, syncError: String(e) }; }
+        }
+      }
+      return { ok: true };
+    } catch (err) { return { ok: false, error: String(err) }; }
+  });
+}
+
+makeCollectionHandlers('contacts', 'Contacts', CONTACT_HEADERS);
+makeCollectionHandlers('buyers', 'Buyers', BUYER_HEADERS);
+makeCollectionHandlers('properties', 'Properties', PROPERTY_HEADERS);
 
 /* ---------------- Data location (share across computers via a cloud folder) ---------------- */
 ipcMain.handle('data:getLocation', () => {
@@ -494,11 +554,14 @@ ipcMain.handle('gsheets:createSheet', async (_e, contacts) => {
     const res = await api.spreadsheets.create({
       requestBody: {
         properties: { title: 'Declan Prospecting Contacts' },
-        sheets: [{ properties: { title: 'Contacts' } }]
+        sheets: GS_TABS.map((t) => ({ properties: { title: t } }))
       }
     }, GS_REQ_OPTS);
     const sheetId = res.data.spreadsheetId;
-    await gsSaveToSheet(auth, sheetId, Array.isArray(contacts) ? contacts : []);
+    const d = readData();
+    await gsSaveTab(auth, sheetId, 'Contacts', CONTACT_HEADERS, Array.isArray(contacts) ? contacts : d.contacts);
+    await gsSaveTab(auth, sheetId, 'Buyers', BUYER_HEADERS, d.buyers);
+    await gsSaveTab(auth, sheetId, 'Properties', PROPERTY_HEADERS, d.properties);
     updateConfig((cfg) => { cfg.gSheetId = sheetId; cfg.gSheetName = 'Declan Prospecting Contacts'; });
     return { ok: true, sheetId, sheetName: 'Declan Prospecting Contacts', sheetUrl: 'https://docs.google.com/spreadsheets/d/' + sheetId };
   } catch(e) { return { ok: false, error: String(e) }; }
@@ -514,10 +577,7 @@ ipcMain.handle('gsheets:linkSheet', async (_e, urlOrId) => {
     const api = gsApi(auth);
     const meta = await api.spreadsheets.get({ spreadsheetId: sheetId }, GS_REQ_OPTS);
     const sheetName = meta.data.properties.title;
-    const hasTab = (meta.data.sheets || []).some((s) => s.properties.title === 'Contacts');
-    if (!hasTab) {
-      await api.spreadsheets.batchUpdate({ spreadsheetId: sheetId, requestBody: { requests: [{ addSheet: { properties: { title: 'Contacts' } } }] } }, GS_REQ_OPTS);
-    }
+    await ensureTabs(auth, sheetId);
     updateConfig((cfg) => { cfg.gSheetId = sheetId; cfg.gSheetName = sheetName; });
     return { ok: true, sheetId, sheetName };
   } catch(e) { return { ok: false, error: String(e) }; }

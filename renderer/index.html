@@ -22,7 +22,7 @@
     --warm:#7a4f00; --warm-bg:#fef9ec;
     --cold:#1e3a8a; --cold-bg:#e8f0ff;
     --sms-bubble:#0b7adb; --tip-strong:#412402;
-    --on-accent:#ffffff;
+    --on-accent:#ffffff; --scrim:rgba(20,18,16,0.45);
   }
   [data-theme="dark"] {
     color-scheme: dark;
@@ -40,7 +40,7 @@
     --warm:#e6bb5e; --warm-bg:#322a15;
     --cold:#90adeb; --cold-bg:#1b2742;
     --sms-bubble:#2f8fe6; --tip-strong:#f3ddab;
-    --on-accent:#ffffff;
+    --on-accent:#ffffff; --scrim:rgba(0,0,0,0.6);
   }
   body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0; }
   body, header, nav, .panel, .script-block, .tag, .tip-box, .objection-a, .xyz-card, .email-card, button { transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
@@ -137,6 +137,27 @@
   .crm-table th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--text3); padding: 9px 11px; border-bottom: 1px solid var(--border); background: var(--surface2); white-space: nowrap; }
   .crm-table td { padding: 9px 11px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
   .crm-table tr:last-child td { border-bottom: none; }
+  /* ===== Buyers / Properties / matching ===== */
+  .pill { display:inline-block; font-size:11px; font-weight:600; padding:2px 9px; border-radius:20px; white-space:nowrap; }
+  .pill-on { background:var(--green-bg); color:var(--green); }
+  .pill-off { background:var(--amber-bg); color:var(--amber); }
+  .pill-arch { background:var(--surface2); color:var(--text3); border:1px solid var(--border); }
+  .fit { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; white-space:nowrap; }
+  .fit-great { background:var(--green-bg); color:var(--green); }
+  .fit-good { background:var(--blue-bg); color:var(--blue); }
+  .fit-fair { background:var(--amber-bg); color:var(--amber); }
+  .fit-low { background:var(--surface2); color:var(--text3); }
+  .modal-overlay { position:fixed; inset:0; background:var(--scrim); display:none; align-items:flex-start; justify-content:center; z-index:1000; padding:40px 16px; overflow-y:auto; }
+  .modal-overlay.open { display:flex; }
+  .modal-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; width:100%; max-width:640px; padding:20px 22px; }
+  .modal-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:14px; }
+  .modal-title { font-size:17px; font-weight:600; color:var(--text); }
+  .modal-close { background:none; border:none; font-size:20px; line-height:1; color:var(--text3); cursor:pointer; padding:2px 6px; }
+  .match-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 0; border-top:1px solid var(--border); flex-wrap:wrap; }
+  .match-row:first-child { border-top:none; }
+  .check-row { display:flex; align-items:center; gap:9px; padding:8px 0; border-top:1px solid var(--border); font-size:13px; color:var(--text); }
+  .check-row:first-child { border-top:none; }
+  .check-row input { width:16px; height:16px; flex-shrink:0; }
   .crm-empty { background: var(--surface2); border-radius: 10px; padding: 22px; text-align: center; color: var(--text2); font-size: 13px; }
   .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
   .filter-chip { font-size: 12px; padding: 6px 13px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; }
@@ -150,13 +171,15 @@
 <header>
   <div class="header-left">
     <h1>Declan Addison — Cold Calling Scripts</h1>
-    <p>Neighbourhood prospecting · Just sold · Just listed · Buyer database · Steal listings &nbsp;·&nbsp; <span id="app-version" onclick="showPanel('about')" title="What's new" style="color:var(--text3);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">v0.24.1</span></p>
+    <p>Neighbourhood prospecting · Just sold · Just listed · Buyer database · Steal listings &nbsp;·&nbsp; <span id="app-version" onclick="showPanel('about')" title="What's new" style="color:var(--text3);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">v0.25.0</span></p>
   </div>
   <button id="theme-toggle" onclick="toggleTheme()" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:12.5px;cursor:pointer;font-weight:500;white-space:nowrap;">🌙 Dark</button>
 </header>
 
 <div class="tab-bar-mobile">
   <button class="tab-btn active" onclick="showPanel('contacts',this)">Contacts</button>
+  <button class="tab-btn" onclick="showPanel('buyers',this)">Buyers</button>
+  <button class="tab-btn" onclick="showPanel('properties',this)">Properties</button>
   <button class="tab-btn" onclick="showPanel('justsold',this)">Just sold street</button>
   <button class="tab-btn" onclick="showPanel('listed',this)">Just listed</button>
   <button class="tab-btn" onclick="showPanel('buyerdb',this)">Buyer database</button>
@@ -168,6 +191,9 @@
 <nav>
   <div class="nav-section-label">Tracker</div>
   <a onclick="showPanel('contacts',this)" class="active"><span class="dot" style="background:var(--amber)"></span>Contacts &amp; follow-ups</a>
+  <div class="nav-section-label">Database</div>
+  <a onclick="showPanel('buyers',this)"><span class="dot" style="background:var(--pink)"></span>Buyers</a>
+  <a onclick="showPanel('properties',this)"><span class="dot" style="background:var(--purple)"></span>Properties</a>
   <div class="nav-section-label">Prospect methods</div>
   <a onclick="showPanel('justsold',this)"><span class="dot" style="background:var(--blue)"></span>Just sold street</a>
   <a onclick="showPanel('listed',this)"><span class="dot" style="background:var(--green)"></span>Just listed</a>
@@ -1498,6 +1524,143 @@
 </div>
 
 
+<!-- ===================== BUYERS DATABASE ===================== -->
+<div id="buyers" class="panel">
+  <div class="panel-header">
+    <div class="badge" style="background:var(--pink-bg);color:var(--pink)">Buyer database</div>
+    <h2>Buyers</h2>
+    <p>Keep every buyer's budget, preferences and the properties they've enquired on. Then hit <strong>Match</strong> to instantly rank the best properties for them — including off-market ones.</p>
+  </div>
+
+  <div class="crm-section">
+    <div class="script-label">Add / edit a buyer</div>
+    <input type="hidden" id="buyer-edit-id">
+    <div class="crm-grid">
+      <div class="crm-field"><label>First name</label><input id="b-first" placeholder="First name"></div>
+      <div class="crm-field"><label>Last name</label><input id="b-last" placeholder="Last name"></div>
+      <div class="crm-field"><label>Mobile</label><input id="b-mobile" placeholder="04xx xxx xxx" inputmode="tel"></div>
+      <div class="crm-field"><label>Email (optional)</label><input id="b-email" placeholder="name@email.com" inputmode="email"></div>
+      <div class="crm-field"><label>Buyer type</label>
+        <select id="b-type">
+          <option value="">—</option>
+          <option value="fhb">First-home buyer</option>
+          <option value="upgrader">Upgrader</option>
+          <option value="downsizer">Downsizer</option>
+          <option value="investor">Investor</option>
+        </select>
+      </div>
+      <div class="crm-field"><label>Preferred suburbs (comma-separated)</label><input id="b-suburbs" placeholder="Richmond, Hawthorn, Kew"></div>
+      <div class="crm-field"><label>Budget min ($)</label><input id="b-budgetMin" inputmode="numeric" placeholder="500000"></div>
+      <div class="crm-field"><label>Budget max ($)</label><input id="b-budgetMax" inputmode="numeric" placeholder="750000"></div>
+      <div class="crm-field" style="grid-column:1/-1;"><label>Property types wanted</label>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;padding-top:4px;">
+          <label style="font-weight:400;text-transform:none;letter-spacing:0;font-size:13px;display:flex;gap:6px;align-items:center;color:var(--text);"><input type="checkbox" class="b-type-cb" value="house">House</label>
+          <label style="font-weight:400;text-transform:none;letter-spacing:0;font-size:13px;display:flex;gap:6px;align-items:center;color:var(--text);"><input type="checkbox" class="b-type-cb" value="townhouse">Townhouse / Villa</label>
+          <label style="font-weight:400;text-transform:none;letter-spacing:0;font-size:13px;display:flex;gap:6px;align-items:center;color:var(--text);"><input type="checkbox" class="b-type-cb" value="unit">Unit / Apartment</label>
+          <label style="font-weight:400;text-transform:none;letter-spacing:0;font-size:13px;display:flex;gap:6px;align-items:center;color:var(--text);"><input type="checkbox" class="b-type-cb" value="land">Land / Acreage</label>
+        </div>
+      </div>
+      <div class="crm-field"><label>Min bedrooms</label><input id="b-bedsMin" inputmode="numeric" placeholder="3"></div>
+      <div class="crm-field"><label>Min bathrooms</label><input id="b-bathsMin" inputmode="numeric" placeholder="2"></div>
+      <div class="crm-field"><label>Min car spaces</label><input id="b-carMin" inputmode="numeric" placeholder="1"></div>
+      <div class="crm-field"><label>Min land (m²)</label><input id="b-landMin" inputmode="numeric" placeholder="400"></div>
+      <div class="crm-field" style="grid-column:1/-1;"><label>Notes (optional)</label><textarea id="b-notes" rows="2" placeholder="What they're really after, finance, timeframe…"></textarea></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button id="buyer-save-btn" class="crm-btn crm-btn-primary" onclick="buyerSave()">＋ Save buyer</button>
+      <button class="crm-btn crm-btn-ghost" onclick="buyerClearForm()">Clear</button>
+    </div>
+    <div id="b-msg" style="font-size:12.5px;color:var(--teal);margin-top:8px;min-height:16px;"></div>
+  </div>
+
+  <div class="crm-section">
+    <div class="script-label">All buyers</div>
+    <div class="filter-bar" id="buyer-filter-bar"></div>
+    <div style="position:relative;margin-bottom:12px;">
+      <input id="buyer-search" oninput="buyerDoSearch(this.value)" placeholder="Search name, mobile, email, suburb or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:14px;color:var(--text);font-family:inherit;">
+    </div>
+    <div id="buyer-table-wrap"></div>
+  </div>
+</div>
+
+<!-- ===================== PROPERTIES INVENTORY ===================== -->
+<div id="properties" class="panel">
+  <div class="panel-header">
+    <div class="badge" style="background:var(--purple-bg);color:var(--purple)">Property inventory</div>
+    <h2>Properties</h2>
+    <p>Track everything you have available — on market, off market, and archived (sold or no longer listing). Hit <strong>Match</strong> on any property to see the buyers it suits best.</p>
+  </div>
+
+  <div class="crm-section">
+    <div class="script-label">Add / edit a property</div>
+    <input type="hidden" id="prop-edit-id">
+    <div class="crm-grid">
+      <div class="crm-field"><label>Status</label>
+        <select id="p-status">
+          <option value="onmarket">On market</option>
+          <option value="offmarket">Off market</option>
+          <option value="archived">Archived (sold / withdrawn)</option>
+        </select>
+      </div>
+      <div class="crm-field"><label>Type</label>
+        <select id="p-type">
+          <option value="house">House</option>
+          <option value="townhouse">Townhouse / Villa</option>
+          <option value="unit">Unit / Apartment</option>
+          <option value="land">Land / Acreage</option>
+        </select>
+      </div>
+      <div class="crm-field" style="grid-column:1/-1;"><label>Address</label><input id="p-address" placeholder="12 Example St"></div>
+      <div class="crm-field"><label>Suburb</label><input id="p-suburb" placeholder="Richmond"></div>
+      <div class="crm-field"><label>Postcode</label><input id="p-postcode" inputmode="numeric" placeholder="3121"></div>
+      <div class="crm-field"><label>Price / guide ($) — used for matching</label><input id="p-price" inputmode="numeric" placeholder="700000"></div>
+      <div class="crm-field"><label>Price type</label>
+        <select id="p-priceType">
+          <option value="fixed">Fixed price</option>
+          <option value="range">Range</option>
+          <option value="auction">Auction</option>
+          <option value="eoi">EOI</option>
+        </select>
+      </div>
+      <div class="crm-field"><label>Price max ($) — if a range</label><input id="p-priceMax" inputmode="numeric" placeholder="770000"></div>
+      <div class="crm-field"><label>Bedrooms</label><input id="p-beds" inputmode="numeric" placeholder="3"></div>
+      <div class="crm-field"><label>Bathrooms</label><input id="p-baths" inputmode="numeric" placeholder="2"></div>
+      <div class="crm-field"><label>Car spaces</label><input id="p-car" inputmode="numeric" placeholder="2"></div>
+      <div class="crm-field"><label>Land (m²)</label><input id="p-land" inputmode="numeric" placeholder="450"></div>
+      <div class="crm-field" style="grid-column:1/-1;"><label>Listing link (optional)</label><input id="p-listingUrl" placeholder="https://…"></div>
+      <div class="crm-field"><label>Listed date (optional)</label><input type="date" id="p-listedDate"></div>
+      <div class="crm-field"><label>Archive reason (if archived)</label>
+        <select id="p-archiveReason">
+          <option value="">—</option>
+          <option value="sold">Sold</option>
+          <option value="withdrawn">Withdrawn / no longer listing</option>
+        </select>
+      </div>
+      <div class="crm-field"><label>Sale price ($) — if sold</label><input id="p-salePrice" inputmode="numeric" placeholder="785000"></div>
+      <div class="crm-field"><label>Sale date — if sold</label><input type="date" id="p-saleDate"></div>
+      <div class="crm-field" style="grid-column:1/-1;"><label>Notes (optional)</label><textarea id="p-notes" rows="2" placeholder="Anything worth remembering about this property…"></textarea></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button id="prop-save-btn" class="crm-btn crm-btn-primary" onclick="propSave()">＋ Save property</button>
+      <button class="crm-btn crm-btn-ghost" onclick="propClearForm()">Clear</button>
+    </div>
+    <div id="p-msg" style="font-size:12.5px;color:var(--teal);margin-top:8px;min-height:16px;"></div>
+  </div>
+
+  <div class="crm-section">
+    <div class="script-label">Inventory</div>
+    <div class="btn-bar">
+      <button class="prop-tab branch-tab" data-status="onmarket" onclick="propShowTab('onmarket')">On market</button>
+      <button class="prop-tab branch-tab" data-status="offmarket" onclick="propShowTab('offmarket')">Off market</button>
+      <button class="prop-tab branch-tab" data-status="archived" onclick="propShowTab('archived')">Archived</button>
+    </div>
+    <div style="position:relative;margin-bottom:12px;">
+      <input id="prop-search" oninput="propDoSearch(this.value)" placeholder="Search address, suburb, postcode or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:14px;color:var(--text);font-family:inherit;">
+    </div>
+    <div id="prop-table-wrap"></div>
+  </div>
+</div>
+
 <!-- ===================== ABOUT & WHAT'S NEW ===================== -->
 <div id="about" class="panel">
   <div class="panel-header">
@@ -1508,7 +1671,7 @@
 
   <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:22px;">
     <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">You're running</div>
-    <div id="about-version" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Version 0.24.1</div>
+    <div id="about-version" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Version 0.25.0</div>
   </div>
 
   <div style="background:var(--blue-bg);border-radius:10px;padding:14px 16px;margin-bottom:22px;">
@@ -1518,7 +1681,15 @@
   </div>
 
   <div class="script-label">Version history</div>
-  <div style="margin-top:4px;"><div class="changelog-row"><div class="changelog-ver">v0.24.1</div><div class="muted-sm">Behind-the-scenes tidy-up of the app's styling so it's quicker and safer to improve from here — nothing changed in how the app looks or works.</div></div><div class="changelog-row"><div class="changelog-ver">v0.24</div><div class="muted-sm">Sync your contacts to a <strong style="color:var(--text);">Google Sheet</strong>: connect once from the Storage box and your contacts stay in step on every computer — and you can view or edit them right in Google Sheets, even from your phone. Also added <strong style="color:var(--text);">Linux support</strong> (Linux Mint), so the app now runs on Windows, Mac and Linux.</div></div><div class="changelog-row"><div class="changelog-ver">v0.23</div><div class="muted-sm">Made updating easy on Mac: added a <strong style="color:var(--text);">Check for updates</strong> button on this page (and an automatic check when you open the app). When a new version is out it tells you and opens the download — just open the .dmg and drag the app into Applications. Windows keeps installing updates by itself.</div></div><div class="changelog-row"><div class="changelog-ver">v0.22</div><div class="muted-sm">Share your contacts across computers: point the tracker at a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) from the Storage box, then choose the same folder on your other computer. Also turned on automatic updates (via GitHub) so new versions can install themselves.</div></div><div class="changelog-row"><div class="changelog-ver">v0.21</div><div class="muted-sm">Windows support is back: the app now installs and runs on Windows as well as Mac. Added a Windows installer build (<strong style="color:var(--text);">npm run build:win</strong>) and double-click launchers, and fixed a first-time setup issue where the app engine sometimes didn't finish installing.</div></div><div class="changelog-row"><div class="changelog-ver">v0.20.1</div><div class="muted-sm">Brought Just listed, Buyer database and Steal listings up to the same standard as Just sold — branched follow-ups (no answer / interested / not interested) and HOT / WARM / COLD nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.18</div><div class="muted-sm">Rebuilt as a cross-platform desktop app (Electron) with a local database and native Excel/CSV export &amp; import — no browser, no sandbox.</div></div><div class="changelog-row"><div class="changelog-ver">v0.17</div><div class="muted-sm">Added a call-outcome option (no answer / interested / not interested) when logging a contact, so the follow-up reminders use the right branch. You can also change a contact's outcome later and the schedule restarts from that day.</div></div><div class="changelog-row"><div class="changelog-ver">v0.16</div><div class="muted-sm">Added this About &amp; what's new page, with version history.</div></div><div class="changelog-row"><div class="changelog-ver">v0.15</div><div class="muted-sm">Renamed to a stable filename so data survives updates; added optional project-folder data file (auto-saves to prospecting-data.json on Chrome/Edge).</div></div><div class="changelog-row"><div class="changelog-ver">v0.14</div><div class="muted-sm">Split the Just sold follow-up into three branches: no answer (voicemail + SMS), answered &amp; interested, answered &amp; not interested.</div></div><div class="changelog-row"><div class="changelog-ver">v0.13</div><div class="muted-sm">Rewrote the Just sold openers to feel warmer and more genuine — dropped the "this is a cold call" line while keeping the research behind each one.</div></div><div class="changelog-row"><div class="changelog-ver">v0.12</div><div class="muted-sm">Added a search box to the contact tracker.</div></div><div class="changelog-row"><div class="changelog-ver">v0.11</div><div class="muted-sm">Built the contact tracker: quick logging, automatic due/overdue reminders from each call date, and Excel export/import (one sheet per method).</div></div><div class="changelog-row"><div class="changelog-ver">v0.10</div><div class="muted-sm">Added dark mode with a light/dark toggle and a full themed colour system.</div></div><div class="changelog-row"><div class="changelog-ver">v0.9</div><div class="muted-sm">Gave each prospect method its own openers, objections, closes, follow-up and nurture; removed the old shared sections. Stripped all email steps — calls and messages only.</div></div><div class="changelog-row"><div class="changelog-ver">v0.8</div><div class="muted-sm">Moved Just listed into the prospect methods with its own openers, objections and closes.</div></div><div class="changelog-row"><div class="changelog-ver">v0.7</div><div class="muted-sm">Consolidated the core openers, objections and closes into the Just sold street method.</div></div><div class="changelog-row"><div class="changelog-ver">v0.6</div><div class="muted-sm">Added two new prospect methods: Buyer database and Steal listings.</div></div><div class="changelog-row"><div class="changelog-ver">v0.5</div><div class="muted-sm">Reorganised into prospect methods and a special opens section.</div></div><div class="changelog-row"><div class="changelog-ver">v0.4</div><div class="muted-sm">Rebuilt the openers around proven psychology and cold-calling data.</div></div><div class="changelog-row"><div class="changelog-ver">v0.3</div><div class="muted-sm">Added the HOT / WARM / COLD SMS nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.2</div><div class="muted-sm">Added voicemail scripts, the follow-up sequence and the no-answer nurture.</div></div><div class="changelog-row"><div class="changelog-ver">v0.1</div><div class="muted-sm">First downloadable version with the core just-sold scripts.</div></div></div>
+  <div style="margin-top:4px;"><div class="changelog-row"><div class="changelog-ver">v0.25</div><div class="muted-sm">Big one: a proper <strong style="color:var(--text);">Buyers database</strong> (budget, preferences, preferred suburbs, and the properties each buyer enquired on) and a <strong style="color:var(--text);">Properties</strong> inventory (on market / off market / archived). Hit <strong style="color:var(--text);">Match</strong> on any buyer or property to instantly see the best fits, ranked — including off-market properties. Everything syncs to Google Sheets too (new Buyers and Properties tabs).</div></div><div class="changelog-row"><div class="changelog-ver">v0.24.1</div><div class="muted-sm">Behind-the-scenes tidy-up of the app's styling so it's quicker and safer to improve from here — nothing changed in how the app looks or works.</div></div><div class="changelog-row"><div class="changelog-ver">v0.24</div><div class="muted-sm">Sync your contacts to a <strong style="color:var(--text);">Google Sheet</strong>: connect once from the Storage box and your contacts stay in step on every computer — and you can view or edit them right in Google Sheets, even from your phone. Also added <strong style="color:var(--text);">Linux support</strong> (Linux Mint), so the app now runs on Windows, Mac and Linux.</div></div><div class="changelog-row"><div class="changelog-ver">v0.23</div><div class="muted-sm">Made updating easy on Mac: added a <strong style="color:var(--text);">Check for updates</strong> button on this page (and an automatic check when you open the app). When a new version is out it tells you and opens the download — just open the .dmg and drag the app into Applications. Windows keeps installing updates by itself.</div></div><div class="changelog-row"><div class="changelog-ver">v0.22</div><div class="muted-sm">Share your contacts across computers: point the tracker at a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) from the Storage box, then choose the same folder on your other computer. Also turned on automatic updates (via GitHub) so new versions can install themselves.</div></div><div class="changelog-row"><div class="changelog-ver">v0.21</div><div class="muted-sm">Windows support is back: the app now installs and runs on Windows as well as Mac. Added a Windows installer build (<strong style="color:var(--text);">npm run build:win</strong>) and double-click launchers, and fixed a first-time setup issue where the app engine sometimes didn't finish installing.</div></div><div class="changelog-row"><div class="changelog-ver">v0.20.1</div><div class="muted-sm">Brought Just listed, Buyer database and Steal listings up to the same standard as Just sold — branched follow-ups (no answer / interested / not interested) and HOT / WARM / COLD nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.18</div><div class="muted-sm">Rebuilt as a cross-platform desktop app (Electron) with a local database and native Excel/CSV export &amp; import — no browser, no sandbox.</div></div><div class="changelog-row"><div class="changelog-ver">v0.17</div><div class="muted-sm">Added a call-outcome option (no answer / interested / not interested) when logging a contact, so the follow-up reminders use the right branch. You can also change a contact's outcome later and the schedule restarts from that day.</div></div><div class="changelog-row"><div class="changelog-ver">v0.16</div><div class="muted-sm">Added this About &amp; what's new page, with version history.</div></div><div class="changelog-row"><div class="changelog-ver">v0.15</div><div class="muted-sm">Renamed to a stable filename so data survives updates; added optional project-folder data file (auto-saves to prospecting-data.json on Chrome/Edge).</div></div><div class="changelog-row"><div class="changelog-ver">v0.14</div><div class="muted-sm">Split the Just sold follow-up into three branches: no answer (voicemail + SMS), answered &amp; interested, answered &amp; not interested.</div></div><div class="changelog-row"><div class="changelog-ver">v0.13</div><div class="muted-sm">Rewrote the Just sold openers to feel warmer and more genuine — dropped the "this is a cold call" line while keeping the research behind each one.</div></div><div class="changelog-row"><div class="changelog-ver">v0.12</div><div class="muted-sm">Added a search box to the contact tracker.</div></div><div class="changelog-row"><div class="changelog-ver">v0.11</div><div class="muted-sm">Built the contact tracker: quick logging, automatic due/overdue reminders from each call date, and Excel export/import (one sheet per method).</div></div><div class="changelog-row"><div class="changelog-ver">v0.10</div><div class="muted-sm">Added dark mode with a light/dark toggle and a full themed colour system.</div></div><div class="changelog-row"><div class="changelog-ver">v0.9</div><div class="muted-sm">Gave each prospect method its own openers, objections, closes, follow-up and nurture; removed the old shared sections. Stripped all email steps — calls and messages only.</div></div><div class="changelog-row"><div class="changelog-ver">v0.8</div><div class="muted-sm">Moved Just listed into the prospect methods with its own openers, objections and closes.</div></div><div class="changelog-row"><div class="changelog-ver">v0.7</div><div class="muted-sm">Consolidated the core openers, objections and closes into the Just sold street method.</div></div><div class="changelog-row"><div class="changelog-ver">v0.6</div><div class="muted-sm">Added two new prospect methods: Buyer database and Steal listings.</div></div><div class="changelog-row"><div class="changelog-ver">v0.5</div><div class="muted-sm">Reorganised into prospect methods and a special opens section.</div></div><div class="changelog-row"><div class="changelog-ver">v0.4</div><div class="muted-sm">Rebuilt the openers around proven psychology and cold-calling data.</div></div><div class="changelog-row"><div class="changelog-ver">v0.3</div><div class="muted-sm">Added the HOT / WARM / COLD SMS nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.2</div><div class="muted-sm">Added voicemail scripts, the follow-up sequence and the no-answer nurture.</div></div><div class="changelog-row"><div class="changelog-ver">v0.1</div><div class="muted-sm">First downloadable version with the core just-sold scripts.</div></div></div>
+</div>
+
+<!-- Reusable modal (matching results + enquiry pickers) -->
+<div id="modal-overlay" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-card">
+    <div class="modal-head"><div class="modal-title" id="modal-title"></div><button class="modal-close" onclick="closeModal()" title="Close">✕</button></div>
+    <div id="modal-body"></div>
+  </div>
 </div>
 
 </main>
@@ -1796,7 +1967,17 @@ function crmExportXlsx(){
     var rows=exportRows(m).map(function(r){ return header.map(function(h){ return r[h]; }); });
     return { name: METHODS[m].sheet, header: header, rows: rows };
   });
-  window.api.exportExcel(sheets, 'Declan_Contacts_'+todayISO()+'.xlsx').then(function(res){ if(res && res.ok) alert('Saved to '+res.path); });
+  // Buyers sheet
+  var bHeader=['First Name','Last Name','Mobile','Email','Buyer Type','Budget Min','Budget Max','Types','Beds Min','Baths Min','Car Min','Land Min','Suburbs','Enquiries','Archived','Notes','ID'];
+  sheets.push({ name:'Buyers', header:bHeader, rows: (typeof buyersLoad==='function'?buyersLoad():[]).map(function(b){
+    return [b.first||'',b.last||'',b.mobile||'',b.email||'',(BUYER_TYPE_LABEL[b.buyerType]||''),b.budgetMin||'',b.budgetMax||'',(b.types||[]).map(function(t){return PROP_TYPE_LABEL[t]||t;}).join(', '),b.bedsMin||'',b.bathsMin||'',b.carMin||'',b.landMin||'',(b.suburbs||[]).join(', '),(b.enquiries||[]).length,b.archived?'Yes':'',b.notes||'',b.id];
+  }) });
+  // Properties sheet
+  var pHeader=['Address','Suburb','Postcode','Type','Status','Price','Price Type','Price Max','Beds','Baths','Car','Land','Sale Price','Sale Date','Listing URL','Listed Date','Notes','ID'];
+  sheets.push({ name:'Properties', header:pHeader, rows: (typeof propsLoadCache==='function'?propsLoadCache():[]).map(function(p){
+    return [p.address||'',p.suburb||'',p.postcode||'',(PROP_TYPE_LABEL[p.type]||p.type||''),(PROP_STATUS_LABEL[p.status]||p.status||''),p.price||'',(PRICE_TYPE_LABEL[p.priceType]||p.priceType||''),p.priceMax||'',p.beds||'',p.baths||'',p.car||'',p.land||'',p.salePrice||'',p.saleDate||'',p.listingUrl||'',p.listedDate||'',p.notes||'',p.id];
+  }) });
+  window.api.exportExcel(sheets, 'Declan_Data_'+todayISO()+'.xlsx').then(function(res){ if(res && res.ok) alert('Saved to '+res.path); });
 }
 function crmExportCsv(){
   var headers=['Method','First Name','Last Name','Mobile','Email','Address','Call Date','Outcome','Next Action','Next Due','Notes','Steps Done','ID'];
@@ -1970,7 +2151,7 @@ function gsCreateSheet(btn){
   var orig=btn.textContent; btn.disabled=true; btn.textContent='Creating…';
   window.api.gsCreateSheet(CRM_CACHE||[]).then(function(res){
     btn.disabled=false; btn.textContent=orig;
-    if(res && res.ok){ gsRefreshStatus(); alert('Sheet created and contacts uploaded!\n\nSheet: '+res.sheetName); }
+    if(res && res.ok){ gsRefreshStatus(); buyersReload(); propsReload(); alert('Sheet created and your data uploaded!\n\nSheet: '+res.sheetName); }
     else { alert('Could not create sheet: '+(res&&res.error||'Unknown error')); }
   }).catch(function(e){ btn.disabled=false; btn.textContent=orig; alert('Error: '+e); });
 }
@@ -1985,8 +2166,8 @@ function gsLinkSheet(btn){
     btn.disabled=false; btn.textContent=orig;
     if(res && res.ok){
       window.api.loadContacts().then(function(rows){
-        CRM_CACHE=rows||[]; crmRenderAll(); gsRefreshStatus();
-        alert('Linked! Contacts loaded from sheet.\n\nSheet: '+res.sheetName);
+        CRM_CACHE=rows||[]; crmRenderAll(); gsRefreshStatus(); buyersReload(); propsReload();
+        alert('Linked! Data loaded from sheet.\n\nSheet: '+res.sheetName);
       });
     } else { alert('Could not link sheet: '+(res&&res.error||'Unknown error')); }
   }).catch(function(e){ btn.disabled=false; btn.textContent=orig; alert('Error: '+e); });
@@ -2001,6 +2182,264 @@ function gsDisconnect(){
 function gsOpenSheet(){
   if(_gsSheetUrl && window.api && window.api.gsOpenSheet) window.api.gsOpenSheet(_gsSheetUrl);
 }
+</script>
+
+<script>
+/* ===== Buyers database + Properties inventory + matching ===== */
+var BUYERS_CACHE = [];
+var PROPS_CACHE = [];
+var buyerFilter = 'active';      // active | archived | all
+var buyerSearch = '';
+var propStatusTab = 'onmarket';  // onmarket | offmarket | archived
+var propSearch = '';
+
+var PROP_TYPE_LABEL = { house:'House', townhouse:'Townhouse / Villa', unit:'Unit / Apartment', land:'Land / Acreage' };
+var BUYER_TYPE_LABEL = { '':'', fhb:'First-home buyer', upgrader:'Upgrader', downsizer:'Downsizer', investor:'Investor' };
+var PRICE_TYPE_LABEL = { fixed:'Fixed price', range:'Range', auction:'Auction', eoi:'EOI' };
+var PROP_STATUS_LABEL = { onmarket:'On market', offmarket:'Off market', archived:'Archived' };
+
+function buid(){ return 'b' + Date.now() + Math.floor(Math.random()*1000); }
+function puid(){ return 'p' + Date.now() + Math.floor(Math.random()*1000); }
+function gv(id){ var e=document.getElementById(id); return e?String(e.value).trim():''; }
+function gnum(id){ var v=gv(id); return v===''? '' : (parseFloat(v.replace(/[, $]/g,''))||0); }
+function setv(id,v){ var e=document.getElementById(id); if(e) e.value=(v==null?'':v); }
+function listFromCsv(s){ return String(s||'').split(',').map(function(x){return x.trim();}).filter(Boolean); }
+function fmtMoney(n){ if(n===''||n==null||isNaN(n)) return ''; return '$'+Number(n).toLocaleString(); }
+function openExt(u){ u=decodeURIComponent(u); if(window.api&&window.api.gsOpenSheet){ window.api.gsOpenSheet(u); } else { window.open(u,'_blank'); } }
+
+function buyersLoad(){ return BUYERS_CACHE; }
+function buyersSaveCache(arr){ BUYERS_CACHE=arr; if(window.api&&window.api.saveBuyers) window.api.saveBuyers(arr); }
+function propsLoadCache(){ return PROPS_CACHE; }
+function propsSaveCache(arr){ PROPS_CACHE=arr; if(window.api&&window.api.saveProperties) window.api.saveProperties(arr); }
+function buyersReload(){ if(window.api&&window.api.loadBuyers){ return window.api.loadBuyers().then(function(r){ BUYERS_CACHE=r||[]; buyerRenderTable(); }); } buyerRenderTable(); return Promise.resolve(); }
+function propsReload(){ if(window.api&&window.api.loadProperties){ return window.api.loadProperties().then(function(r){ PROPS_CACHE=r||[]; propRenderTable(); }); } propRenderTable(); return Promise.resolve(); }
+
+/* ---- Modal ---- */
+function openModal(title, html){ var ov=document.getElementById('modal-overlay'); if(!ov) return; document.getElementById('modal-title').textContent=title; document.getElementById('modal-body').innerHTML=html; ov.classList.add('open'); }
+function closeModal(){ var ov=document.getElementById('modal-overlay'); if(ov) ov.classList.remove('open'); }
+
+/* ---- Buyers ---- */
+function buyerName(b){ return ((b.first||'')+' '+(b.last||'')).trim(); }
+function buyerCheckedTypes(){ var out=[]; document.querySelectorAll('.b-type-cb').forEach(function(cb){ if(cb.checked) out.push(cb.value); }); return out; }
+function buyerSave(){
+  var first=gv('b-first'), last=gv('b-last'), mobile=gv('b-mobile');
+  if(!first && !last && !mobile){ msg('b-msg','Add at least a name or mobile number.', true); return; }
+  var arr=buyersLoad(); var id=gv('buyer-edit-id');
+  var rec={ id:id||buid(), first:first, last:last, mobile:mobile, email:gv('b-email'),
+    buyerType:gv('b-type'), budgetMin:gnum('b-budgetMin'), budgetMax:gnum('b-budgetMax'),
+    types:buyerCheckedTypes(), bedsMin:gnum('b-bedsMin'), bathsMin:gnum('b-bathsMin'), carMin:gnum('b-carMin'), landMin:gnum('b-landMin'),
+    suburbs:listFromCsv(gv('b-suburbs')), notes:gv('b-notes') };
+  if(id){ var cur=arr.find(function(x){return x.id===id;}); rec.enquiries=(cur&&cur.enquiries)?cur.enquiries:[]; rec.archived=cur?!!cur.archived:false; arr=arr.map(function(x){ return x.id===id?rec:x; }); }
+  else { rec.enquiries=[]; rec.archived=false; arr.push(rec); }
+  buyersSaveCache(arr); buyerClearForm();
+  msg('b-msg','✓ Buyer '+(id?'updated':'saved')+': '+(first||last||mobile)+'.', false);
+  buyerRenderTable();
+}
+function buyerClearForm(){
+  setv('buyer-edit-id','');
+  ['b-first','b-last','b-mobile','b-email','b-budgetMin','b-budgetMax','b-bedsMin','b-bathsMin','b-carMin','b-landMin','b-suburbs','b-notes'].forEach(function(id){ setv(id,''); });
+  setv('b-type','');
+  document.querySelectorAll('.b-type-cb').forEach(function(cb){ cb.checked=false; });
+  var sb=document.getElementById('buyer-save-btn'); if(sb) sb.textContent='＋ Save buyer';
+}
+function buyerEdit(id){
+  var c=buyersLoad().find(function(x){return x.id===id;}); if(!c) return;
+  setv('buyer-edit-id',c.id); setv('b-first',c.first); setv('b-last',c.last); setv('b-mobile',c.mobile); setv('b-email',c.email);
+  setv('b-type',c.buyerType||''); setv('b-budgetMin',c.budgetMin); setv('b-budgetMax',c.budgetMax);
+  setv('b-bedsMin',c.bedsMin); setv('b-bathsMin',c.bathsMin); setv('b-carMin',c.carMin); setv('b-landMin',c.landMin);
+  setv('b-suburbs',(c.suburbs||[]).join(', ')); setv('b-notes',c.notes);
+  document.querySelectorAll('.b-type-cb').forEach(function(cb){ cb.checked=(c.types||[]).indexOf(cb.value)>-1; });
+  var sb=document.getElementById('buyer-save-btn'); if(sb) sb.textContent='✓ Update buyer';
+  var panel=document.getElementById('buyers'); if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function buyerArchive(id){ var arr=buyersLoad(); var c=arr.find(function(x){return x.id===id;}); if(!c) return; c.archived=!c.archived; buyersSaveCache(arr); buyerRenderTable(); }
+function buyerDelete(id){ if(!confirm('Delete this buyer permanently?')) return; buyersSaveCache(buyersLoad().filter(function(x){return x.id!==id;})); buyerRenderTable(); }
+function buyerSetFilter(f){ buyerFilter=f; buyerRenderTable(); }
+function buyerDoSearch(v){ buyerSearch=String(v||'').toLowerCase(); buyerRenderTable(); }
+function buyerRenderTable(){
+  var wrap=document.getElementById('buyer-table-wrap'); if(!wrap) return;
+  var fb=document.getElementById('buyer-filter-bar');
+  if(fb){ var chips=[['active','Active'],['archived','Archived'],['all','All']]; fb.innerHTML=chips.map(function(c){ return '<button class="filter-chip'+(buyerFilter===c[0]?' active':'')+'" onclick="buyerSetFilter(\''+c[0]+'\')">'+c[1]+'</button>'; }).join(''); }
+  var arr=buyersLoad().slice();
+  arr=arr.filter(function(b){ if(buyerFilter==='active') return !b.archived; if(buyerFilter==='archived') return b.archived; return true; });
+  if(buyerSearch){ arr=arr.filter(function(b){ return (buyerName(b)+' '+(b.mobile||'')+' '+(b.email||'')+' '+(b.suburbs||[]).join(' ')+' '+(b.notes||'')).toLowerCase().indexOf(buyerSearch)>-1; }); }
+  if(!arr.length){ wrap.innerHTML='<div class="crm-empty">No buyers yet. Add one above to start matching them to properties.</div>'; return; }
+  var rows=arr.map(function(b){
+    var budget=(b.budgetMin!==''&&b.budgetMin!=null)||(b.budgetMax!==''&&b.budgetMax!=null) ? ((fmtMoney(b.budgetMin)||'$0')+' – '+(fmtMoney(b.budgetMax)||'any')) : '—';
+    var types=(b.types||[]).map(function(t){return PROP_TYPE_LABEL[t]||t;}).join(', ')||'Any type';
+    var pref=[]; if(b.bedsMin) pref.push(b.bedsMin+'+ bed'); if(b.bathsMin) pref.push(b.bathsMin+'+ bath'); if(b.carMin) pref.push(b.carMin+'+ car'); if(b.landMin) pref.push(b.landMin+'m²');
+    var subs=(b.suburbs||[]).join(', ')||'Any area';
+    return '<tr>'+
+      '<td><div style="font-weight:600;">'+esc(buyerName(b)||'—')+'</div>'+(b.buyerType?'<div class="muted-sm">'+esc(BUYER_TYPE_LABEL[b.buyerType]||'')+'</div>':'')+(b.archived?'<div style="margin-top:3px;"><span class="pill pill-arch">Archived</span></div>':'')+'</td>'+
+      '<td>'+esc(b.mobile||'')+(b.email?'<div class="muted-sm">'+esc(b.email)+'</div>':'')+'</td>'+
+      '<td>'+esc(budget)+'</td>'+
+      '<td>'+esc(types)+(pref.length?'<div class="muted-sm">'+esc(pref.join(' · '))+'</div>':'')+'</td>'+
+      '<td>'+esc(subs)+'</td>'+
+      '<td style="text-align:center;">'+((b.enquiries||[]).length||'')+'</td>'+
+      '<td><div class="due-actions">'+
+        '<button class="crm-btn crm-btn-primary crm-btn-sm" onclick="buyerMatch(\''+b.id+'\')">Match</button>'+
+        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="buyerEnquiries(\''+b.id+'\')">Enquiries</button>'+
+        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="buyerEdit(\''+b.id+'\')">Edit</button>'+
+        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="buyerArchive(\''+b.id+'\')">'+(b.archived?'Reopen':'Archive')+'</button>'+
+        '<button class="crm-btn crm-btn-danger crm-btn-sm" onclick="buyerDelete(\''+b.id+'\')">Delete</button>'+
+      '</div></td></tr>';
+  }).join('');
+  wrap.innerHTML='<div class="crm-table-wrap"><table class="crm-table"><thead><tr><th>Buyer</th><th>Contact</th><th>Budget</th><th>Wants</th><th>Areas</th><th>Enq.</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+
+/* ---- Properties ---- */
+function propSave(){
+  var address=gv('p-address');
+  if(!address && !gv('p-suburb')){ msg('p-msg','Add at least an address or suburb.', true); return; }
+  var arr=propsLoadCache(); var id=gv('prop-edit-id');
+  var rec={ id:id||puid(), status:gv('p-status')||'onmarket', archiveReason:gv('p-archiveReason'),
+    address:address, suburb:gv('p-suburb'), postcode:gv('p-postcode'), type:gv('p-type')||'house',
+    price:gnum('p-price'), priceType:gv('p-priceType')||'fixed', priceMax:gnum('p-priceMax'),
+    beds:gnum('p-beds'), baths:gnum('p-baths'), car:gnum('p-car'), land:gnum('p-land'),
+    salePrice:gnum('p-salePrice'), saleDate:gv('p-saleDate'), listingUrl:gv('p-listingUrl'), listedDate:gv('p-listedDate'), notes:gv('p-notes') };
+  if(id){ arr=arr.map(function(x){ return x.id===id?rec:x; }); } else { arr.push(rec); }
+  propsSaveCache(arr); propClearForm();
+  msg('p-msg','✓ Property '+(id?'updated':'saved')+': '+(address||rec.suburb)+'.', false);
+  propStatusTab=rec.status; propSyncTabButtons(); propRenderTable();
+}
+function propClearForm(){
+  setv('prop-edit-id','');
+  ['p-address','p-suburb','p-postcode','p-price','p-priceMax','p-beds','p-baths','p-car','p-land','p-salePrice','p-saleDate','p-listingUrl','p-listedDate','p-notes'].forEach(function(id){ setv(id,''); });
+  setv('p-status','onmarket'); setv('p-type','house'); setv('p-priceType','fixed'); setv('p-archiveReason','');
+  var sb=document.getElementById('prop-save-btn'); if(sb) sb.textContent='＋ Save property';
+}
+function propEdit(id){
+  var p=propsLoadCache().find(function(x){return x.id===id;}); if(!p) return;
+  setv('prop-edit-id',p.id); setv('p-status',p.status||'onmarket'); setv('p-archiveReason',p.archiveReason||'');
+  setv('p-address',p.address); setv('p-suburb',p.suburb); setv('p-postcode',p.postcode); setv('p-type',p.type||'house');
+  setv('p-price',p.price); setv('p-priceType',p.priceType||'fixed'); setv('p-priceMax',p.priceMax);
+  setv('p-beds',p.beds); setv('p-baths',p.baths); setv('p-car',p.car); setv('p-land',p.land);
+  setv('p-salePrice',p.salePrice); setv('p-saleDate',p.saleDate); setv('p-listingUrl',p.listingUrl); setv('p-listedDate',p.listedDate); setv('p-notes',p.notes);
+  var sb=document.getElementById('prop-save-btn'); if(sb) sb.textContent='✓ Update property';
+  var panel=document.getElementById('properties'); if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function propDelete(id){ if(!confirm('Delete this property permanently?')) return; propsSaveCache(propsLoadCache().filter(function(x){return x.id!==id;})); propRenderTable(); }
+function propSetStatus(id, status){ var arr=propsLoadCache(); var p=arr.find(function(x){return x.id===id;}); if(!p) return; p.status=status; propsSaveCache(arr); propRenderTable(); }
+function propShowTab(status){ propStatusTab=status; propSyncTabButtons(); propRenderTable(); }
+function propSyncTabButtons(){ document.querySelectorAll('.prop-tab').forEach(function(btn){ var on=btn.getAttribute('data-status')===propStatusTab; btn.style.fontWeight=on?'600':'500'; if(on){ btn.style.background='var(--purple-bg)'; btn.style.color='var(--purple)'; btn.style.border='none'; } else { btn.style.background='transparent'; btn.style.color='var(--text2)'; btn.style.border='1px solid var(--border)'; } }); }
+function propDoSearch(v){ propSearch=String(v||'').toLowerCase(); propRenderTable(); }
+function propPriceLabel(p){
+  if(p.status==='archived' && p.archiveReason==='sold' && p.salePrice) return 'Sold '+fmtMoney(p.salePrice);
+  if(!p.price) return PRICE_TYPE_LABEL[p.priceType]||'—';
+  if(p.priceType==='range' && p.priceMax) return fmtMoney(p.price)+' – '+fmtMoney(p.priceMax);
+  if(p.priceType==='auction') return 'Auction · '+fmtMoney(p.price);
+  if(p.priceType==='eoi') return 'EOI · '+fmtMoney(p.price);
+  return fmtMoney(p.price);
+}
+function propStatusMenu(p){
+  var opts=[['onmarket','On'],['offmarket','Off'],['archived','Arch']];
+  return opts.filter(function(o){return o[0]!==p.status;}).map(function(o){ return '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="propSetStatus(\''+p.id+'\',\''+o[0]+'\')">→ '+o[1]+'</button>'; }).join('');
+}
+function propRenderTable(){
+  var wrap=document.getElementById('prop-table-wrap'); if(!wrap) return;
+  var arr=propsLoadCache().filter(function(p){ return (p.status||'onmarket')===propStatusTab; });
+  if(propSearch){ arr=arr.filter(function(p){ return ((p.address||'')+' '+(p.suburb||'')+' '+(p.postcode||'')+' '+(p.notes||'')).toLowerCase().indexOf(propSearch)>-1; }); }
+  if(!arr.length){ wrap.innerHTML='<div class="crm-empty">No '+PROP_STATUS_LABEL[propStatusTab].toLowerCase()+' properties yet.</div>'; return; }
+  var rows=arr.map(function(p){
+    var specs=[]; if(p.beds) specs.push(p.beds+' bed'); if(p.baths) specs.push(p.baths+' bath'); if(p.car) specs.push(p.car+' car'); if(p.land) specs.push(p.land+'m²');
+    var loc=esc([p.suburb,p.postcode].filter(Boolean).join(' '));
+    var link=p.listingUrl? '<a href="#" onclick="openExt(\''+encodeURIComponent(p.listingUrl)+'\');return false;" style="color:var(--blue);text-decoration:none;">View listing ↗</a>' : '';
+    return '<tr>'+
+      '<td><div style="font-weight:600;">'+esc(p.address||'—')+'</div>'+(loc?'<div class="muted-sm">'+loc+'</div>':'')+(link?'<div class="muted-sm">'+link+'</div>':'')+'</td>'+
+      '<td>'+esc(PROP_TYPE_LABEL[p.type]||p.type||'')+'</td>'+
+      '<td>'+esc(propPriceLabel(p))+'</td>'+
+      '<td>'+esc(specs.join(' · ')||'—')+'</td>'+
+      '<td><div class="due-actions">'+
+        '<button class="crm-btn crm-btn-primary crm-btn-sm" onclick="propMatch(\''+p.id+'\')">Match</button>'+
+        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="propEnquiries(\''+p.id+'\')">Enquiries</button>'+
+        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="propEdit(\''+p.id+'\')">Edit</button>'+
+        propStatusMenu(p)+
+        '<button class="crm-btn crm-btn-danger crm-btn-sm" onclick="propDelete(\''+p.id+'\')">Delete</button>'+
+      '</div></td></tr>';
+  }).join('');
+  wrap.innerHTML='<div class="crm-table-wrap"><table class="crm-table"><thead><tr><th>Property</th><th>Type</th><th>Price</th><th>Specs</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+
+/* ---- Matching (pure best-fit ranking; no hard exclusions) ---- */
+function fitScore(b, p){
+  var W={price:35,type:20,suburb:20,beds:10,baths:6,car:5,land:4};
+  var num=0, den=0, why=[], gaps=[];
+  var hasBudget=(b.budgetMin!==''&&b.budgetMin!=null)||(b.budgetMax!==''&&b.budgetMax!=null);
+  if(hasBudget && p.price){
+    var lo=Number(b.budgetMin)||0, hi=(b.budgetMax!==''&&b.budgetMax!=null)?Number(b.budgetMax):Infinity, c;
+    if(p.price>=lo && p.price<=hi){ c=1; why.push('within budget'); }
+    else if(p.price<lo){ c=0.9; why.push('under budget'); }
+    else { var over=(p.price-hi)/hi; c=Math.max(0,1-over); gaps.push('over budget '+Math.round(over*100)+'%'); }
+    num+=W.price*c; den+=W.price;
+  }
+  if((b.types||[]).length){ var ct=(b.types.indexOf(p.type)>-1)?1:0; if(ct) why.push(PROP_TYPE_LABEL[p.type]); else gaps.push('type'); num+=W.type*ct; den+=W.type; }
+  if((b.suburbs||[]).length){ var sl=b.suburbs.map(function(s){return String(s).toLowerCase();}); var cs=(sl.indexOf(String(p.suburb||'').toLowerCase())>-1)?1:0; if(cs) why.push(p.suburb); else gaps.push('area'); num+=W.suburb*cs; den+=W.suburb; }
+  [['beds',W.beds,'bedsMin','bed'],['baths',W.baths,'bathsMin','bath'],['car',W.car,'carMin','car']].forEach(function(k){
+    var min=b[k[2]]; if(min!==''&&min!=null&&min!==0){ var act=Number(p[k[0]])||0; var cc=act>=min?1:Math.max(0,1-(min-act)*0.34); if(cc>=1) why.push(min+'+ '+k[3]); else gaps.push(k[3]); num+=k[1]*cc; den+=k[1]; }
+  });
+  if(b.landMin!==''&&b.landMin!=null&&b.landMin!==0){ var la=Number(p.land)||0; var cl=Math.min(1, la/Number(b.landMin)); if(cl>=1) why.push('land'); else gaps.push('land'); num+=W.land*cl; den+=W.land; }
+  var score=den>0?Math.round(100*num/den):50;
+  return { score:score, why:why, gaps:gaps };
+}
+function fitLabel(s){ if(s>=80) return ['Great','fit-great']; if(s>=60) return ['Good','fit-good']; if(s>=40) return ['Fair','fit-fair']; return ['Low','fit-low']; }
+function fitBadge(s){ var l=fitLabel(s); return '<span class="fit '+l[1]+'">'+s+'% · '+l[0]+'</span>'; }
+function fitWhy(r){ var parts=[]; if(r.why.length) parts.push(r.why.filter(Boolean).slice(0,4).join(' · ')); if(r.gaps.length) parts.push('gaps: '+r.gaps.slice(0,3).join(', ')); return parts.join('  ·  '); }
+function activeProps(){ return propsLoadCache().filter(function(p){ return (p.status||'onmarket')!=='archived'; }); }
+
+function buyerMatch(id){
+  var b=buyersLoad().find(function(x){return x.id===id;}); if(!b) return;
+  var list=activeProps().map(function(p){ return { p:p, r:fitScore(b,p) }; }).sort(function(a,c){ return c.r.score-a.r.score; });
+  var body = list.length ? list.map(function(it){ var p=it.p; var loc=[p.suburb,p.postcode].filter(Boolean).join(' ');
+    return '<div class="match-row"><div style="min-width:0;flex:1;"><div style="font-weight:600;">'+esc(p.address||loc||'—')+' <span class="pill '+(p.status==='offmarket'?'pill-off':'pill-on')+'">'+PROP_STATUS_LABEL[p.status||'onmarket']+'</span></div><div class="muted-sm">'+esc([PROP_TYPE_LABEL[p.type]||'',propPriceLabel(p),loc].filter(Boolean).join(' · '))+'</div>'+(fitWhy(it.r)?'<div class="muted-sm">'+esc(fitWhy(it.r))+'</div>':'')+'</div><div>'+fitBadge(it.r.score)+'</div></div>';
+  }).join('') : '<div class="crm-empty">No on-market or off-market properties to match yet.</div>';
+  openModal('Best properties for '+(buyerName(b)||'this buyer'), body);
+}
+function propMatch(id){
+  var p=propsLoadCache().find(function(x){return x.id===id;}); if(!p) return;
+  var list=buyersLoad().filter(function(b){return !b.archived;}).map(function(b){ return { b:b, r:fitScore(b,p) }; }).sort(function(a,c){ return c.r.score-a.r.score; });
+  var body = list.length ? list.map(function(it){ var b=it.b;
+    return '<div class="match-row"><div style="min-width:0;flex:1;"><div style="font-weight:600;">'+esc(buyerName(b)||'—')+'</div><div class="muted-sm">'+esc([b.mobile||'',b.email||''].filter(Boolean).join(' · '))+'</div>'+(fitWhy(it.r)?'<div class="muted-sm">'+esc(fitWhy(it.r))+'</div>':'')+'</div><div>'+fitBadge(it.r.score)+'</div></div>';
+  }).join('') : '<div class="crm-empty">No active buyers to match yet.</div>';
+  openModal('Best buyers for '+(p.address||p.suburb||'this property'), body);
+}
+
+/* ---- Enquiries (editable from both sides; source of truth = buyer.enquiries) ---- */
+function buyerEnquiries(id){
+  var b=buyersLoad().find(function(x){return x.id===id;}); if(!b) return;
+  var props=propsLoadCache();
+  if(!props.length){ openModal('Enquiries', '<div class="crm-empty">Add some properties first.</div>'); return; }
+  var set=b.enquiries||[];
+  var body='<div class="muted-sm" style="margin-bottom:10px;">Tick the properties '+esc(buyerName(b)||'this buyer')+' has enquired on:</div>'+
+    props.map(function(p){ return '<label class="check-row"><input type="checkbox" class="enq-cb" value="'+p.id+'"'+(set.indexOf(p.id)>-1?' checked':'')+'>'+esc((p.address||p.suburb||'—')+'  ('+PROP_STATUS_LABEL[p.status||'onmarket']+')')+'</label>'; }).join('')+
+    '<div style="margin-top:14px;"><button class="crm-btn crm-btn-primary crm-btn-sm" onclick="buyerSaveEnquiries(\''+b.id+'\')">Save</button></div>';
+  openModal('Enquiries — '+(buyerName(b)||'buyer'), body);
+}
+function buyerSaveEnquiries(id){
+  var arr=buyersLoad(); var b=arr.find(function(x){return x.id===id;}); if(!b) return;
+  var sel=[]; document.querySelectorAll('.enq-cb').forEach(function(cb){ if(cb.checked) sel.push(cb.value); });
+  b.enquiries=sel; buyersSaveCache(arr); closeModal(); buyerRenderTable();
+}
+function propEnquiries(id){
+  var p=propsLoadCache().find(function(x){return x.id===id;}); if(!p) return;
+  var buyers=buyersLoad();
+  if(!buyers.length){ openModal('Enquiries', '<div class="crm-empty">Add some buyers first.</div>'); return; }
+  var body='<div class="muted-sm" style="margin-bottom:10px;">Tick the buyers who enquired on '+esc(p.address||p.suburb||'this property')+':</div>'+
+    buyers.map(function(b){ var on=(b.enquiries||[]).indexOf(p.id)>-1; return '<label class="check-row"><input type="checkbox" class="enq-cb" value="'+b.id+'"'+(on?' checked':'')+'>'+esc(buyerName(b)||b.mobile||'—')+'</label>'; }).join('')+
+    '<div style="margin-top:14px;"><button class="crm-btn crm-btn-primary crm-btn-sm" onclick="propSaveEnquiries(\''+p.id+'\')">Save</button></div>';
+  openModal('Enquiries — '+(p.address||p.suburb||'property'), body);
+}
+function propSaveEnquiries(id){
+  var arr=buyersLoad(); var checked={};
+  document.querySelectorAll('.enq-cb').forEach(function(cb){ if(cb.checked) checked[cb.value]=1; });
+  arr.forEach(function(b){ b.enquiries=b.enquiries||[]; var has=b.enquiries.indexOf(id)>-1; var want=!!checked[b.id]; if(want&&!has) b.enquiries.push(id); else if(!want&&has) b.enquiries=b.enquiries.filter(function(x){return x!==id;}); });
+  buyersSaveCache(arr); closeModal(); propRenderTable();
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  propSyncTabButtons();
+  if(window.api && window.api.loadBuyers){ window.api.loadBuyers().then(function(r){ BUYERS_CACHE=r||[]; buyerRenderTable(); }).catch(function(){ buyerRenderTable(); }); } else { buyerRenderTable(); }
+  if(window.api && window.api.loadProperties){ window.api.loadProperties().then(function(r){ PROPS_CACHE=r||[]; propRenderTable(); }).catch(function(){ propRenderTable(); }); } else { propRenderTable(); }
+});
 </script>
 
 <script>
