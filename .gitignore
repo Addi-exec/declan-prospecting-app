@@ -8,8 +8,9 @@ signing/
 *.pfx
 *.p12
 
-# Local editor / tooling state
-.claude/
+# Local editor / tooling state (ignore local settings, but DO track project skills)
+.claude/*
+!.claude/skills/
 
 # NEVER publish contacts data or exports, even if they end up in this folder
 prospecting-data.json

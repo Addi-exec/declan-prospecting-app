@@ -10,36 +10,47 @@ Australia. Two jobs in one app:
 2. **Contact tracker (CRM)** — log contacts after calls; the app computes when
    each person is due for their next follow-up/nurture touch, and exports to Excel.
 
-Built with **Electron, all JavaScript**. **Cross-platform: Windows + macOS.**
-Declan's own machine is Windows. Dev mode (`npm start`) and the installer build
-work on both; keep any platform-specific code branched on `process.platform`.
+Built with **Electron, all JavaScript**. **Cross-platform: Windows, macOS, and
+Linux** (Linux Mint). Declan's own machine is Windows; he also runs Linux Mint.
+Dev mode (`npm start`) and the installer builds work on all three; keep any
+platform-specific code branched on `process.platform` ('darwin' | 'win32' | 'linux').
 
 ## Tech stack
 - **Electron** (main + preload + renderer). No framework — the UI is one big
   hand-written `renderer/index.html` (HTML + inline CSS + vanilla JS).
 - **exceljs** for native Excel/CSV import/export (pure JS, no native deps).
-- **Local JSON database** for contacts (no SQLite yet — see Roadmap).
-- **Updates** are ENABLED and platform-split (signed Windows can self-install;
-  unsigned macOS cannot, so it does a manual check):
+- **googleapis** for optional Google Sheets sync of contacts (runtime dep; all
+  `gsheets:*` handlers degrade gracefully if it's absent). See the Google Sheets
+  section below and the `google-sheets-integration` skill.
+- **Local JSON database** for contacts (no SQLite yet — see Roadmap); when Google
+  Sheets is connected the sheet is the source of truth, mirrored to the local file.
+- **Updates** are ENABLED and platform-split (signed Windows + Linux AppImage can
+  self-install; unsigned macOS cannot, so it does a manual check):
   - **Windows**: `main.js` runs `autoUpdater.checkForUpdates()` (electron-updater)
     on launch when packaged (silent; no-ops in dev or if no release is reachable).
     A found update downloads in the background and offers a restart-to-install.
+  - **Linux**: same `electron-updater` path as Windows. Auto-updates when run as an
+    **AppImage**; the `.deb` build can't self-update (the check just no-ops, caught
+    by `.catch`), so .deb users reinstall the latest download.
   - **macOS**: `main.js` queries the GitHub Releases API directly (built-in
     `https`, no deps), compares versions, and if newer opens the `.dmg` download
     in the browser via `shell.openExternal` — the user drags the new app into
     Applications. Runs silently on launch (packaged) + via the About-page button.
-  Needs GitHub `publish` config (owner/repo — already set) + releases published
-  via `npm run release`. See README "PUBLISHING UPDATES VIA GITHUB".
+  Platform branch lives in `app.whenReady()`: `darwin` → manual check; else
+  (`win32`/`linux`) → `electron-updater`. Needs GitHub `publish` config (owner/repo
+  — already set) + releases published via `npm run release`.
 
 ## Run / build
 ```
-npm install        # one time
-npm start          # run in dev (Windows + Mac)
-npm run build:win  # -> dist/*.exe  (nsis installer; unsigned, SmartScreen warns first run)
-npm run build:mac  # -> dist/*.dmg  (build on a Mac; unsigned, right-click->Open first time)
-npm run build      # builds for the current platform
+npm install         # one time
+npm start           # run in dev (Windows + Mac + Linux)
+npm run build:win   # -> dist/*.exe  (nsis installer; unsigned, SmartScreen warns first run)
+npm run build:mac   # -> dist/*.dmg  (build on a Mac; unsigned, right-click->Open first time)
+npm run build:linux # -> dist/*.AppImage + dist/*.deb  (build on Linux)
+npm run build       # builds for the current platform
 ```
-Double-click launchers: `Start (Windows).bat` / `Start (Mac).command` (run `npm start`).
+Double-click launchers: `Start (Windows).bat` / `Start (Mac).command` /
+`Start (Linux).sh` (run `npm start`; the Linux one needs `chmod +x` once).
 First-time Windows install: `Setup (Windows).bat` (downloads the Electron binary
 via an npm mirror; see the Windows setup note below).
 
@@ -55,6 +66,14 @@ empty — no `electron.exe`, no `path.txt`). Symptom: `npm start` fails with
    `node_modules\electron\dist`, then write `electron.exe` into
    `node_modules\electron\path.txt`.
 The `.npmrc` pins `electron_mirror` to npmmirror.com to dodge blocked GitHub downloads.
+
+**Same bug, all OSes — one-command fix:** run
+`node .claude/skills/electron-install-fix/scripts/fix-electron.js` from the project
+root. It auto-detects the platform, finds the cached zip (macOS
+`~/Library/Caches/electron/`, Windows `%LOCALAPPDATA%\electron\Cache\`, **Linux
+`~/.cache/electron/`**), extracts it, and writes `path.txt` with no trailing newline.
+See the `electron-install-fix` skill. (`path.txt` contents per OS: macOS
+`Electron.app/Contents/MacOS/Electron`, Windows `electron.exe`, Linux `electron`.)
 
 ### `npm run build:win` gotcha (winCodeSign symlinks)
 On a non-admin box without Developer Mode, the first `build:win` dies extracting
@@ -91,14 +110,18 @@ electron/main.js      BrowserWindow; IPC: contacts load/save, Excel import/expor
                       Windows = electron-updater auto-install; macOS = manual
                       (queries GitHub Releases, opens the .dmg download)
 electron/preload.js   contextBridge -> window.api (the only renderer<->main surface)
-renderer/index.html   THE ENTIRE APP (UI, styles, all logic). ~1800 lines.
-assets/               icon.ico (Win), icon.icns (Mac), icon.png/icon_512.png, make_icon.py
+renderer/index.html   THE ENTIRE APP (UI, styles, all logic). ~2000 lines.
+assets/               icon.ico (Win), icon.icns (Mac), icon.png/icon_512.png (Linux), make_icon.py
 Start (Windows).bat   dev-mode launcher (Windows)
 Setup (Windows).bat   one-time Windows installer (downloads Electron via mirror)
 Trust Cert (Windows).bat  trusts the self-signed code-signing cert (per-user)
 Start (Mac).command   dev-mode launcher (Mac)
+Start (Linux).sh      dev-mode launcher (Linux; chmod +x once)
 signing/              self-signed code-signing cert (.pfx/.cer); GITIGNORED
 .npmrc                pins Electron download mirror
+.claude/skills/       project skills: prospecting-app-dev-workflow,
+                      electron-install-fix (+ scripts/fix-electron.js),
+                      google-sheets-integration
 CLAUDE.md             this file
 ```
 
@@ -115,8 +138,16 @@ The renderer NEVER touches Node/fs directly. Everything goes through:
 - `importExcel()` -> { ok, sheets:[{name, rows:[{Header:value}]}] }
 - `getVersion()` -> app version string
 - `checkForUpdates()` — manual update check (wired to the About-page button).
-  Windows: triggers electron-updater. macOS: queries GitHub Releases and offers
+  Windows/Linux: triggers electron-updater. macOS: queries GitHub Releases and offers
   to open the .dmg download (unsigned apps can't auto-apply on Mac).
+- **Google Sheets sync** (optional; see the `google-sheets-integration` skill):
+  - `gsGetStatus()` -> { hasCredentials, authenticated, sheetId, sheetName, sheetUrl }
+  - `gsSetCredentials(clientId, clientSecret)` — store the OAuth Desktop creds
+  - `gsConnect()` -> runs the browser OAuth flow (localhost:42813 redirect)
+  - `gsCreateSheet(contacts)` / `gsLinkSheet(url)` — make or adopt a sheet
+  - `gsDisconnect()` / `gsOpenSheet(url)`
+  When connected, `loadContacts`/`saveContacts` read/write the sheet (mirrored to
+  the local JSON file); a sync failure never loses local data.
 
 ## Data
 - Contacts persist to `<dataDir>/prospecting-data.json`. `dataDir` defaults to
@@ -128,6 +159,17 @@ The renderer NEVER touches Node/fs directly. Everything goes through:
 - In the renderer they live in an in-memory cache `CRM_CACHE`; `crmLoad()` returns it,
   `crmSave(arr)` updates it AND calls `window.api.saveContacts`. On launch the init
   loads from `window.api.loadContacts()` into `CRM_CACHE`.
+
+### Google Sheets sync (optional cross-device source of truth)
+- Config keys in `userData/app-config.json` (never the repo/renderer): `gClientId`,
+  `gClientSecret`, `gTokens`, `gSheetId`, `gSheetName`. Read/written via
+  `readConfig`/`writeConfig`/`updateConfig` in `main.js`.
+- Sheet layout: one tab `Contacts`, columns = `CONTACT_HEADERS` (matches the record
+  shape above). `gsLoadFromSheet` reads `Contacts!A:N`; `gsSaveToSheet` clears + rewrites.
+- When connected, `contacts:load` reads the sheet (mirrors to local JSON), `contacts:save`
+  writes local JSON first then pushes to the sheet — a sync failure returns
+  `{ok:true, synced:false, syncError}` and never loses local data.
+- Full setup + every Google Cloud error fix: the `google-sheets-integration` skill.
 
 ### Contact record shape
 ```js
@@ -182,7 +224,7 @@ Follow-up, Nurture.
 1. **Versioning**: feature = bump the decimal (…0.9 -> 0.10 -> 0.11…); bug fix =
    add a third number (e.g. 0.20.1). Update it in THREE places when you ship:
    the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **0.23.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **0.24.0**.
 2. **Theming**: every colour MUST be a CSS variable defined in BOTH `:root` and
    `[data-theme="dark"]`. Never hardcode hex in markup/JS — new UI must work in
    light AND dark automatically. Dark mode is a header toggle, persisted in

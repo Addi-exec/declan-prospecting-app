@@ -22,6 +22,7 @@
     --warm:#7a4f00; --warm-bg:#fef9ec;
     --cold:#1e3a8a; --cold-bg:#e8f0ff;
     --sms-bubble:#0b7adb; --tip-strong:#412402;
+    --on-accent:#ffffff;
   }
   [data-theme="dark"] {
     color-scheme: dark;
@@ -39,6 +40,7 @@
     --warm:#e6bb5e; --warm-bg:#322a15;
     --cold:#90adeb; --cold-bg:#1b2742;
     --sms-bubble:#2f8fe6; --tip-strong:#f3ddab;
+    --on-accent:#ffffff;
   }
   body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0; }
   body, header, nav, .panel, .script-block, .tag, .tip-box, .objection-a, .xyz-card, .email-card, button { transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
@@ -103,7 +105,7 @@
   .crm-field input, .crm-field select, .crm-field textarea { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; font-size: 14px; color: var(--text); font-family: inherit; width: 100%; }
   .crm-field input:focus, .crm-field select:focus, .crm-field textarea:focus { outline: 2px solid var(--blue); outline-offset: 0; border-color: transparent; }
   .crm-btn { border: none; border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background-color .15s, color .15s, border-color .15s; }
-  .crm-btn-primary { background: var(--blue); color: #fff; }
+  .crm-btn-primary { background: var(--blue); color: var(--on-accent); }
   .crm-btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
   .crm-btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger-border); }
   .crm-btn-sm { padding: 5px 10px; font-size: 12px; }
@@ -137,7 +139,7 @@
 <header>
   <div class="header-left">
     <h1>Declan Addison — Cold Calling Scripts</h1>
-    <p>Neighbourhood prospecting · Just sold · Just listed · Buyer database · Steal listings &nbsp;·&nbsp; <span id="app-version" onclick="showPanel('about')" title="What's new" style="color:var(--text3);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">v0.23.0</span></p>
+    <p>Neighbourhood prospecting · Just sold · Just listed · Buyer database · Steal listings &nbsp;·&nbsp; <span id="app-version" onclick="showPanel('about')" title="What's new" style="color:var(--text3);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">v0.24.0</span></p>
   </div>
   <button id="theme-toggle" onclick="toggleTheme()" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:12.5px;cursor:pointer;font-weight:500;white-space:nowrap;">🌙 Dark</button>
 </header>
@@ -184,6 +186,64 @@
     <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
       <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="chooseDataFolder()">☁ Use a shared folder…</button>
       <button id="data-default-btn" class="crm-btn crm-btn-ghost crm-btn-sm" style="display:none;" onclick="useDefaultDataFolder()">Use this computer only</button>
+    </div>
+  </div>
+
+  <!-- Google Sheets sync card -->
+  <div id="gsheets-card" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:22px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+      <span style="font-size:13px;font-weight:600;color:var(--text);">Google Sheets sync</span>
+      <span id="gs-badge" style="font-size:11px;font-weight:600;border-radius:20px;padding:2px 9px;border:1px solid var(--border);background:var(--surface);color:var(--text3);">Not connected</span>
+    </div>
+
+    <!-- State 1: no credentials -->
+    <div id="gs-state-setup">
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Keep your contacts in a Google Sheet — readable on any device, no extra software. <span style="color:var(--blue);cursor:pointer;text-decoration:underline;" onclick="gsToggleSetupForm(this)">Set up →</span></div>
+      <div id="gs-creds-form" style="display:none;margin-top:10px;">
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px;padding:10px 12px;background:var(--blue-bg);border-radius:7px;">
+          <strong style="color:var(--text);">One-time Google Cloud setup (free):</strong><br>
+          1. Go to <strong>console.cloud.google.com</strong> → create a project<br>
+          2. APIs &amp; Services → Library → enable <strong>Google Sheets API</strong><br>
+          3. Credentials → Create → <strong>OAuth 2.0 Client ID</strong> → type: <em>Desktop app</em><br>
+          4. Paste the Client ID and Secret below, click Save
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+          <div class="crm-field" style="margin:0;flex:1;min-width:200px;"><label style="font-size:11px;">Client ID</label><input id="gs-client-id" placeholder="…apps.googleusercontent.com" style="font-size:12px;"></div>
+          <div class="crm-field" style="margin:0;flex:1;min-width:140px;"><label style="font-size:11px;">Client Secret</label><input id="gs-client-secret" placeholder="GOCSPX-…" type="password" style="font-size:12px;"></div>
+        </div>
+        <button class="crm-btn crm-btn-primary crm-btn-sm" onclick="gsSaveCredentials()">Save &amp; continue →</button>
+      </div>
+    </div>
+
+    <!-- State 2: credentials saved, not yet signed in -->
+    <div id="gs-state-auth" style="display:none;">
+      <div style="font-size:12.5px;color:var(--text2);margin-bottom:8px;">Credentials saved. Click below to sign in with Google and grant access to Sheets.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="crm-btn crm-btn-primary crm-btn-sm" onclick="gsConnect(this)">Sign in with Google…</button>
+        <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="gsShowSetupForm()">Change credentials</button>
+      </div>
+    </div>
+
+    <!-- State 3: signed in, no sheet linked yet -->
+    <div id="gs-state-pick" style="display:none;">
+      <div style="font-size:12.5px;color:var(--text2);margin-bottom:8px;">Signed in. Create a new sheet or link one you already have:</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <button class="crm-btn crm-btn-primary crm-btn-sm" onclick="gsCreateSheet(this)">Create new sheet for me</button>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">— or paste a Google Sheets URL to link an existing sheet —</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input id="gs-link-url" placeholder="https://docs.google.com/spreadsheets/d/…" style="flex:1;min-width:220px;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);">
+        <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="gsLinkSheet(this)">Link sheet</button>
+      </div>
+    </div>
+
+    <!-- State 4: fully syncing -->
+    <div id="gs-state-synced" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="font-size:12.5px;color:var(--text2);">Syncing to:</span>
+        <a id="gs-sheet-link" href="#" style="font-size:12.5px;font-weight:600;color:var(--blue);text-decoration:none;" onclick="gsOpenSheet();return false;"></a>
+        <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="gsDisconnect()">Disconnect</button>
+      </div>
     </div>
   </div>
 
@@ -1437,17 +1497,17 @@
 
   <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:22px;">
     <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">You're running</div>
-    <div id="about-version" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Version 0.23.0</div>
+    <div id="about-version" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Version 0.24.0</div>
   </div>
 
   <div style="background:var(--blue-bg);border-radius:10px;padding:14px 16px;margin-bottom:22px;">
     <div style="font-size:13px;font-weight:600;color:var(--blue);margin-bottom:6px;">How updates work</div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.7;">The app <strong style="color:var(--text);">checks for updates each time you open it</strong>, and you can check any time with the button below. <strong style="color:var(--text);">On Windows</strong> a new version installs itself and asks you to restart. <strong style="color:var(--text);">On Mac</strong> it opens the download for you — just open the .dmg and drag the app into your Applications folder, replacing the old one. Either way your contacts are never touched. This page always shows the version you currently have.</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;">The app <strong style="color:var(--text);">checks for updates each time you open it</strong>, and you can check any time with the button below. <strong style="color:var(--text);">On Windows</strong> a new version installs itself and asks you to restart. <strong style="color:var(--text);">On Mac</strong> it opens the download for you — just open the .dmg and drag the app into your Applications folder, replacing the old one. <strong style="color:var(--text);">On Linux</strong> the AppImage version updates itself; the .deb version you reinstall from the latest download. Either way your contacts are never touched. This page always shows the version you currently have.</div>
     <button class="crm-btn crm-btn-primary" style="margin-top:12px;" onclick="checkForUpdates(this)">Check for updates</button>
   </div>
 
   <div class="script-label">Version history</div>
-  <div style="margin-top:4px;"><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.23</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Made updating easy on Mac: added a <strong style="color:var(--text);">Check for updates</strong> button on this page (and an automatic check when you open the app). When a new version is out it tells you and opens the download — just open the .dmg and drag the app into Applications. Windows keeps installing updates by itself.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.22</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Share your contacts across computers: point the tracker at a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) from the Storage box, then choose the same folder on your other computer. Also turned on automatic updates (via GitHub) so new versions can install themselves.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.21</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Windows support is back: the app now installs and runs on Windows as well as Mac. Added a Windows installer build (<strong style="color:var(--text);">npm run build:win</strong>) and double-click launchers, and fixed a first-time setup issue where the app engine sometimes didn't finish installing.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.20.1</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Brought Just listed, Buyer database and Steal listings up to the same standard as Just sold — branched follow-ups (no answer / interested / not interested) and HOT / WARM / COLD nurture tracks.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.18</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Rebuilt as a cross-platform desktop app (Electron) with a local database and native Excel/CSV export &amp; import — no browser, no sandbox.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.17</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added a call-outcome option (no answer / interested / not interested) when logging a contact, so the follow-up reminders use the right branch. You can also change a contact's outcome later and the schedule restarts from that day.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.16</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added this About &amp; what's new page, with version history.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.15</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Renamed to a stable filename so data survives updates; added optional project-folder data file (auto-saves to prospecting-data.json on Chrome/Edge).</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.14</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Split the Just sold follow-up into three branches: no answer (voicemail + SMS), answered &amp; interested, answered &amp; not interested.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.13</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Rewrote the Just sold openers to feel warmer and more genuine — dropped the "this is a cold call" line while keeping the research behind each one.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.12</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added a search box to the contact tracker.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.11</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Built the contact tracker: quick logging, automatic due/overdue reminders from each call date, and Excel export/import (one sheet per method).</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.10</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added dark mode with a light/dark toggle and a full themed colour system.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.9</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Gave each prospect method its own openers, objections, closes, follow-up and nurture; removed the old shared sections. Stripped all email steps — calls and messages only.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.8</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Moved Just listed into the prospect methods with its own openers, objections and closes.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.7</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Consolidated the core openers, objections and closes into the Just sold street method.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.6</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added two new prospect methods: Buyer database and Steal listings.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.5</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Reorganised into prospect methods and a special opens section.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.4</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Rebuilt the openers around proven psychology and cold-calling data.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.3</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added the HOT / WARM / COLD SMS nurture tracks.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.2</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added voicemail scripts, the follow-up sequence and the no-answer nurture.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.1</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">First downloadable version with the core just-sold scripts.</div></div></div>
+  <div style="margin-top:4px;"><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.24</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Sync your contacts to a <strong style="color:var(--text);">Google Sheet</strong>: connect once from the Storage box and your contacts stay in step on every computer — and you can view or edit them right in Google Sheets, even from your phone. Also added <strong style="color:var(--text);">Linux support</strong> (Linux Mint), so the app now runs on Windows, Mac and Linux.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.23</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Made updating easy on Mac: added a <strong style="color:var(--text);">Check for updates</strong> button on this page (and an automatic check when you open the app). When a new version is out it tells you and opens the download — just open the .dmg and drag the app into Applications. Windows keeps installing updates by itself.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.22</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Share your contacts across computers: point the tracker at a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) from the Storage box, then choose the same folder on your other computer. Also turned on automatic updates (via GitHub) so new versions can install themselves.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.21</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Windows support is back: the app now installs and runs on Windows as well as Mac. Added a Windows installer build (<strong style="color:var(--text);">npm run build:win</strong>) and double-click launchers, and fixed a first-time setup issue where the app engine sometimes didn't finish installing.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.20.1</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Brought Just listed, Buyer database and Steal listings up to the same standard as Just sold — branched follow-ups (no answer / interested / not interested) and HOT / WARM / COLD nurture tracks.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.18</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Rebuilt as a cross-platform desktop app (Electron) with a local database and native Excel/CSV export &amp; import — no browser, no sandbox.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.17</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added a call-outcome option (no answer / interested / not interested) when logging a contact, so the follow-up reminders use the right branch. You can also change a contact's outcome later and the schedule restarts from that day.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.16</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added this About &amp; what's new page, with version history.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.15</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Renamed to a stable filename so data survives updates; added optional project-folder data file (auto-saves to prospecting-data.json on Chrome/Edge).</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.14</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Split the Just sold follow-up into three branches: no answer (voicemail + SMS), answered &amp; interested, answered &amp; not interested.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.13</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Rewrote the Just sold openers to feel warmer and more genuine — dropped the "this is a cold call" line while keeping the research behind each one.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.12</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added a search box to the contact tracker.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.11</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Built the contact tracker: quick logging, automatic due/overdue reminders from each call date, and Excel export/import (one sheet per method).</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.10</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added dark mode with a light/dark toggle and a full themed colour system.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.9</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Gave each prospect method its own openers, objections, closes, follow-up and nurture; removed the old shared sections. Stripped all email steps — calls and messages only.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.8</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Moved Just listed into the prospect methods with its own openers, objections and closes.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.7</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Consolidated the core openers, objections and closes into the Just sold street method.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.6</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added two new prospect methods: Buyer database and Steal listings.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.5</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Reorganised into prospect methods and a special opens section.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.4</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Rebuilt the openers around proven psychology and cold-calling data.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.3</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added the HOT / WARM / COLD SMS nurture tracks.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.2</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">Added voicemail scripts, the follow-up sequence and the no-answer nurture.</div></div><div style="display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:3px 8px;height:fit-content;min-width:46px;text-align:center;">v0.1</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">First downloadable version with the core just-sold scripts.</div></div></div>
 </div>
 
 </main>
@@ -1817,12 +1877,120 @@ document.addEventListener('DOMContentLoaded', function(){
   var cd=document.getElementById('f-callDate'); if(cd) cd.value=todayISO();
   injectLogButtons();
   refreshDataLocation();
+  gsRefreshStatus();
   if(window.api && window.api.loadContacts){
     window.api.loadContacts().then(function(rows){ CRM_CACHE = rows || []; crmRenderAll(); }).catch(function(){ crmRenderAll(); });
   } else { crmRenderAll(); }
 });
 </script>
 
+
+<script>
+/* ===== Google Sheets sync ===== */
+var _gsSheetUrl = null;
+
+function gsRefreshStatus(){
+  if(!(window.api && window.api.gsGetStatus)) return;
+  window.api.gsGetStatus().then(function(s){ gsApplyState(s); }).catch(function(){});
+}
+
+function gsApplyState(s){
+  if(!s) s={};
+  var badge=document.getElementById('gs-badge');
+  var stSetup=document.getElementById('gs-state-setup');
+  var stAuth=document.getElementById('gs-state-auth');
+  var stPick=document.getElementById('gs-state-pick');
+  var stSynced=document.getElementById('gs-state-synced');
+  var link=document.getElementById('gs-sheet-link');
+  [stSetup,stAuth,stPick,stSynced].forEach(function(el){ if(el) el.style.display='none'; });
+  if(s.authenticated && s.sheetId){
+    if(badge){ badge.textContent='✓ Syncing'; badge.style.cssText='font-size:11px;font-weight:600;border-radius:20px;padding:2px 9px;background:var(--green-bg);color:var(--green);border:none;'; }
+    if(stSynced) stSynced.style.display='';
+    if(link){ link.textContent=s.sheetName||'My Sheet'; _gsSheetUrl=s.sheetUrl; }
+  } else if(s.authenticated && !s.sheetId){
+    if(badge){ badge.textContent='Signed in'; badge.style.cssText='font-size:11px;font-weight:600;border-radius:20px;padding:2px 9px;background:var(--amber-bg);color:var(--amber);border:none;'; }
+    if(stPick) stPick.style.display='';
+  } else if(s.hasCredentials){
+    if(badge){ badge.textContent='Not connected'; badge.style.cssText='font-size:11px;font-weight:600;border-radius:20px;padding:2px 9px;background:var(--surface);color:var(--text3);border:1px solid var(--border);'; }
+    if(stAuth) stAuth.style.display='';
+  } else {
+    if(badge){ badge.textContent='Not connected'; badge.style.cssText='font-size:11px;font-weight:600;border-radius:20px;padding:2px 9px;background:var(--surface);color:var(--text3);border:1px solid var(--border);'; }
+    if(stSetup) stSetup.style.display='';
+  }
+}
+
+function gsToggleSetupForm(span){
+  var form=document.getElementById('gs-creds-form');
+  if(!form) return;
+  var visible=form.style.display!=='none';
+  form.style.display=visible?'none':'';
+  if(span) span.textContent=visible?'Set up →':'Hide setup ↑';
+}
+
+function gsShowSetupForm(){
+  gsApplyState({hasCredentials:false});
+  var form=document.getElementById('gs-creds-form');
+  if(form) form.style.display='';
+}
+
+function gsSaveCredentials(){
+  var id=(document.getElementById('gs-client-id')||{}).value||'';
+  var secret=(document.getElementById('gs-client-secret')||{}).value||'';
+  if(!id.trim()||!secret.trim()){ alert('Enter both the Client ID and Client Secret.'); return; }
+  if(!(window.api && window.api.gsSetCredentials)) return;
+  window.api.gsSetCredentials(id.trim(),secret.trim()).then(function(res){
+    if(res && res.ok){ gsApplyState({hasCredentials:true,authenticated:false}); }
+    else { alert('Could not save: '+(res&&res.error||'Unknown error')); }
+  });
+}
+
+function gsConnect(btn){
+  if(!(window.api && window.api.gsConnect)) return;
+  var orig=btn.textContent; btn.disabled=true; btn.textContent='Opening browser…';
+  window.api.gsConnect().then(function(res){
+    btn.disabled=false; btn.textContent=orig;
+    if(res && res.ok){ gsRefreshStatus(); }
+    else { alert('Sign-in failed: '+(res&&res.error||'Unknown error')); }
+  }).catch(function(e){ btn.disabled=false; btn.textContent=orig; alert('Error: '+e); });
+}
+
+function gsCreateSheet(btn){
+  if(!(window.api && window.api.gsCreateSheet)) return;
+  var orig=btn.textContent; btn.disabled=true; btn.textContent='Creating…';
+  window.api.gsCreateSheet(CRM_CACHE||[]).then(function(res){
+    btn.disabled=false; btn.textContent=orig;
+    if(res && res.ok){ gsRefreshStatus(); alert('Sheet created and contacts uploaded!\n\nSheet: '+res.sheetName); }
+    else { alert('Could not create sheet: '+(res&&res.error||'Unknown error')); }
+  }).catch(function(e){ btn.disabled=false; btn.textContent=orig; alert('Error: '+e); });
+}
+
+function gsLinkSheet(btn){
+  var input=document.getElementById('gs-link-url');
+  var val=(input||{}).value||'';
+  if(!val.trim()){ alert('Paste a Google Sheets URL first.'); return; }
+  if(!(window.api && window.api.gsLinkSheet)) return;
+  var orig=btn.textContent; btn.disabled=true; btn.textContent='Linking…';
+  window.api.gsLinkSheet(val.trim()).then(function(res){
+    btn.disabled=false; btn.textContent=orig;
+    if(res && res.ok){
+      window.api.loadContacts().then(function(rows){
+        CRM_CACHE=rows||[]; crmRenderAll(); gsRefreshStatus();
+        alert('Linked! Contacts loaded from sheet.\n\nSheet: '+res.sheetName);
+      });
+    } else { alert('Could not link sheet: '+(res&&res.error||'Unknown error')); }
+  }).catch(function(e){ btn.disabled=false; btn.textContent=orig; alert('Error: '+e); });
+}
+
+function gsDisconnect(){
+  if(!confirm('Disconnect from Google Sheets?\n\nContacts will continue saving locally.')) return;
+  if(!(window.api && window.api.gsDisconnect)) return;
+  window.api.gsDisconnect().then(function(res){ if(res && res.ok) gsRefreshStatus(); });
+}
+
+function gsOpenSheet(){
+  if(_gsSheetUrl && window.api && window.api.gsOpenSheet) window.api.gsOpenSheet(_gsSheetUrl);
+}
+</script>
 
 <script>
 /* ===== Version display + manual update check (desktop only) ===== */

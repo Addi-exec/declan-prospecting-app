@@ -1,7 +1,7 @@
 # Declan Prospecting App
 
 Prospecting scripts + contact tracker, as a desktop app (Electron).
-Runs on **Windows** and **macOS**.
+Runs on **Windows**, **macOS**, and **Linux** (e.g. Linux Mint).
 
 ==================================================
 QUICK START — WINDOWS (the easy way)
@@ -44,6 +44,28 @@ STEP 3: Double-click "Start (Mac).command".
 Your contacts auto-save to a local database and are never affected by updates.
 
 ==================================================
+QUICK START — LINUX (Linux Mint / Ubuntu)
+==================================================
+
+STEP 1 (one time): Install Node.js
+  - Install the LTS version. On Linux Mint / Ubuntu:
+        sudo apt update && sudo apt install nodejs npm
+    (or get the "LTS" installer from https://nodejs.org). LTS (v22) is the
+    most reliable; very new versions (v24) can trip up the one-time setup.
+
+STEP 2 (one time): Make the launcher executable:
+  - Open a terminal in this folder and run:
+        chmod +x "Start (Linux).sh"
+
+STEP 3: Run "Start (Linux).sh" (double-click → "Run", or ./"Start (Linux).sh").
+  - First launch installs the app automatically (needs internet once), then opens.
+  - After that, it just opens.
+
+If npm start ever fails with "Electron failed to install correctly", run:
+      node .claude/skills/electron-install-fix/scripts/fix-electron.js
+(the cached Linux binary lives in ~/.cache/electron/).
+
+==================================================
 HOW UPDATES WORK
 ==================================================
 
@@ -62,8 +84,9 @@ OPTIONAL: build a real installed app
 For an installed app with its own icon (instead of the launcher):
   npm install        # one time
 
-  Windows:  npm run build:win   # -> dist/*.exe installer
-  Mac:      npm run build:mac    # -> dist/*.dmg
+  Windows:  npm run build:win     # -> dist/*.exe installer
+  Mac:      npm run build:mac      # -> dist/*.dmg
+  Linux:    npm run build:linux    # -> dist/*.AppImage and dist/*.deb
 
 Windows: run the .exe installer in dist/. Unsigned by default, so Windows
 SmartScreen may warn the first time — click "More info" -> "Run anyway".

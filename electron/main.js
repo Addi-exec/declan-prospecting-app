@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
 const https = require('https');
 const ExcelJS = require('exceljs');
 const { autoUpdater } = require('electron-updater');
@@ -17,6 +18,9 @@ function configFile() { return path.join(app.getPath('userData'), 'app-config.js
 function readConfig() { try { return JSON.parse(fs.readFileSync(configFile(), 'utf8')) || {}; } catch (e) { return {}; }
 }
 function writeConfig(cfg) { try { fs.writeFileSync(configFile(), JSON.stringify(cfg, null, 2)); return true; } catch (e) { return false; } }
+// Read the config, let the caller mutate it, then persist — the read/modify/write
+// dance was repeated in many handlers, so this keeps them to one line and consistent.
+function updateConfig(mutate) { const cfg = readConfig(); mutate(cfg); writeConfig(cfg); return cfg; }
 // Where contacts live: a user-chosen shared folder (e.g. Dropbox/iCloud) or the default userData dir.
 function dataDir() { const c = readConfig(); return (c.dataDir && fs.existsSync(c.dataDir)) ? c.dataDir : app.getPath('userData'); }
 function dataFile() { return path.join(dataDir(), DATA_FILENAME); }
@@ -175,9 +179,10 @@ app.whenReady().then(() => {
     // only prompt (with a Download button) if a newer version exists.
     if (app.isPackaged) macUpdateCheck(false);
   } else {
-    wireAutoUpdate();
-    // Auto-update via GitHub Releases (Windows is signed, so it can self-install).
+    // Windows + Linux: electron-updater. Windows (signed) self-installs; Linux
+    // auto-updates when run as an AppImage (a .deb install simply no-ops the check).
     // Silent on launch; no-ops cleanly in dev or if no release/repo is reachable.
+    wireAutoUpdate();
     if (app.isPackaged) autoUpdater.checkForUpdates().catch(() => {});
   }
   app.on('activate', () => {
@@ -201,9 +206,90 @@ ipcMain.handle('update:check', async () => {
   catch (e) { manualCheck = false; return { ok: false, error: String(e) }; }
 });
 
-/* ---------------- Contacts: load / save (local database) ---------------- */
+/* ---------------- Google Sheets integration ----------------
+   googleapis is a runtime dependency (npm install googleapis).
+   All gsheets:* handlers degrade gracefully if the package is absent. */
+
+const GS_REDIRECT_PORT = 42813;
+const GS_REDIRECT_URI = 'http://localhost:' + GS_REDIRECT_PORT;
+const GS_SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
+const CONTACT_HEADERS = ['id','method','outcome','first','last','address','mobile','email','callDate','stepsDone','branchDate','archived','notes'];
+// Per-request timeout so a hung network never freezes contacts:load / contacts:save —
+// the callers all fall back to the local JSON file when a Sheets call rejects.
+const GS_REQ_OPTS = { timeout: 20000 };
+
+function requireGoogle() {
+  try { return require('googleapis'); } catch(e) { return null; }
+}
+
+// One place that builds the Sheets v4 client (was duplicated across four handlers).
+function gsApi(auth) { return requireGoogle().google.sheets({ version: 'v4', auth }); }
+
+function makeOAuth2Client(cfg) {
+  const gapis = requireGoogle();
+  if (!gapis || !cfg.gClientId || !cfg.gClientSecret) return null;
+  const client = new gapis.google.auth.OAuth2(cfg.gClientId, cfg.gClientSecret, GS_REDIRECT_URI);
+  if (cfg.gTokens) {
+    client.setCredentials(cfg.gTokens);
+    // Persist refreshed access/refresh tokens so the user stays signed in across launches.
+    client.on('tokens', (t) => updateConfig((c) => { c.gTokens = Object.assign({}, c.gTokens, t); }));
+  }
+  return client;
+}
+
+function getAuthClient() {
+  const cfg = readConfig();
+  if (!cfg.gTokens) return null;
+  return makeOAuth2Client(cfg);
+}
+
+async function gsLoadFromSheet(auth, sheetId) {
+  const api = gsApi(auth);
+  const res = await api.spreadsheets.values.get({ spreadsheetId: sheetId, range: 'Contacts!A:N' }, GS_REQ_OPTS);
+  const rows = res.data.values || [];
+  if (rows.length < 2) return [];
+  const header = rows[0].map((h) => String(h).trim());
+  return rows.slice(1)
+    .filter((r) => r.some((v) => v != null && v !== ''))
+    .map((r) => {
+      const obj = {};
+      header.forEach((h, i) => { obj[h] = r[i] != null ? String(r[i]) : ''; });
+      obj.stepsDone = parseInt(obj.stepsDone, 10) || 0;
+      obj.archived = obj.archived === 'true';
+      return obj;
+    });
+}
+
+async function gsSaveToSheet(auth, sheetId, contacts) {
+  const api = gsApi(auth);
+  const values = [
+    CONTACT_HEADERS,
+    ...contacts.map((c) => CONTACT_HEADERS.map((h) => (c[h] == null ? '' : String(c[h]))))
+  ];
+  await api.spreadsheets.values.clear({ spreadsheetId: sheetId, range: 'Contacts!A:N' }, GS_REQ_OPTS);
+  await api.spreadsheets.values.update({
+    spreadsheetId: sheetId, range: 'Contacts!A1',
+    valueInputOption: 'RAW', requestBody: { values }
+  }, GS_REQ_OPTS);
+}
+
+/* ---------------- Contacts: load / save (local + optional Google Sheets) ---------------- */
 ipcMain.handle('contacts:load', async () => {
   try {
+    const cfg = readConfig();
+    if (cfg.gTokens && cfg.gSheetId) {
+      const auth = getAuthClient();
+      if (auth) {
+        try {
+          const contacts = await gsLoadFromSheet(auth, cfg.gSheetId);
+          // Keep a local mirror so the app still works offline; a failed mirror write
+          // shouldn't hide the freshly-fetched contacts, but it's worth surfacing.
+          try { fs.writeFileSync(dataFile(), JSON.stringify(contacts, null, 2)); }
+          catch(e) { console.warn('Could not write local contacts mirror:', String(e)); }
+          return contacts;
+        } catch(e) { /* fall through to local file */ }
+      }
+    }
     const p = dataFile();
     if (!fs.existsSync(p)) return [];
     return JSON.parse(fs.readFileSync(p, 'utf8') || '[]');
@@ -211,8 +297,20 @@ ipcMain.handle('contacts:load', async () => {
 });
 
 ipcMain.handle('contacts:save', async (_e, arr) => {
-  try { fs.writeFileSync(dataFile(), JSON.stringify(arr, null, 2)); return { ok: true }; }
-  catch (err) { return { ok: false, error: String(err) }; }
+  try {
+    fs.writeFileSync(dataFile(), JSON.stringify(arr, null, 2));
+    const cfg = readConfig();
+    if (cfg.gTokens && cfg.gSheetId) {
+      const auth = getAuthClient();
+      if (auth) {
+        try {
+          await gsSaveToSheet(auth, cfg.gSheetId, arr);
+          return { ok: true, synced: true };
+        } catch(e) { return { ok: true, synced: false, syncError: String(e) }; }
+      }
+    }
+    return { ok: true };
+  } catch (err) { return { ok: false, error: String(err) }; }
 });
 
 /* ---------------- Data location (share across computers via a cloud folder) ---------------- */
@@ -240,7 +338,7 @@ ipcMain.handle('data:setLocation', async () => {
       if (fs.existsSync(oldFile)) current = fs.readFileSync(oldFile, 'utf8') || '[]';
       fs.writeFileSync(newFile, current);
     }
-    const cfg = readConfig(); cfg.dataDir = newDir; writeConfig(cfg);
+    updateConfig((cfg) => { cfg.dataDir = newDir; });
     return { ok: true, path: newFile, dir: newDir, adopted };
   } catch (err) { return { ok: false, error: String(err) }; }
 });
@@ -249,7 +347,7 @@ ipcMain.handle('data:setLocation', async () => {
 ipcMain.handle('data:useDefault', async () => {
   const oldFile = dataFile();
   try {
-    const cfg = readConfig(); delete cfg.dataDir; writeConfig(cfg);
+    updateConfig((cfg) => { delete cfg.dataDir; });
     const def = dataFile();
     if (oldFile !== def && fs.existsSync(oldFile) && !fs.existsSync(def)) {
       fs.writeFileSync(def, fs.readFileSync(oldFile, 'utf8') || '[]');
@@ -324,4 +422,113 @@ ipcMain.handle('excel:import', async () => {
   } catch (err) {
     return { ok: false, error: 'Could not read that file. Make sure it is a .xlsx or .csv.' };
   }
+});
+
+/* ---------------- Google Sheets: connect + manage ---------------- */
+ipcMain.handle('gsheets:getStatus', () => {
+  const cfg = readConfig();
+  return {
+    hasCredentials: !!(cfg.gClientId && cfg.gClientSecret),
+    authenticated: !!(cfg.gTokens),
+    sheetId: cfg.gSheetId || null,
+    sheetName: cfg.gSheetName || null,
+    sheetUrl: cfg.gSheetId ? 'https://docs.google.com/spreadsheets/d/' + cfg.gSheetId : null
+  };
+});
+
+ipcMain.handle('gsheets:setCredentials', (_e, clientId, clientSecret) => {
+  updateConfig((cfg) => {
+    cfg.gClientId = String(clientId).trim();
+    cfg.gClientSecret = String(clientSecret).trim();
+  });
+  return { ok: true };
+});
+
+ipcMain.handle('gsheets:connect', () => {
+  if (!requireGoogle()) return { ok: false, error: 'googleapis package not installed — run npm install in the app folder.' };
+  const cfg = readConfig();
+  const client = makeOAuth2Client(cfg);
+  if (!client) return { ok: false, error: 'No credentials saved yet.' };
+
+  const authUrl = client.generateAuthUrl({ access_type: 'offline', scope: GS_SCOPES, prompt: 'consent' });
+
+  return new Promise((resolve) => {
+    let server;
+    const timer = setTimeout(() => { server && server.close(); resolve({ ok: false, error: 'Sign-in timed out (2 min). Please try again.' }); }, 120000);
+
+    server = http.createServer(async (req, res) => {
+      const q = new URL(req.url, GS_REDIRECT_URI);
+      const code = q.searchParams.get('code');
+      const err = q.searchParams.get('error');
+      const html = (msg, ok) => `<html><body style="font-family:sans-serif;text-align:center;padding:60px 40px"><h2 style="color:${ok ? '#1a5fb4' : '#c01c28'}">${msg}</h2><p style="color:#555">You can close this tab and go back to the app.</p></body></html>`;
+
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      if (err || !code) {
+        res.end(html('Access denied', false));
+        clearTimeout(timer); server.close();
+        return resolve({ ok: false, error: 'Access was denied.' });
+      }
+      try {
+        const { tokens } = await client.getToken(code);
+        updateConfig((c) => { c.gTokens = tokens; });
+        res.end(html('Connected to Google Sheets!', true));
+        clearTimeout(timer); server.close();
+        resolve({ ok: true });
+      } catch(e) {
+        res.end(html('Error: ' + String(e), false));
+        clearTimeout(timer); server.close();
+        resolve({ ok: false, error: String(e) });
+      }
+    });
+
+    server.on('error', (e) => { clearTimeout(timer); resolve({ ok: false, error: 'Port 42813 is in use. Close other apps and try again.' }); });
+    server.listen(GS_REDIRECT_PORT, '127.0.0.1', () => shell.openExternal(authUrl));
+  });
+});
+
+ipcMain.handle('gsheets:createSheet', async (_e, contacts) => {
+  const auth = getAuthClient();
+  if (!auth) return { ok: false, error: 'Not signed in to Google.' };
+  try {
+    const api = gsApi(auth);
+    const res = await api.spreadsheets.create({
+      requestBody: {
+        properties: { title: 'Declan Prospecting Contacts' },
+        sheets: [{ properties: { title: 'Contacts' } }]
+      }
+    }, GS_REQ_OPTS);
+    const sheetId = res.data.spreadsheetId;
+    await gsSaveToSheet(auth, sheetId, Array.isArray(contacts) ? contacts : []);
+    updateConfig((cfg) => { cfg.gSheetId = sheetId; cfg.gSheetName = 'Declan Prospecting Contacts'; });
+    return { ok: true, sheetId, sheetName: 'Declan Prospecting Contacts', sheetUrl: 'https://docs.google.com/spreadsheets/d/' + sheetId };
+  } catch(e) { return { ok: false, error: String(e) }; }
+});
+
+ipcMain.handle('gsheets:linkSheet', async (_e, urlOrId) => {
+  const auth = getAuthClient();
+  if (!auth) return { ok: false, error: 'Not signed in to Google.' };
+  let sheetId = String(urlOrId).trim();
+  const m = sheetId.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) sheetId = m[1];
+  try {
+    const api = gsApi(auth);
+    const meta = await api.spreadsheets.get({ spreadsheetId: sheetId }, GS_REQ_OPTS);
+    const sheetName = meta.data.properties.title;
+    const hasTab = (meta.data.sheets || []).some((s) => s.properties.title === 'Contacts');
+    if (!hasTab) {
+      await api.spreadsheets.batchUpdate({ spreadsheetId: sheetId, requestBody: { requests: [{ addSheet: { properties: { title: 'Contacts' } } }] } }, GS_REQ_OPTS);
+    }
+    updateConfig((cfg) => { cfg.gSheetId = sheetId; cfg.gSheetName = sheetName; });
+    return { ok: true, sheetId, sheetName };
+  } catch(e) { return { ok: false, error: String(e) }; }
+});
+
+ipcMain.handle('gsheets:disconnect', () => {
+  updateConfig((cfg) => { delete cfg.gTokens; delete cfg.gSheetId; delete cfg.gSheetName; });
+  return { ok: true };
+});
+
+ipcMain.handle('gsheets:openSheet', (_e, url) => {
+  shell.openExternal(url);
+  return { ok: true };
 });

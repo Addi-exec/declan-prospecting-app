@@ -10,5 +10,12 @@ contextBridge.exposeInMainWorld('api', {
   saveTextFile: (text, suggested) => ipcRenderer.invoke('file:saveText', text, suggested),
   importExcel: () => ipcRenderer.invoke('excel:import'),
   getVersion: () => ipcRenderer.invoke('app:getVersion'),
-  checkForUpdates: () => ipcRenderer.invoke('update:check')
+  checkForUpdates: () => ipcRenderer.invoke('update:check'),
+  gsGetStatus: () => ipcRenderer.invoke('gsheets:getStatus'),
+  gsSetCredentials: (id, secret) => ipcRenderer.invoke('gsheets:setCredentials', id, secret),
+  gsConnect: () => ipcRenderer.invoke('gsheets:connect'),
+  gsCreateSheet: (contacts) => ipcRenderer.invoke('gsheets:createSheet', contacts),
+  gsLinkSheet: (url) => ipcRenderer.invoke('gsheets:linkSheet', url),
+  gsDisconnect: () => ipcRenderer.invoke('gsheets:disconnect'),
+  gsOpenSheet: (url) => ipcRenderer.invoke('gsheets:openSheet', url)
 });

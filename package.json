@@ -1,6 +1,6 @@
 {
   "name": "declan-prospecting-app",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "Prospecting scripts and contact tracker for real estate cold calling.",
   "author": "Declan Addison",
   "license": "UNLICENSED",
@@ -11,6 +11,7 @@
     "build": "electron-builder",
     "build:mac": "electron-builder --mac",
     "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
     "release": "electron-builder --publish always"
   },
   "devDependencies": {
@@ -19,7 +20,8 @@
   },
   "dependencies": {
     "electron-updater": "^6.3.9",
-    "exceljs": "^4.4.0"
+    "exceljs": "^4.4.0",
+    "googleapis": "^173.0.0"
   },
   "build": {
     "appId": "com.declanaddison.prospecting",
@@ -48,6 +50,20 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Declan Prospecting App"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "assets/icon.png",
+      "category": "Office",
+      "maintainer": "Declan Addison <declan@declanprospecting.app>",
+      "synopsis": "Prospecting scripts and contact tracker for real estate cold calling.",
+      "desktop": {
+        "Name": "Declan Prospecting App",
+        "Comment": "Prospecting scripts and contact tracker"
+      }
     },
     "publish": [
       {

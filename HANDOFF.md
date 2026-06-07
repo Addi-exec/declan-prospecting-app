@@ -99,8 +99,20 @@ Main process: `electron/main.js`. Secure bridge: `electron/preload.js`.
 - **Data privacy**: contacts NEVER go to GitHub. They live outside the repo, and
   `.gitignore` hard-blocks `prospecting-data.json`, `app-config.json`, and any
   `*.csv` / `*.xlsx` even if they land in the folder. Verified.
+- **Google Sheets sync (v0.24.0)**: optionally store contacts in a Google Sheet so
+  they sync across all devices and are viewable/editable in the browser or phone.
+  Free, no credit card (Sheets API + OAuth need no billing). OAuth "Desktop app"
+  flow via a localhost redirect; secrets live only in `userData/app-config.json`,
+  never the repo. Full setup + every Google Cloud error fix is in the
+  `google-sheets-integration` skill (`.claude/skills/`).
+- **Linux support (v0.24.0)**: the app now runs on Linux (Linux Mint) alongside
+  Windows + Mac. Build targets AppImage + .deb (`npm run build:linux`), a
+  `Start (Linux).sh` launcher, and Linux auto-update via AppImage. The
+  `electron-install-fix` skill's `fix-electron.js` repairs a broken Electron binary
+  on any OS with one command.
 
-Current version: **0.23.0**. Repo: https://github.com/Addi-exec/declan-prospecting-app
+Current version: **0.24.0** (Sheets + Linux added in-app; publish a release to ship
+it — see §6). Repo: https://github.com/Addi-exec/declan-prospecting-app
 
 ---
 
@@ -221,12 +233,14 @@ To ship a new version:
 | Thing | Value |
 |------|-------|
 | Repo | https://github.com/Addi-exec/declan-prospecting-app (public) |
-| Current version | 0.23.0 |
+| Current version | 0.24.0 |
 | Reinstall after reset | Download installer from the Releases page (see §0A) |
 | Default data path (Mac) | `~/Library/Application Support/Declan Prospecting App/prospecting-data.json` |
 | Default data path (Win) | `%APPDATA%\Declan Prospecting App\prospecting-data.json` |
-| Share data | App → Contacts → Storage → "Use a shared folder…" (same cloud folder on each machine) |
+| Default data path (Linux) | `~/.config/Declan Prospecting App/prospecting-data.json` |
+| Share data (simple) | App → Contacts → Storage → "Use a shared folder…" (same cloud folder on each machine) |
+| Share data (Sheets) | App → Contacts → Storage → connect Google Sheets (`google-sheets-integration` skill) |
 | Run dev | `npm start` |
-| Build Mac | `npm run build:mac` |
-| Build Win | `npm run build:win` |
+| Build Mac / Win / Linux | `npm run build:mac` / `build:win` / `build:linux` |
+| Fix "Electron failed to install" | `node .claude/skills/electron-install-fix/scripts/fix-electron.js` |
 | Publish release | `npm run release` (needs `GH_TOKEN`) |
