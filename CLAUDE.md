@@ -110,7 +110,7 @@ electron/main.js      BrowserWindow; IPC: contacts load/save, Excel import/expor
                       Windows = electron-updater auto-install; macOS = manual
                       (queries GitHub Releases, opens the .dmg download)
 electron/preload.js   contextBridge -> window.api (the only renderer<->main surface)
-renderer/index.html   THE ENTIRE APP (UI, styles, all logic). ~2470 lines.
+renderer/index.html   THE ENTIRE APP (UI, styles, all logic). ~2600 lines.
 assets/               icon.ico (Win), icon.icns (Mac), icon.png/icon_512.png (Linux), make_icon.py
 Start (Windows).bat   dev-mode launcher (Windows)
 Setup (Windows).bat   one-time Windows installer (downloads Electron via mirror)
@@ -236,9 +236,19 @@ Follow-up, Nurture.
   Every call is paired with an "SMS if no answer".
 - **Nurture** sub-tab = three temperature tracks: **HOT / WARM / COLD** (SMS + calls).
 
+## Navigation (v0.26 redesign)
+- A horizontal **`.topbar`** (brand + tabs + ? + theme toggle) replaced the old left
+  sidebar + mobile tab bar. Tabs: **Tracker** (panel id stays `contacts`), **Prospecting ▾**,
+  **Buyers**, **Properties**. The dead sidebar/`.tab-bar-mobile`/`.layout` CSS is left in place.
+- **Prospecting** is a `.nav-wrap` containing the `#nav-prospecting` button + a hover/click
+  `#prospecting-dd` dropdown of the 4 methods. `prospectingClick()` toggles it (touch);
+  `pickMethod(m)` opens a method panel. `showPanel` marks `#nav-prospecting` active for any
+  `METHOD_PANELS` id, else matches the `.nav-item` whose onclick names the id; it closes the
+  dropdown + scrolls to top. An outside-click handler closes the dropdown.
+
 ## Tab system (JS functions in renderer)
 - `showPanel(id, el)` — switches top-level panels (contacts, justsold, listed,
-  buyerdb, steallist, about) + nav/mobile highlight.
+  buyerdb, steallist, buyers, properties, about) + top-tab highlight.
 - `showJsTab/showJlTab/showBdTab/showSlTab` — method sub-tabs (built by `makeTabFn`).
 - `showJsfTab(id, el)` — follow-up BRANCH tabs. Generalised: derives the group
   prefix from the id (`jsf`/`jlf`/`bdf`/`slf`) and toggles `.{prefix}-track` /
@@ -253,8 +263,15 @@ Follow-up, Nurture.
   milestone is `{ d: dayOffsetFromStart, t: 'label' }`.
 - `sinceDate(c)` = `branchDate || callDate`. `schedFor(c)` = `METHODS[method].ms[outcome]`.
 - `nextMilestone(c)` = next uncompleted milestone + its due date (sinceDate + d days).
-- Dashboard "Due now & overdue" shows anything due within 7 days; ✓ Done = `crmMarkDone`
-  (stepsDone++), Stop = `crmArchive`.
+- Dashboard "Due now & overdue" (the Tracker hero, with a `#due-stats` strip) shows anything
+  due within 7 days as rich cards; ✓ Mark done = `crmMarkDone` (stepsDone++), Stop = `crmArchive`.
+- **Smart Due cards (v0.26)**: each card shows the actual script for that step, pulled LIVE from
+  the existing Follow-up/Nurture pages — `scriptForDue(c, nm)` finds the branch track
+  `#<prefix>f-<outcome>` (prefix via `METHOD_PREFIX`) and reads its Nth `.seq-item` (`h4` +
+  `.script-block` call + `.sms-bubble` SMS). "Nurture touch" steps resolve a temperature by outcome
+  (interested→hot, notinterested→cold, noanswer→warm) and read the Nth `.sms-bubble` of
+  `#<prefix>n-<temp>`. `crmCopySms` copies the SMS (navigator.clipboard + textarea fallback). Single
+  source = the script DOM, so no drift.
 - `crmSetOutcome(id, value)` resets `stepsDone=0` and sets `branchDate=today` so the
   schedule restarts on the new branch.
 - Search box: `crmSearch` filters table across name/mobile/email/address/notes.
@@ -265,7 +282,7 @@ Follow-up, Nurture.
 1. **Versioning**: feature = bump the decimal (…0.9 -> 0.10 -> 0.11…); bug fix =
    add a third number (e.g. 0.20.1). Update it in THREE places when you ship:
    the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **0.25.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **0.26.0**.
 2. **Theming**: every colour MUST be a CSS variable defined in BOTH `:root` and
    `[data-theme="dark"]`. Never hardcode hex in markup/JS — new UI must work in
    light AND dark automatically. Dark mode is a header toggle, persisted in
@@ -294,6 +311,12 @@ Follow-up, Nurture.
   the 3 version spots. Code signing (self-signed cert in `signing/`, or a CA cert)
   keeps the publisher consistent so electron-updater's signature check passes.
 
-## Brand
-Primary blue `#1a5fb4`, amber accent `#e3ad4f`. Icon: white house + amber chat
-bubble on a blue gradient (regenerate via `assets/make_icon.py`).
+## Brand / look (v0.26 redesign)
+**Monochrome** UI: warm dark-greys (not black) in dark mode, whites/light-greys in light,
+near-black/near-white text. **Primary chrome** = `--primary` (monochrome ink). The single warm
+accent is a **stylish brown** (`--accent`/`--accent-bg`/`--accent-strong`), used minimally
+(SMS-bubble edges, focus ring, the brand mark, small dots). Per-section colours
+(`--blue/green/teal/pink/purple/danger`, muted) are kept ONLY for wayfinding (method chips,
+section dots, overdue red). The palette migration kept every legacy token name resolving (e.g.
+`--amber`/`--sms-bubble` repointed to the brown accent), so component CSS was re-skinned via the
+`:root`/`[data-theme="dark"]` blocks alone. Icon (`assets/make_icon.py`) is unchanged for now.
