@@ -303,10 +303,11 @@ Follow-up, Nurture.
   All go through `window.api`.
 
 ## CONVENTIONS — follow these for any change
-1. **Versioning**: feature = bump the decimal (…0.9 -> 0.10 -> 0.11…); bug fix =
-   add a third number (e.g. 0.20.1). Update it in THREE places when you ship:
-   the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **0.28.0**.
+1. **Versioning** (semver from v1.0.0 on): `MAJOR.MINOR.PATCH` — **MAJOR** = big overhauls /
+   breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
+   looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
+   places when you ship: the header `#app-version` span, the About page `#about-version`, and
+   `package.json` "version". Add a changelog entry on the About page. Current: **1.0.0**.
 2. **Theming**: every colour MUST be a CSS variable defined in BOTH `:root` and
    `[data-theme="dark"]`. Never hardcode hex in markup/JS — new UI must work in
    light AND dark automatically. Dark mode is a header toggle, persisted in
