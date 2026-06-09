@@ -31,11 +31,11 @@ function dataFile() { return path.join(dataDir(), DATA_FILENAME); }
 function readData() {
   try {
     const p = dataFile();
-    if (!fs.existsSync(p)) return { contacts: [], buyers: [], properties: [] };
+    if (!fs.existsSync(p)) return { contacts: [], buyers: [], properties: [], inspections: [] };
     const raw = JSON.parse(fs.readFileSync(p, 'utf8') || '{}');
-    if (Array.isArray(raw)) return { contacts: raw, buyers: [], properties: [] };
-    return { contacts: raw.contacts || [], buyers: raw.buyers || [], properties: raw.properties || [] };
-  } catch (e) { return { contacts: [], buyers: [], properties: [] }; }
+    if (Array.isArray(raw)) return { contacts: raw, buyers: [], properties: [], inspections: [] };
+    return { contacts: raw.contacts || [], buyers: raw.buyers || [], properties: raw.properties || [], inspections: raw.inspections || [] };
+  } catch (e) { return { contacts: [], buyers: [], properties: [], inspections: [] }; }
 }
 function updateData(mutate) {
   const d = readData(); mutate(d);
@@ -234,6 +234,7 @@ const GS_SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const CONTACT_HEADERS = ['id','method','outcome','first','last','address','mobile','email','callDate','stepsDone','branchDate','archived','notes'];
 const BUYER_HEADERS = ['id','first','last','mobile','email','buyerType','budgetMin','budgetMax','types','bedsMin','bathsMin','carMin','landMin','suburbs','enquiries','archived','notes'];
 const PROPERTY_HEADERS = ['id','status','archiveReason','address','suburb','postcode','type','price','priceType','priceMax','beds','baths','car','land','salePrice','saleDate','listingUrl','listedDate','notes'];
+const INSPECTION_HEADERS = ['id','propertyId','date','startTime','attendees','notes','createdAt','archived'];
 // Per-request timeout so a hung network never freezes contacts:load / contacts:save —
 // the callers all fall back to the local JSON file when a Sheets call rejects.
 const GS_REQ_OPTS = { timeout: 20000 };
@@ -267,9 +268,9 @@ function getAuthClient() {
    single comma-separated cell; numeric/boolean fields are coerced back on load.
    gsLoadTab THROWS on a missing tab or API error so callers fall back to local
    data instead of mirroring an empty result over it. */
-const GS_TABS = ['Contacts', 'Buyers', 'Properties'];
+const GS_TABS = ['Contacts', 'Buyers', 'Properties', 'Inspections'];
 const GS_ARRAY_FIELDS = { types: 1, suburbs: 1 };
-const GS_JSON_FIELDS = { enquiries: 1 }; // enquiries are objects {id,active,notes} → stored as JSON in one cell
+const GS_JSON_FIELDS = { enquiries: 1, attendees: 1 }; // arrays of objects → stored as JSON in one cell
 const GS_NUM_FIELDS = { stepsDone:1, budgetMin:1, budgetMax:1, bedsMin:1, bathsMin:1, carMin:1, landMin:1, price:1, priceMax:1, beds:1, baths:1, car:1, land:1, salePrice:1 };
 const GS_BOOL_FIELDS = { archived: 1 };
 
@@ -378,6 +379,7 @@ function makeCollectionHandlers(key, tab, headers) {
 makeCollectionHandlers('contacts', 'Contacts', CONTACT_HEADERS);
 makeCollectionHandlers('buyers', 'Buyers', BUYER_HEADERS);
 makeCollectionHandlers('properties', 'Properties', PROPERTY_HEADERS);
+makeCollectionHandlers('inspections', 'Inspections', INSPECTION_HEADERS);
 
 /* ---------------- Data location (share across computers via a cloud folder) ---------------- */
 ipcMain.handle('data:getLocation', () => {
@@ -568,6 +570,7 @@ ipcMain.handle('gsheets:createSheet', async (_e, contacts) => {
     await gsSaveTab(auth, sheetId, 'Contacts', CONTACT_HEADERS, Array.isArray(contacts) ? contacts : d.contacts);
     await gsSaveTab(auth, sheetId, 'Buyers', BUYER_HEADERS, d.buyers);
     await gsSaveTab(auth, sheetId, 'Properties', PROPERTY_HEADERS, d.properties);
+    await gsSaveTab(auth, sheetId, 'Inspections', INSPECTION_HEADERS, d.inspections);
     updateConfig((cfg) => { cfg.gSheetId = sheetId; cfg.gSheetName = 'Declan Prospecting Contacts'; });
     return { ok: true, sheetId, sheetName: 'Declan Prospecting Contacts', sheetUrl: 'https://docs.google.com/spreadsheets/d/' + sheetId };
   } catch(e) { return { ok: false, error: String(e) }; }

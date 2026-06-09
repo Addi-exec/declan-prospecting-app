@@ -7,6 +7,8 @@ contextBridge.exposeInMainWorld('api', {
   saveBuyers: (arr) => ipcRenderer.invoke('buyers:save', arr),
   loadProperties: () => ipcRenderer.invoke('properties:load'),
   saveProperties: (arr) => ipcRenderer.invoke('properties:save', arr),
+  loadInspections: () => ipcRenderer.invoke('inspections:load'),
+  saveInspections: (arr) => ipcRenderer.invoke('inspections:save', arr),
   getDataLocation: () => ipcRenderer.invoke('data:getLocation'),
   setDataLocation: () => ipcRenderer.invoke('data:setLocation'),
   useDefaultDataLocation: () => ipcRenderer.invoke('data:useDefault'),
