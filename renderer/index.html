@@ -165,6 +165,18 @@
   .check-row { display:flex; align-items:center; gap:9px; padding:8px 0; border-top:1px solid var(--border); font-size:13px; color:var(--text); }
   .check-row:first-child { border-top:none; }
   .check-row input { width:16px; height:16px; flex-shrink:0; }
+  /* Property → expandable enquiries panel */
+  .enq-detail > td { background:var(--surface2); padding:0; }
+  .enq-panel { padding:14px 16px 16px; }
+  .enq-head { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:4px; }
+  .enq-htitle { font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--text3); }
+  .enq-add { font-size:12.5px; padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text); font-family:inherit; max-width:220px; }
+  .enq-list .enq-buyer:first-child { border-top:none; }
+  .enq-buyer { display:flex; gap:14px; align-items:flex-start; padding:12px 0; border-top:1px solid var(--border); flex-wrap:wrap; }
+  .enq-binfo { min-width:160px; }
+  .enq-bname { font-weight:600; color:var(--text); font-size:13.5px; }
+  .enq-note { flex:1; min-width:220px; }
+  .enq-note textarea { width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:7px 9px; font-size:12.5px; color:var(--text); font-family:inherit; resize:vertical; }
   .crm-empty { background: var(--surface2); border-radius: 10px; padding: 22px; text-align: center; color: var(--text2); font-size: 13px; }
   .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
   .filter-chip { font-size: 12px; padding: 6px 13px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; }
@@ -225,7 +237,7 @@
   <div class="topbar-inner">
     <div class="brand">
       <div class="brand-mark">D</div>
-      <div><div class="brand-name">Declan Addison</div><div class="brand-sub" id="app-version" onclick="showPanel('about')" title="What's new" style="cursor:pointer;">v0.26.3</div></div>
+      <div><div class="brand-name">Declan Addison</div><div class="brand-sub" id="app-version" onclick="showPanel('about')" title="What's new" style="cursor:pointer;">v0.27.0</div></div>
     </div>
     <div class="topnav">
       <button class="nav-item active" onclick="showPanel('contacts',this)"><span class="nav-dot" style="background:var(--accent)"></span>Tracker</button>
@@ -1716,7 +1728,7 @@
 
   <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:22px;">
     <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">You're running</div>
-    <div id="about-version" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Version 0.26.3</div>
+    <div id="about-version" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Version 0.27.0</div>
   </div>
 
   <div style="background:var(--blue-bg);border-radius:10px;padding:14px 16px;margin-bottom:22px;">
@@ -1726,7 +1738,7 @@
   </div>
 
   <div class="script-label">Version history</div>
-  <div style="margin-top:4px;"><div class="changelog-row"><div class="changelog-ver">v0.26.3</div><div class="muted-sm">The <strong style="color:var(--text);">Prospecting</strong> menu now opens on hover and stays open as you move down to pick a method, and the top tabs show a clear outline when you hover them.</div></div><div class="changelog-row"><div class="changelog-ver">v0.26</div><div class="muted-sm">A fresh look and a smarter workspace: clean <strong style="color:var(--text);">tabs across the top</strong> (with a Prospecting menu for your four methods), a calm <strong style="color:var(--text);">black-and-white design</strong> with subtle brown accents and a tidied dark mode, and a rebuilt <strong style="color:var(--text);">Tracker</strong> — each due person now shows you the exact call or text to use for their next step, with a one-tap <strong style="color:var(--text);">Copy SMS</strong>, so you never have to go hunting through the script pages.</div></div><div class="changelog-row"><div class="changelog-ver">v0.25</div><div class="muted-sm">Big one: a proper <strong style="color:var(--text);">Buyers database</strong> (budget, preferences, preferred suburbs, and the properties each buyer enquired on) and a <strong style="color:var(--text);">Properties</strong> inventory (on market / off market / archived). Hit <strong style="color:var(--text);">Match</strong> on any buyer or property to instantly see the best fits, ranked — including off-market properties. Everything syncs to Google Sheets too (new Buyers and Properties tabs).</div></div><div class="changelog-row"><div class="changelog-ver">v0.24.1</div><div class="muted-sm">Behind-the-scenes tidy-up of the app's styling so it's quicker and safer to improve from here — nothing changed in how the app looks or works.</div></div><div class="changelog-row"><div class="changelog-ver">v0.24</div><div class="muted-sm">Sync your contacts to a <strong style="color:var(--text);">Google Sheet</strong>: connect once from the Storage box and your contacts stay in step on every computer — and you can view or edit them right in Google Sheets, even from your phone. Also added <strong style="color:var(--text);">Linux support</strong> (Linux Mint), so the app now runs on Windows, Mac and Linux.</div></div><div class="changelog-row"><div class="changelog-ver">v0.23</div><div class="muted-sm">Made updating easy on Mac: added a <strong style="color:var(--text);">Check for updates</strong> button on this page (and an automatic check when you open the app). When a new version is out it tells you and opens the download — just open the .dmg and drag the app into Applications. Windows keeps installing updates by itself.</div></div><div class="changelog-row"><div class="changelog-ver">v0.22</div><div class="muted-sm">Share your contacts across computers: point the tracker at a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) from the Storage box, then choose the same folder on your other computer. Also turned on automatic updates (via GitHub) so new versions can install themselves.</div></div><div class="changelog-row"><div class="changelog-ver">v0.21</div><div class="muted-sm">Windows support is back: the app now installs and runs on Windows as well as Mac. Added a Windows installer build (<strong style="color:var(--text);">npm run build:win</strong>) and double-click launchers, and fixed a first-time setup issue where the app engine sometimes didn't finish installing.</div></div><div class="changelog-row"><div class="changelog-ver">v0.20.1</div><div class="muted-sm">Brought Just listed, Buyer database and Steal listings up to the same standard as Just sold — branched follow-ups (no answer / interested / not interested) and HOT / WARM / COLD nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.18</div><div class="muted-sm">Rebuilt as a cross-platform desktop app (Electron) with a local database and native Excel/CSV export &amp; import — no browser, no sandbox.</div></div><div class="changelog-row"><div class="changelog-ver">v0.17</div><div class="muted-sm">Added a call-outcome option (no answer / interested / not interested) when logging a contact, so the follow-up reminders use the right branch. You can also change a contact's outcome later and the schedule restarts from that day.</div></div><div class="changelog-row"><div class="changelog-ver">v0.16</div><div class="muted-sm">Added this About &amp; what's new page, with version history.</div></div><div class="changelog-row"><div class="changelog-ver">v0.15</div><div class="muted-sm">Renamed to a stable filename so data survives updates; added optional project-folder data file (auto-saves to prospecting-data.json on Chrome/Edge).</div></div><div class="changelog-row"><div class="changelog-ver">v0.14</div><div class="muted-sm">Split the Just sold follow-up into three branches: no answer (voicemail + SMS), answered &amp; interested, answered &amp; not interested.</div></div><div class="changelog-row"><div class="changelog-ver">v0.13</div><div class="muted-sm">Rewrote the Just sold openers to feel warmer and more genuine — dropped the "this is a cold call" line while keeping the research behind each one.</div></div><div class="changelog-row"><div class="changelog-ver">v0.12</div><div class="muted-sm">Added a search box to the contact tracker.</div></div><div class="changelog-row"><div class="changelog-ver">v0.11</div><div class="muted-sm">Built the contact tracker: quick logging, automatic due/overdue reminders from each call date, and Excel export/import (one sheet per method).</div></div><div class="changelog-row"><div class="changelog-ver">v0.10</div><div class="muted-sm">Added dark mode with a light/dark toggle and a full themed colour system.</div></div><div class="changelog-row"><div class="changelog-ver">v0.9</div><div class="muted-sm">Gave each prospect method its own openers, objections, closes, follow-up and nurture; removed the old shared sections. Stripped all email steps — calls and messages only.</div></div><div class="changelog-row"><div class="changelog-ver">v0.8</div><div class="muted-sm">Moved Just listed into the prospect methods with its own openers, objections and closes.</div></div><div class="changelog-row"><div class="changelog-ver">v0.7</div><div class="muted-sm">Consolidated the core openers, objections and closes into the Just sold street method.</div></div><div class="changelog-row"><div class="changelog-ver">v0.6</div><div class="muted-sm">Added two new prospect methods: Buyer database and Steal listings.</div></div><div class="changelog-row"><div class="changelog-ver">v0.5</div><div class="muted-sm">Reorganised into prospect methods and a special opens section.</div></div><div class="changelog-row"><div class="changelog-ver">v0.4</div><div class="muted-sm">Rebuilt the openers around proven psychology and cold-calling data.</div></div><div class="changelog-row"><div class="changelog-ver">v0.3</div><div class="muted-sm">Added the HOT / WARM / COLD SMS nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.2</div><div class="muted-sm">Added voicemail scripts, the follow-up sequence and the no-answer nurture.</div></div><div class="changelog-row"><div class="changelog-ver">v0.1</div><div class="muted-sm">First downloadable version with the core just-sold scripts.</div></div></div>
+  <div style="margin-top:4px;"><div class="changelog-row"><div class="changelog-ver">v0.27</div><div class="muted-sm">Properties now have an <strong style="color:var(--text);">Enquiries</strong> panel that opens out under each property to list every buyer who enquired. For each one you can jot <strong style="color:var(--text);">notes</strong> and toggle whether they're still an <strong style="color:var(--text);">active buyer</strong> of that property (vs just a past enquiry), and add or remove buyers right there.</div></div><div class="changelog-row"><div class="changelog-ver">v0.26.3</div><div class="muted-sm">The <strong style="color:var(--text);">Prospecting</strong> menu now opens on hover and stays open as you move down to pick a method, and the top tabs show a clear outline when you hover them.</div></div><div class="changelog-row"><div class="changelog-ver">v0.26</div><div class="muted-sm">A fresh look and a smarter workspace: clean <strong style="color:var(--text);">tabs across the top</strong> (with a Prospecting menu for your four methods), a calm <strong style="color:var(--text);">black-and-white design</strong> with subtle brown accents and a tidied dark mode, and a rebuilt <strong style="color:var(--text);">Tracker</strong> — each due person now shows you the exact call or text to use for their next step, with a one-tap <strong style="color:var(--text);">Copy SMS</strong>, so you never have to go hunting through the script pages.</div></div><div class="changelog-row"><div class="changelog-ver">v0.25</div><div class="muted-sm">Big one: a proper <strong style="color:var(--text);">Buyers database</strong> (budget, preferences, preferred suburbs, and the properties each buyer enquired on) and a <strong style="color:var(--text);">Properties</strong> inventory (on market / off market / archived). Hit <strong style="color:var(--text);">Match</strong> on any buyer or property to instantly see the best fits, ranked — including off-market properties. Everything syncs to Google Sheets too (new Buyers and Properties tabs).</div></div><div class="changelog-row"><div class="changelog-ver">v0.24.1</div><div class="muted-sm">Behind-the-scenes tidy-up of the app's styling so it's quicker and safer to improve from here — nothing changed in how the app looks or works.</div></div><div class="changelog-row"><div class="changelog-ver">v0.24</div><div class="muted-sm">Sync your contacts to a <strong style="color:var(--text);">Google Sheet</strong>: connect once from the Storage box and your contacts stay in step on every computer — and you can view or edit them right in Google Sheets, even from your phone. Also added <strong style="color:var(--text);">Linux support</strong> (Linux Mint), so the app now runs on Windows, Mac and Linux.</div></div><div class="changelog-row"><div class="changelog-ver">v0.23</div><div class="muted-sm">Made updating easy on Mac: added a <strong style="color:var(--text);">Check for updates</strong> button on this page (and an automatic check when you open the app). When a new version is out it tells you and opens the download — just open the .dmg and drag the app into Applications. Windows keeps installing updates by itself.</div></div><div class="changelog-row"><div class="changelog-ver">v0.22</div><div class="muted-sm">Share your contacts across computers: point the tracker at a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) from the Storage box, then choose the same folder on your other computer. Also turned on automatic updates (via GitHub) so new versions can install themselves.</div></div><div class="changelog-row"><div class="changelog-ver">v0.21</div><div class="muted-sm">Windows support is back: the app now installs and runs on Windows as well as Mac. Added a Windows installer build (<strong style="color:var(--text);">npm run build:win</strong>) and double-click launchers, and fixed a first-time setup issue where the app engine sometimes didn't finish installing.</div></div><div class="changelog-row"><div class="changelog-ver">v0.20.1</div><div class="muted-sm">Brought Just listed, Buyer database and Steal listings up to the same standard as Just sold — branched follow-ups (no answer / interested / not interested) and HOT / WARM / COLD nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.18</div><div class="muted-sm">Rebuilt as a cross-platform desktop app (Electron) with a local database and native Excel/CSV export &amp; import — no browser, no sandbox.</div></div><div class="changelog-row"><div class="changelog-ver">v0.17</div><div class="muted-sm">Added a call-outcome option (no answer / interested / not interested) when logging a contact, so the follow-up reminders use the right branch. You can also change a contact's outcome later and the schedule restarts from that day.</div></div><div class="changelog-row"><div class="changelog-ver">v0.16</div><div class="muted-sm">Added this About &amp; what's new page, with version history.</div></div><div class="changelog-row"><div class="changelog-ver">v0.15</div><div class="muted-sm">Renamed to a stable filename so data survives updates; added optional project-folder data file (auto-saves to prospecting-data.json on Chrome/Edge).</div></div><div class="changelog-row"><div class="changelog-ver">v0.14</div><div class="muted-sm">Split the Just sold follow-up into three branches: no answer (voicemail + SMS), answered &amp; interested, answered &amp; not interested.</div></div><div class="changelog-row"><div class="changelog-ver">v0.13</div><div class="muted-sm">Rewrote the Just sold openers to feel warmer and more genuine — dropped the "this is a cold call" line while keeping the research behind each one.</div></div><div class="changelog-row"><div class="changelog-ver">v0.12</div><div class="muted-sm">Added a search box to the contact tracker.</div></div><div class="changelog-row"><div class="changelog-ver">v0.11</div><div class="muted-sm">Built the contact tracker: quick logging, automatic due/overdue reminders from each call date, and Excel export/import (one sheet per method).</div></div><div class="changelog-row"><div class="changelog-ver">v0.10</div><div class="muted-sm">Added dark mode with a light/dark toggle and a full themed colour system.</div></div><div class="changelog-row"><div class="changelog-ver">v0.9</div><div class="muted-sm">Gave each prospect method its own openers, objections, closes, follow-up and nurture; removed the old shared sections. Stripped all email steps — calls and messages only.</div></div><div class="changelog-row"><div class="changelog-ver">v0.8</div><div class="muted-sm">Moved Just listed into the prospect methods with its own openers, objections and closes.</div></div><div class="changelog-row"><div class="changelog-ver">v0.7</div><div class="muted-sm">Consolidated the core openers, objections and closes into the Just sold street method.</div></div><div class="changelog-row"><div class="changelog-ver">v0.6</div><div class="muted-sm">Added two new prospect methods: Buyer database and Steal listings.</div></div><div class="changelog-row"><div class="changelog-ver">v0.5</div><div class="muted-sm">Reorganised into prospect methods and a special opens section.</div></div><div class="changelog-row"><div class="changelog-ver">v0.4</div><div class="muted-sm">Rebuilt the openers around proven psychology and cold-calling data.</div></div><div class="changelog-row"><div class="changelog-ver">v0.3</div><div class="muted-sm">Added the HOT / WARM / COLD SMS nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.2</div><div class="muted-sm">Added voicemail scripts, the follow-up sequence and the no-answer nurture.</div></div><div class="changelog-row"><div class="changelog-ver">v0.1</div><div class="muted-sm">First downloadable version with the core just-sold scripts.</div></div></div>
 </div>
 
 <!-- Reusable modal (matching results + enquiry pickers) -->
@@ -2338,8 +2350,22 @@ function buyersLoad(){ return BUYERS_CACHE; }
 function buyersSaveCache(arr){ BUYERS_CACHE=arr; if(window.api&&window.api.saveBuyers) window.api.saveBuyers(arr); }
 function propsLoadCache(){ return PROPS_CACHE; }
 function propsSaveCache(arr){ PROPS_CACHE=arr; if(window.api&&window.api.saveProperties) window.api.saveProperties(arr); }
-function buyersReload(){ if(window.api&&window.api.loadBuyers){ return window.api.loadBuyers().then(function(r){ BUYERS_CACHE=r||[]; buyerRenderTable(); }); } buyerRenderTable(); return Promise.resolve(); }
+function buyersReload(){ if(window.api&&window.api.loadBuyers){ return window.api.loadBuyers().then(function(r){ BUYERS_CACHE=normalizeBuyers(r||[]); buyerRenderTable(); }); } buyerRenderTable(); return Promise.resolve(); }
 function propsReload(){ if(window.api&&window.api.loadProperties){ return window.api.loadProperties().then(function(r){ PROPS_CACHE=r||[]; propRenderTable(); }); } propRenderTable(); return Promise.resolve(); }
+
+/* ---- Enquiries are objects {id:propertyId, active:bool, notes:string}. Normalise legacy [propertyId] strings. ---- */
+function normEnq(enq){ return (enq||[]).map(function(e){ return (typeof e==='string')?{id:e,active:true,notes:''}:{id:(e&&e.id)||'',active:e?e.active!==false:true,notes:(e&&e.notes)||''}; }).filter(function(e){ return e.id; }); }
+function normalizeBuyers(arr){ (arr||[]).forEach(function(b){ b.enquiries=normEnq(b.enquiries); }); return arr||[]; }
+var PROP_EXPANDED={};
+function enqFor(b,propId){ return (b.enquiries||[]).filter(function(e){return e.id===propId;})[0]||null; }
+function buyersForProp(propId){ return buyersLoad().filter(function(b){ return !!enqFor(b,propId); }).map(function(b){ return {b:b, e:enqFor(b,propId)}; }); }
+function addEnquiry(buyerId, propId){ var arr=buyersLoad(); var b=arr.find(function(x){return x.id===buyerId;}); if(!b) return; b.enquiries=b.enquiries||[]; if(!enqFor(b,propId)) b.enquiries.push({id:propId,active:true,notes:''}); buyersSaveCache(arr); }
+function removeEnquiry(buyerId, propId){ var arr=buyersLoad(); var b=arr.find(function(x){return x.id===buyerId;}); if(!b) return; b.enquiries=(b.enquiries||[]).filter(function(e){return e.id!==propId;}); buyersSaveCache(arr); }
+function toggleEnquiryActive(buyerId, propId){ var arr=buyersLoad(); var b=arr.find(function(x){return x.id===buyerId;}); if(!b) return; var e=enqFor(b,propId); if(e){ e.active=!e.active; buyersSaveCache(arr); } propRenderTable(); }
+function setEnquiryNote(buyerId, propId, txt){ var arr=buyersLoad(); var b=arr.find(function(x){return x.id===buyerId;}); if(!b) return; var e=enqFor(b,propId); if(e){ e.notes=txt; buyersSaveCache(arr); } }
+function propToggleEnq(propId){ if(PROP_EXPANDED[propId]) delete PROP_EXPANDED[propId]; else PROP_EXPANDED[propId]=true; propRenderTable(); }
+function addEnqFromSelect(propId, buyerId){ if(buyerId){ addEnquiry(buyerId, propId); propRenderTable(); } }
+function propRemoveEnq(buyerId, propId){ removeEnquiry(buyerId, propId); propRenderTable(); }
 
 /* ---- Modal ---- */
 function openModal(title, html){ var ov=document.getElementById('modal-overlay'); if(!ov) return; document.getElementById('modal-title').textContent=title; document.getElementById('modal-body').innerHTML=html; ov.classList.add('open'); }
@@ -2471,18 +2497,20 @@ function propRenderTable(){
     var specs=[]; if(p.beds) specs.push(p.beds+' bed'); if(p.baths) specs.push(p.baths+' bath'); if(p.car) specs.push(p.car+' car'); if(p.land) specs.push(p.land+'m²');
     var loc=esc([p.suburb,p.postcode].filter(Boolean).join(' '));
     var link=p.listingUrl? '<a href="#" onclick="openExt(\''+encodeURIComponent(p.listingUrl)+'\');return false;" style="color:var(--blue);text-decoration:none;">View listing ↗</a>' : '';
-    return '<tr>'+
+    var n=buyersForProp(p.id).length; var expanded=!!PROP_EXPANDED[p.id];
+    var mainRow='<tr>'+
       '<td><div style="font-weight:600;">'+esc(p.address||'—')+'</div>'+(loc?'<div class="muted-sm">'+loc+'</div>':'')+(link?'<div class="muted-sm">'+link+'</div>':'')+'</td>'+
       '<td>'+esc(PROP_TYPE_LABEL[p.type]||p.type||'')+'</td>'+
       '<td>'+esc(propPriceLabel(p))+'</td>'+
       '<td>'+esc(specs.join(' · ')||'—')+'</td>'+
       '<td><div class="due-actions">'+
         '<button class="crm-btn crm-btn-primary crm-btn-sm" onclick="propMatch(\''+p.id+'\')">Match</button>'+
-        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="propEnquiries(\''+p.id+'\')">Enquiries</button>'+
+        '<button class="crm-btn '+(expanded?'crm-btn-primary':'crm-btn-ghost')+' crm-btn-sm" onclick="propToggleEnq(\''+p.id+'\')">'+(expanded?'▾':'▸')+' Enquiries ('+n+')</button>'+
         '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="propEdit(\''+p.id+'\')">Edit</button>'+
         propStatusMenu(p)+
         '<button class="crm-btn crm-btn-danger crm-btn-sm" onclick="propDelete(\''+p.id+'\')">Delete</button>'+
       '</div></td></tr>';
+    return mainRow + (expanded ? '<tr class="enq-detail"><td colspan="5">'+enqPanelHtml(p)+'</td></tr>' : '');
   }).join('');
   wrap.innerHTML='<div class="crm-table-wrap"><table class="crm-table"><thead><tr><th>Property</th><th>Type</th><th>Price</th><th>Specs</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
@@ -2530,41 +2558,49 @@ function propMatch(id){
   openModal('Best buyers for '+(p.address||p.suburb||'this property'), body);
 }
 
-/* ---- Enquiries (editable from both sides; source of truth = buyer.enquiries) ---- */
+/* ---- Enquiries: per buyer↔property {active, notes}. Property side = inline expand panel;
+   buyer side = quick checklist modal. Source of truth = buyer.enquiries. ---- */
 function buyerEnquiries(id){
   var b=buyersLoad().find(function(x){return x.id===id;}); if(!b) return;
   var props=propsLoadCache();
   if(!props.length){ openModal('Enquiries', '<div class="crm-empty">Add some properties first.</div>'); return; }
-  var set=b.enquiries||[];
-  var body='<div class="muted-sm" style="margin-bottom:10px;">Tick the properties '+esc(buyerName(b)||'this buyer')+' has enquired on:</div>'+
-    props.map(function(p){ return '<label class="check-row"><input type="checkbox" class="enq-cb" value="'+p.id+'"'+(set.indexOf(p.id)>-1?' checked':'')+'>'+esc((p.address||p.suburb||'—')+'  ('+PROP_STATUS_LABEL[p.status||'onmarket']+')')+'</label>'; }).join('')+
+  var setIds=(b.enquiries||[]).map(function(e){return e.id;});
+  var body='<div class="muted-sm" style="margin-bottom:10px;">Tick the properties '+esc(buyerName(b)||'this buyer')+' has enquired on. Manage notes &amp; active status from each property’s Enquiries panel.</div>'+
+    props.map(function(p){ return '<label class="check-row"><input type="checkbox" class="enq-cb" value="'+p.id+'"'+(setIds.indexOf(p.id)>-1?' checked':'')+'>'+esc((p.address||p.suburb||'—')+'  ('+PROP_STATUS_LABEL[p.status||'onmarket']+')')+'</label>'; }).join('')+
     '<div style="margin-top:14px;"><button class="crm-btn crm-btn-primary crm-btn-sm" onclick="buyerSaveEnquiries(\''+b.id+'\')">Save</button></div>';
   openModal('Enquiries — '+(buyerName(b)||'buyer'), body);
 }
 function buyerSaveEnquiries(id){
   var arr=buyersLoad(); var b=arr.find(function(x){return x.id===id;}); if(!b) return;
-  var sel=[]; document.querySelectorAll('.enq-cb').forEach(function(cb){ if(cb.checked) sel.push(cb.value); });
-  b.enquiries=sel; buyersSaveCache(arr); closeModal(); buyerRenderTable();
+  var cur=b.enquiries||[]; var sel=[]; document.querySelectorAll('.enq-cb').forEach(function(cb){ if(cb.checked) sel.push(cb.value); });
+  b.enquiries=sel.map(function(pid){ var ex=cur.filter(function(e){return e.id===pid;})[0]; return ex||{id:pid,active:true,notes:''}; });
+  buyersSaveCache(arr); closeModal(); buyerRenderTable();
 }
-function propEnquiries(id){
-  var p=propsLoadCache().find(function(x){return x.id===id;}); if(!p) return;
-  var buyers=buyersLoad();
-  if(!buyers.length){ openModal('Enquiries', '<div class="crm-empty">Add some buyers first.</div>'); return; }
-  var body='<div class="muted-sm" style="margin-bottom:10px;">Tick the buyers who enquired on '+esc(p.address||p.suburb||'this property')+':</div>'+
-    buyers.map(function(b){ var on=(b.enquiries||[]).indexOf(p.id)>-1; return '<label class="check-row"><input type="checkbox" class="enq-cb" value="'+b.id+'"'+(on?' checked':'')+'>'+esc(buyerName(b)||b.mobile||'—')+'</label>'; }).join('')+
-    '<div style="margin-top:14px;"><button class="crm-btn crm-btn-primary crm-btn-sm" onclick="propSaveEnquiries(\''+p.id+'\')">Save</button></div>';
-  openModal('Enquiries — '+(p.address||p.suburb||'property'), body);
-}
-function propSaveEnquiries(id){
-  var arr=buyersLoad(); var checked={};
-  document.querySelectorAll('.enq-cb').forEach(function(cb){ if(cb.checked) checked[cb.value]=1; });
-  arr.forEach(function(b){ b.enquiries=b.enquiries||[]; var has=b.enquiries.indexOf(id)>-1; var want=!!checked[b.id]; if(want&&!has) b.enquiries.push(id); else if(!want&&has) b.enquiries=b.enquiries.filter(function(x){return x!==id;}); });
-  buyersSaveCache(arr); closeModal(); propRenderTable();
+// Inline panel shown under a property row (the expanded "box") listing its enquiring buyers.
+function enqPanelHtml(p){
+  var list=buyersForProp(p.id); var have={}; list.forEach(function(x){ have[x.b.id]=1; });
+  var addOpts=buyersLoad().filter(function(b){ return !have[b.id]; }).map(function(b){ return '<option value="'+b.id+'">'+esc(buyerName(b)||b.mobile||'—')+'</option>'; }).join('');
+  var head='<div class="enq-head"><div class="enq-htitle">Buyers who enquired ('+list.length+')</div>'+
+    (addOpts? '<select class="enq-add" onchange="addEnqFromSelect(\''+p.id+'\',this.value);this.value=\'\';"><option value="">+ Add a buyer…</option>'+addOpts+'</select>' : '<span class="muted-sm">All buyers added</span>')+'</div>';
+  var body = list.length ? '<div class="enq-list">'+list.map(function(x){ var b=x.b, e=x.e;
+    return '<div class="enq-buyer">'+
+      '<div class="enq-binfo">'+
+        '<div class="enq-bname">'+esc(buyerName(b)||'—')+'</div>'+
+        '<div class="muted-sm">'+esc([b.mobile||'',b.email||''].filter(Boolean).join(' · '))+'</div>'+
+        '<div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;">'+
+          '<button class="crm-btn '+(e.active?'crm-btn-primary':'crm-btn-ghost')+' crm-btn-sm" onclick="toggleEnquiryActive(\''+b.id+'\',\''+p.id+'\')">'+(e.active?'● Active buyer':'○ Inactive')+'</button>'+
+          '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="propRemoveEnq(\''+b.id+'\',\''+p.id+'\')">Remove</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="enq-note"><textarea rows="2" placeholder="Notes for this buyer on this property…" onchange="setEnquiryNote(\''+b.id+'\',\''+p.id+'\',this.value)">'+esc(e.notes||'')+'</textarea></div>'+
+    '</div>';
+  }).join('')+'</div>' : '<div class="muted-sm" style="padding-top:4px;">No buyers have enquired yet'+(addOpts?' — add one above.':'.')+'</div>';
+  return '<div class="enq-panel">'+head+body+'</div>';
 }
 
 document.addEventListener('DOMContentLoaded', function(){
   propSyncTabButtons();
-  if(window.api && window.api.loadBuyers){ window.api.loadBuyers().then(function(r){ BUYERS_CACHE=r||[]; buyerRenderTable(); }).catch(function(){ buyerRenderTable(); }); } else { buyerRenderTable(); }
+  if(window.api && window.api.loadBuyers){ window.api.loadBuyers().then(function(r){ BUYERS_CACHE=normalizeBuyers(r||[]); buyerRenderTable(); }).catch(function(){ buyerRenderTable(); }); } else { buyerRenderTable(); }
   if(window.api && window.api.loadProperties){ window.api.loadProperties().then(function(r){ PROPS_CACHE=r||[]; propRenderTable(); }).catch(function(){ propRenderTable(); }); } else { propRenderTable(); }
 });
 </script>

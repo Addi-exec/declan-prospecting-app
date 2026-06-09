@@ -268,7 +268,8 @@ function getAuthClient() {
    gsLoadTab THROWS on a missing tab or API error so callers fall back to local
    data instead of mirroring an empty result over it. */
 const GS_TABS = ['Contacts', 'Buyers', 'Properties'];
-const GS_ARRAY_FIELDS = { types: 1, suburbs: 1, enquiries: 1 };
+const GS_ARRAY_FIELDS = { types: 1, suburbs: 1 };
+const GS_JSON_FIELDS = { enquiries: 1 }; // enquiries are objects {id,active,notes} → stored as JSON in one cell
 const GS_NUM_FIELDS = { stepsDone:1, budgetMin:1, budgetMax:1, bedsMin:1, bathsMin:1, carMin:1, landMin:1, price:1, priceMax:1, beds:1, baths:1, car:1, land:1, salePrice:1 };
 const GS_BOOL_FIELDS = { archived: 1 };
 
@@ -285,6 +286,10 @@ async function gsLoadTab(auth, sheetId, tab) {
       hdr.forEach((h, i) => {
         const v = r[i] != null ? String(r[i]) : '';
         if (GS_ARRAY_FIELDS[h]) o[h] = v ? v.split(',').map((s) => s.trim()).filter(Boolean) : [];
+        else if (GS_JSON_FIELDS[h]) {
+          try { const j = JSON.parse(v); o[h] = Array.isArray(j) ? j : []; }
+          catch (e) { o[h] = v ? v.split(',').map((s) => ({ id: s.trim(), active: true, notes: '' })).filter((x) => x.id) : []; }
+        }
         else if (GS_NUM_FIELDS[h]) o[h] = v === '' ? '' : (parseFloat(v) || 0);
         else if (GS_BOOL_FIELDS[h]) o[h] = v === 'true';
         else o[h] = v;
@@ -300,6 +305,7 @@ async function gsSaveTab(auth, sheetId, tab, headers, rows) {
     ...(rows || []).map((rec) => headers.map((h) => {
       const v = rec[h];
       if (v == null) return '';
+      if (GS_JSON_FIELDS[h]) return JSON.stringify(v || []);
       if (Array.isArray(v)) return v.join(',');
       return String(v);
     }))

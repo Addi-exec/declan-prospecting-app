@@ -197,7 +197,9 @@ The renderer NEVER touches Node/fs directly. Everything goes through:
   buyerType /* ''|'fhb'|'upgrader'|'downsizer'|'investor' */,
   budgetMin, budgetMax /* numbers */, types /* ['house'|'townhouse'|'unit'|'land', …] */,
   bedsMin, bathsMin, carMin, landMin /* numeric minimums; '' = no preference */,
-  suburbs /* [String] preferred areas */, enquiries /* [propertyId] */,
+  suburbs /* [String] preferred areas */,
+  enquiries /* [{ id:propertyId, active:bool, notes:String }] — per buyer↔property; legacy
+              [propertyId] strings auto-migrate via normEnq/normalizeBuyers; GS stores as JSON */,
   archived /* bool */, notes }
 ```
 NB: the new Buyers database (`id="buyers"`) is data-driven and DISTINCT from the cold-calling
