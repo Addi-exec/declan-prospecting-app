@@ -307,7 +307,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **1.0.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **1.0.1**.
 2. **Theming**: every colour MUST be a CSS variable defined in BOTH `:root` and
    `[data-theme="dark"]`. Never hardcode hex in markup/JS — new UI must work in
    light AND dark automatically. Dark mode is a header toggle, persisted in

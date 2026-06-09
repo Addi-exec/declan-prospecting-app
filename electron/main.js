@@ -498,6 +498,8 @@ ipcMain.handle('gsheets:getStatus', () => {
   return {
     hasCredentials: !!(cfg.gClientId && cfg.gClientSecret),
     authenticated: !!(cfg.gTokens),
+    clientId: cfg.gClientId || '',
+    clientSecret: cfg.gClientSecret || '',
     sheetId: cfg.gSheetId || null,
     sheetName: cfg.gSheetName || null,
     sheetUrl: cfg.gSheetId ? 'https://docs.google.com/spreadsheets/d/' + cfg.gSheetId : null
