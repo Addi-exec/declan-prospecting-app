@@ -308,7 +308,10 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **1.3.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **1.3.1**.
+   NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
+   always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
+   import accept both; never show a raw ISO string in the UI or an export.
 2. **Theming**: every colour MUST be a CSS variable. Since v1.2.0 there are selectable
    theme palettes (Settings ⚙️ → Appearance) — five as of v1.3.0: `claude` (default),
    `aston` (Racing Green), `noir` (pure greyscale), `mono` (Espresso), `classic`
