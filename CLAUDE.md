@@ -200,8 +200,9 @@ The renderer NEVER touches Node/fs directly. Everything goes through:
   budgetMin, budgetMax /* numbers */, types /* ['house'|'townhouse'|'unit'|'land', …] */,
   bedsMin, bathsMin, carMin, landMin /* numeric minimums; '' = no preference */,
   suburbs /* [String] preferred areas */,
-  enquiries /* [{ id:propertyId, active:bool, notes:String }] — per buyer↔property; legacy
-              [propertyId] strings auto-migrate via normEnq/normalizeBuyers; GS stores as JSON */,
+  enquiries /* [{ id:propertyId, active:bool, notes:String, offerCandidate:bool }] — per
+              buyer↔property; offerCandidate (v1.1.0) drives the property panel's offer tier;
+              legacy [propertyId] strings auto-migrate via normEnq/normalizeBuyers; GS stores as JSON */,
   archived /* bool */, notes }
 ```
 NB: the new Buyers database (`id="buyers"`) is data-driven and DISTINCT from the cold-calling
@@ -307,11 +308,20 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **1.0.1**.
-2. **Theming**: every colour MUST be a CSS variable defined in BOTH `:root` and
-   `[data-theme="dark"]`. Never hardcode hex in markup/JS — new UI must work in
-   light AND dark automatically. Dark mode is a header toggle, persisted in
-   `localStorage` key `declan-theme`.
+   `package.json` "version". Add a changelog entry on the About page. Current: **1.2.0**.
+2. **Theming**: every colour MUST be a CSS variable. Since v1.2.0 there are FOUR selectable
+   theme palettes (Settings ⚙️ → Appearance): `claude` (default), `aston` (Racing Green),
+   `mono` (Espresso), `classic` (Classic Blue). The active palette is a `data-palette`
+   attribute on `<html>` (absent/`claude` = default), persisted in `localStorage` key
+   `declan-palette`; dark mode remains a separate `data-theme="dark"` attribute (header
+   toggle, `localStorage` key `declan-theme`) and works WITH every palette. Each palette
+   defines the FULL variable set in two blocks: `[data-palette="X"]` (light) and
+   `[data-palette="X"][data-theme="dark"]` (dark); the Claude blocks are
+   `:root, [data-palette="claude"]` + the dark pair. Never hardcode hex in markup/JS — new
+   UI must work in light AND dark across ALL palettes automatically. If you add a NEW CSS
+   variable, define it in ALL palette blocks (8 total: 4 palettes × light/dark). New themes:
+   add a palette block pair + a row in the `PALETTES` array (theme picker cards render from
+   it; swatch chips scope previews via `data-palette`/`data-theme` attributes on the chip).
 3. **No emails in scripts**: all openers/objections/closes/follow-ups/nurture use
    **calls + SMS only**. No email steps anywhere. (The contact record keeps an
    `email` field as stored data, but outreach is never email.)
