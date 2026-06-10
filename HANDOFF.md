@@ -138,7 +138,8 @@ over http, so data calls no-op — fine for checking layout/JS/tabs in light + d
 - **Node v24 "Electron failed to install":** run `node .claude/skills/electron-install-fix/scripts/fix-electron.js`
   (cross-platform; extracts the cached binary, writes `path.txt` w/ no trailing newline). Best fix: use Node LTS v22.
 - **macOS Gatekeeper** on the built .dmg (unsigned): right-click → Open, or `xattr -cr "/Applications/Declan Prospecting App.app"`.
-- **Top tabs wrap to 2 rows on very narrow windows** (flex-wrap) — fine at desktop width; tighten if it bugs Declan.
+- ~~Top tabs wrap onto the page on very narrow windows~~ FIXED in v1.3.0: the bar shrinks its
+  tabs below 980px/700px and grows downward (min-height + wrap) if a second row is still needed.
 - **Installers/auto-update** not yet published (see §4).
 - **Coral shade** is tunable if Declan wants it closer to Claude's exact tone (a patch).
 - Contacts/data NEVER go to GitHub (`.gitignore` blocks `prospecting-data.json`, `app-config.json`, `*.csv`, `*.xlsx`, `signing/`).

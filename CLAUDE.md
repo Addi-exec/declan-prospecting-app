@@ -308,10 +308,11 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **1.2.0**.
-2. **Theming**: every colour MUST be a CSS variable. Since v1.2.0 there are FOUR selectable
-   theme palettes (Settings ⚙️ → Appearance): `claude` (default), `aston` (Racing Green),
-   `mono` (Espresso), `classic` (Classic Blue). The active palette is a `data-palette`
+   `package.json` "version". Add a changelog entry on the About page. Current: **1.3.0**.
+2. **Theming**: every colour MUST be a CSS variable. Since v1.2.0 there are selectable
+   theme palettes (Settings ⚙️ → Appearance) — five as of v1.3.0: `claude` (default),
+   `aston` (Racing Green), `noir` (pure greyscale), `mono` (Espresso), `classic`
+   (Classic Blue). The active palette is a `data-palette`
    attribute on `<html>` (absent/`claude` = default), persisted in `localStorage` key
    `declan-palette`; dark mode remains a separate `data-theme="dark"` attribute (header
    toggle, `localStorage` key `declan-theme`) and works WITH every palette. Each palette
@@ -319,7 +320,7 @@ Follow-up, Nurture.
    `[data-palette="X"][data-theme="dark"]` (dark); the Claude blocks are
    `:root, [data-palette="claude"]` + the dark pair. Never hardcode hex in markup/JS — new
    UI must work in light AND dark across ALL palettes automatically. If you add a NEW CSS
-   variable, define it in ALL palette blocks (8 total: 4 palettes × light/dark). New themes:
+   variable, define it in ALL palette blocks (10 total: 5 palettes × light/dark). New themes:
    add a palette block pair + a row in the `PALETTES` array (theme picker cards render from
    it; swatch chips scope previews via `data-palette`/`data-theme` attributes on the chip).
 3. **No emails in scripts**: all openers/objections/closes/follow-ups/nurture use
