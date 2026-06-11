@@ -299,6 +299,10 @@ Follow-up, Nurture.
   source = the script DOM, so no drift.
 - `crmSetOutcome(id, value)` resets `stepsDone=0` and sets `branchDate=today` so the
   schedule restarts on the new branch.
+- `crmEdit(id)` (v1.4.0) loads a row into the log form (hidden `crm-edit-id`, button flips to
+  "✓ Update contact"); `crmAdd` updates in place when `crm-edit-id` is set. Editing keeps
+  `stepsDone`/`branchDate`/`archived` UNLESS the outcome changed — then it applies the
+  `crmSetOutcome` reset semantics. Method/callDate edits keep progress (schedule recomputes).
 - Search box: `crmSearch` filters table across name/mobile/email/address/notes.
 - Export: `crmExportXlsx` (one sheet per method), `crmExportCsv`; Import: `crmImport`.
   All go through `window.api`.
@@ -308,7 +312,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **1.3.1**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **1.4.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
