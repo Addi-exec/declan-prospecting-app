@@ -435,6 +435,14 @@
      resolve to THAT theme's colours regardless of the active one. */
   .swatch-set { display: inline-flex; gap: 5px; padding: 5px 7px; border-radius: 9px; background: var(--bg); border: 1px solid var(--border); }
   .sw { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border2); display: inline-block; }
+
+  /* ===== v2.0: snooze, call session, quick search ===== */
+  .snooze-sel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 5px 7px; font-size: 12px; color: var(--text2); font-family: inherit; }
+  .cs-big { font-size: 14px; padding: 10px 18px; }
+  .qs-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; font-size: 15px; color: var(--text); font-family: inherit; margin-bottom: 10px; }
+  .qs-row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px; cursor: pointer; }
+  .qs-row:hover { background: var(--surface2); }
+  .qs-kind { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; border-radius: 6px; padding: 2px 7px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -443,7 +451,7 @@
   <div class="topbar-inner">
     <div class="brand">
       <div class="brand-mark">D</div>
-      <div><div class="brand-name">Declan Addison</div><div class="brand-sub" id="app-version" onclick="showPanel('about')" title="What's new" style="cursor:pointer;">v1.4.0</div></div>
+      <div><div class="brand-name">Declan Addison</div><div class="brand-sub" id="app-version" onclick="showPanel('about')" title="What's new" style="cursor:pointer;">v2.0.0</div></div>
     </div>
     <div class="topnav">
       <button class="nav-item active" onclick="showPanel('contacts',this)"><span class="nav-dot" style="background:var(--accent)"></span>Tracker</button>
@@ -461,6 +469,7 @@
       <button class="nav-item" onclick="showPanel('inspections',this)"><span class="nav-dot" style="background:var(--teal)"></span>Inspections</button>
     </div>
     <div class="top-spacer"></div>
+    <button class="icon-btn" onclick="openQuickSearch()" title="Search everything (Ctrl/Cmd+K)">🔍</button>
     <button class="icon-btn" onclick="showPanel('settings')" title="Settings">⚙️</button>
     <button class="icon-btn" onclick="showPanel('about')" title="About &amp; what's new">?</button>
     <button class="icon-btn" id="theme-toggle" onclick="toggleTheme()" title="Theme">🌙</button>
@@ -479,8 +488,16 @@
 
   <div id="due-stats" class="stat-row"></div>
   <div class="crm-section">
-    <div class="script-label">Due now &amp; overdue</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+      <div class="script-label" style="margin:20px 0 6px;">Due now &amp; overdue</div>
+      <button id="cs-start-btn" class="crm-btn crm-btn-primary" onclick="startCallSession()">▶ Start call session</button>
+    </div>
     <div id="due-list"></div>
+  </div>
+
+  <div class="crm-section">
+    <div class="script-label">This week</div>
+    <div id="week-stats" class="stat-row"></div>
   </div>
 
   <div id="storage-card" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:22px;">
@@ -1999,6 +2016,16 @@
     <div class="muted-sm" style="margin-bottom:4px;">Pick a look — every theme the app has had lives here. The ☀️ / 🌙 button in the top bar still switches the one you choose between its light and dark sides. Each card shows its light swatches on the left and dark on the right.</div>
     <div id="theme-grid" class="theme-grid"></div>
   </div>
+
+  <div class="crm-section">
+    <div class="script-label">Data — backup &amp; restore</div>
+    <div class="muted-sm" style="margin-bottom:10px;">A backup is one small file holding <strong style="color:var(--text);">everything</strong> — contacts, buyers, properties and inspections. Keep one before big changes, or use it to move to a new computer. Restoring replaces all current data with the backup's.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="crm-btn crm-btn-primary" onclick="dataBackup()">⬇ Download backup</button>
+      <button class="crm-btn crm-btn-ghost" onclick="dataRestore()">⬆ Restore from backup…</button>
+    </div>
+    <div id="backup-msg" style="font-size:12.5px;color:var(--teal);margin-top:8px;min-height:16px;"></div>
+  </div>
 </div>
 
 <!-- ===================== ABOUT & WHAT'S NEW ===================== -->
@@ -2011,7 +2038,7 @@
 
   <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:22px;">
     <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">You're running</div>
-    <div id="about-version" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Version 1.4.0</div>
+    <div id="about-version" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Version 2.0.0</div>
   </div>
 
   <div style="background:var(--blue-bg);border-radius:10px;padding:14px 16px;margin-bottom:22px;">
@@ -2021,7 +2048,7 @@
   </div>
 
   <div class="script-label">Version history</div>
-  <div style="margin-top:4px;"><div class="changelog-row"><div class="changelog-ver">v1.4.0</div><div class="muted-sm">You can now <strong style="color:var(--text);">edit a tracked contact</strong>: hit <strong style="color:var(--text);">Edit</strong> on any row and it loads into the form above — fix names, numbers, the address, notes, the call date, or move the contact to a <strong style="color:var(--text);">different prospecting method</strong> — then Update. Changing the <strong style="color:var(--text);">outcome</strong> restarts that person's follow-up schedule from today (same as changing it in the table); every other edit keeps their progress exactly where it was.</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.2</div><div class="muted-sm">Safer importing: bringing an Excel file into the tracker now <strong style="color:var(--text);">skips the Buyers, Properties and Inspections tabs</strong> from a full export — they used to be read as contacts by mistake. And if a file has <strong style="color:var(--text);">no contact rows at all</strong>, the import now tells you and leaves your tracker untouched instead of emptying it.</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.1</div><div class="muted-sm">Dates everywhere now read the Australian way — <strong style="color:var(--text);">dd/mm/yyyy</strong> (e.g. 15/06/2026) — on the Tracker's due cards, the contacts table, inspections and their reports, and in Excel/CSV exports. Importing understands both the new format and older exports, and dates typed as dd/mm/yyyy straight into the Google Sheet are now read correctly too (they used to risk being taken as American month-first).</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.0</div><div class="muted-sm">A fifth theme: <strong style="color:var(--text);">Noir</strong> — pure greyscale, just blacks, whites and greys (urgent things stand out by contrast instead of red). Also tidied the <strong style="color:var(--text);">top bar on small windows</strong>: the tabs now shrink neatly, and if they still need a second row the bar grows downward instead of spilling over the page.</div></div><div class="changelog-row"><div class="changelog-ver">v1.2.0</div><div class="muted-sm">New <strong style="color:var(--text);">⚙️ Settings</strong> tab with a <strong style="color:var(--text);">theme picker</strong> — every look the app has ever had, in one place: <strong style="color:var(--text);">Claude</strong> (the cream &amp; coral signature), the brand-new <strong style="color:var(--text);">Racing Green</strong> (graphite greys with black chrome and forest-green accents, Aston Martin inspired), <strong style="color:var(--text);">Espresso</strong> (the warm grey + brown look), and <strong style="color:var(--text);">Classic Blue</strong> (the original). The ☀️ / 🌙 button still flips whichever theme you pick between light and dark, and your choice is remembered.</div></div><div class="changelog-row"><div class="changelog-ver">v1.1.0</div><div class="muted-sm">Each property's <strong style="color:var(--text);">Buyers panel</strong> now shows three tiers: <strong style="color:var(--text);">Offer candidates</strong> (buyers you've flagged as likely to offer), <strong style="color:var(--text);">Inspected</strong> (anyone who attended an open home for that property, pulled automatically from your Inspections records), and <strong style="color:var(--text);">Enquired only</strong>. Hit <strong style="color:var(--text);">＋ Offer candidate</strong> to move a buyer up when they get serious. Every buyer card also shows their <strong style="color:var(--text);">fit score</strong> and inspection count at a glance, and the property row shows a <strong style="color:var(--text);"># offering</strong> count so you can see offer momentum without clicking in.</div></div><div class="changelog-row"><div class="changelog-ver">v1.0.1</div><div class="muted-sm">The Google Sheets box now shows the <strong style="color:var(--text);">Client ID and secret</strong> you're connected with (secret hidden behind a Show button), each with a Copy button, so you can check or move your credentials.</div></div><div class="changelog-row"><div class="changelog-ver">v1.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 1.0 🎉</strong> — the first full release. Fresh <strong style="color:var(--text);">Claude-inspired look</strong>: a warm cream background with a coral/clay accent (and a matching warm dark mode). Everything from the journey is in: prospecting scripts, the smart Tracker, Buyers, Properties with matching, and Inspections.</div></div><div class="changelog-row"><div class="changelog-ver">v0.28</div><div class="muted-sm">New <strong style="color:var(--text);">Inspections</strong> section for open homes: create an inspection for a property + date/time, then add the buyers who attended. As you type a name it searches your buyer database to <strong style="color:var(--text);">link an existing buyer</strong> (or create a new one, warning you about likely duplicates), so you don't get doubles. Keep notes and a follow-up flag against each attendee, and hit <strong style="color:var(--text);">Report</strong> to copy a clean, email-ready summary. Inspection history shows on each buyer and property, and there's a tool to <strong style="color:var(--text);">merge duplicate buyers</strong>.</div></div><div class="changelog-row"><div class="changelog-ver">v0.27</div><div class="muted-sm">Properties now have an <strong style="color:var(--text);">Enquiries</strong> panel that opens out under each property to list every buyer who enquired. For each one you can jot <strong style="color:var(--text);">notes</strong> and toggle whether they're still an <strong style="color:var(--text);">active buyer</strong> of that property (vs just a past enquiry), and add or remove buyers right there.</div></div><div class="changelog-row"><div class="changelog-ver">v0.26.3</div><div class="muted-sm">The <strong style="color:var(--text);">Prospecting</strong> menu now opens on hover and stays open as you move down to pick a method, and the top tabs show a clear outline when you hover them.</div></div><div class="changelog-row"><div class="changelog-ver">v0.26</div><div class="muted-sm">A fresh look and a smarter workspace: clean <strong style="color:var(--text);">tabs across the top</strong> (with a Prospecting menu for your four methods), a calm <strong style="color:var(--text);">black-and-white design</strong> with subtle brown accents and a tidied dark mode, and a rebuilt <strong style="color:var(--text);">Tracker</strong> — each due person now shows you the exact call or text to use for their next step, with a one-tap <strong style="color:var(--text);">Copy SMS</strong>, so you never have to go hunting through the script pages.</div></div><div class="changelog-row"><div class="changelog-ver">v0.25</div><div class="muted-sm">Big one: a proper <strong style="color:var(--text);">Buyers database</strong> (budget, preferences, preferred suburbs, and the properties each buyer enquired on) and a <strong style="color:var(--text);">Properties</strong> inventory (on market / off market / archived). Hit <strong style="color:var(--text);">Match</strong> on any buyer or property to instantly see the best fits, ranked — including off-market properties. Everything syncs to Google Sheets too (new Buyers and Properties tabs).</div></div><div class="changelog-row"><div class="changelog-ver">v0.24.1</div><div class="muted-sm">Behind-the-scenes tidy-up of the app's styling so it's quicker and safer to improve from here — nothing changed in how the app looks or works.</div></div><div class="changelog-row"><div class="changelog-ver">v0.24</div><div class="muted-sm">Sync your contacts to a <strong style="color:var(--text);">Google Sheet</strong>: connect once from the Storage box and your contacts stay in step on every computer — and you can view or edit them right in Google Sheets, even from your phone. Also added <strong style="color:var(--text);">Linux support</strong> (Linux Mint), so the app now runs on Windows, Mac and Linux.</div></div><div class="changelog-row"><div class="changelog-ver">v0.23</div><div class="muted-sm">Made updating easy on Mac: added a <strong style="color:var(--text);">Check for updates</strong> button on this page (and an automatic check when you open the app). When a new version is out it tells you and opens the download — just open the .dmg and drag the app into Applications. Windows keeps installing updates by itself.</div></div><div class="changelog-row"><div class="changelog-ver">v0.22</div><div class="muted-sm">Share your contacts across computers: point the tracker at a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) from the Storage box, then choose the same folder on your other computer. Also turned on automatic updates (via GitHub) so new versions can install themselves.</div></div><div class="changelog-row"><div class="changelog-ver">v0.21</div><div class="muted-sm">Windows support is back: the app now installs and runs on Windows as well as Mac. Added a Windows installer build (<strong style="color:var(--text);">npm run build:win</strong>) and double-click launchers, and fixed a first-time setup issue where the app engine sometimes didn't finish installing.</div></div><div class="changelog-row"><div class="changelog-ver">v0.20.1</div><div class="muted-sm">Brought Just listed, Buyer database and Steal listings up to the same standard as Just sold — branched follow-ups (no answer / interested / not interested) and HOT / WARM / COLD nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.18</div><div class="muted-sm">Rebuilt as a cross-platform desktop app (Electron) with a local database and native Excel/CSV export &amp; import — no browser, no sandbox.</div></div><div class="changelog-row"><div class="changelog-ver">v0.17</div><div class="muted-sm">Added a call-outcome option (no answer / interested / not interested) when logging a contact, so the follow-up reminders use the right branch. You can also change a contact's outcome later and the schedule restarts from that day.</div></div><div class="changelog-row"><div class="changelog-ver">v0.16</div><div class="muted-sm">Added this About &amp; what's new page, with version history.</div></div><div class="changelog-row"><div class="changelog-ver">v0.15</div><div class="muted-sm">Renamed to a stable filename so data survives updates; added optional project-folder data file (auto-saves to prospecting-data.json on Chrome/Edge).</div></div><div class="changelog-row"><div class="changelog-ver">v0.14</div><div class="muted-sm">Split the Just sold follow-up into three branches: no answer (voicemail + SMS), answered &amp; interested, answered &amp; not interested.</div></div><div class="changelog-row"><div class="changelog-ver">v0.13</div><div class="muted-sm">Rewrote the Just sold openers to feel warmer and more genuine — dropped the "this is a cold call" line while keeping the research behind each one.</div></div><div class="changelog-row"><div class="changelog-ver">v0.12</div><div class="muted-sm">Added a search box to the contact tracker.</div></div><div class="changelog-row"><div class="changelog-ver">v0.11</div><div class="muted-sm">Built the contact tracker: quick logging, automatic due/overdue reminders from each call date, and Excel export/import (one sheet per method).</div></div><div class="changelog-row"><div class="changelog-ver">v0.10</div><div class="muted-sm">Added dark mode with a light/dark toggle and a full themed colour system.</div></div><div class="changelog-row"><div class="changelog-ver">v0.9</div><div class="muted-sm">Gave each prospect method its own openers, objections, closes, follow-up and nurture; removed the old shared sections. Stripped all email steps — calls and messages only.</div></div><div class="changelog-row"><div class="changelog-ver">v0.8</div><div class="muted-sm">Moved Just listed into the prospect methods with its own openers, objections and closes.</div></div><div class="changelog-row"><div class="changelog-ver">v0.7</div><div class="muted-sm">Consolidated the core openers, objections and closes into the Just sold street method.</div></div><div class="changelog-row"><div class="changelog-ver">v0.6</div><div class="muted-sm">Added two new prospect methods: Buyer database and Steal listings.</div></div><div class="changelog-row"><div class="changelog-ver">v0.5</div><div class="muted-sm">Reorganised into prospect methods and a special opens section.</div></div><div class="changelog-row"><div class="changelog-ver">v0.4</div><div class="muted-sm">Rebuilt the openers around proven psychology and cold-calling data.</div></div><div class="changelog-row"><div class="changelog-ver">v0.3</div><div class="muted-sm">Added the HOT / WARM / COLD SMS nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.2</div><div class="muted-sm">Added voicemail scripts, the follow-up sequence and the no-answer nurture.</div></div><div class="changelog-row"><div class="changelog-ver">v0.1</div><div class="muted-sm">First downloadable version with the core just-sold scripts.</div></div></div>
+  <div style="margin-top:4px;"><div class="changelog-row"><div class="changelog-ver">v2.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 2.0 🚀 — built for working the phones.</strong> New <strong style="color:var(--text);">▶ Call session</strong> on the Tracker walks you through everyone due, one at a time, with the right script on screen and one-tap buttons (done / 👍 / 👋 / snooze / skip) and a session summary at the end. <strong style="color:var(--text);">📞 Call and 💬 Text buttons</strong> dial or open a pre-filled text straight from a due card. <strong style="color:var(--text);">⏰ Snooze</strong> pushes anyone back 1 day / 3 days / a week without losing their progress. A new <strong style="color:var(--text);">This week</strong> strip counts your calls, texts, new contacts and interested prospects (with a trend vs last week). <strong style="color:var(--text);">🔍 Search everything</strong> (the magnifier, or Ctrl/Cmd+K) finds any contact, buyer or property instantly. Settings gains <strong style="color:var(--text);">backup &amp; restore</strong> — one file with all your data. And logging a contact now <strong style="color:var(--text);">warns about duplicate mobiles</strong>.</div></div><div class="changelog-row"><div class="changelog-ver">v1.4.0</div><div class="muted-sm">You can now <strong style="color:var(--text);">edit a tracked contact</strong>: hit <strong style="color:var(--text);">Edit</strong> on any row and it loads into the form above — fix names, numbers, the address, notes, the call date, or move the contact to a <strong style="color:var(--text);">different prospecting method</strong> — then Update. Changing the <strong style="color:var(--text);">outcome</strong> restarts that person's follow-up schedule from today (same as changing it in the table); every other edit keeps their progress exactly where it was.</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.2</div><div class="muted-sm">Safer importing: bringing an Excel file into the tracker now <strong style="color:var(--text);">skips the Buyers, Properties and Inspections tabs</strong> from a full export — they used to be read as contacts by mistake. And if a file has <strong style="color:var(--text);">no contact rows at all</strong>, the import now tells you and leaves your tracker untouched instead of emptying it.</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.1</div><div class="muted-sm">Dates everywhere now read the Australian way — <strong style="color:var(--text);">dd/mm/yyyy</strong> (e.g. 15/06/2026) — on the Tracker's due cards, the contacts table, inspections and their reports, and in Excel/CSV exports. Importing understands both the new format and older exports, and dates typed as dd/mm/yyyy straight into the Google Sheet are now read correctly too (they used to risk being taken as American month-first).</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.0</div><div class="muted-sm">A fifth theme: <strong style="color:var(--text);">Noir</strong> — pure greyscale, just blacks, whites and greys (urgent things stand out by contrast instead of red). Also tidied the <strong style="color:var(--text);">top bar on small windows</strong>: the tabs now shrink neatly, and if they still need a second row the bar grows downward instead of spilling over the page.</div></div><div class="changelog-row"><div class="changelog-ver">v1.2.0</div><div class="muted-sm">New <strong style="color:var(--text);">⚙️ Settings</strong> tab with a <strong style="color:var(--text);">theme picker</strong> — every look the app has ever had, in one place: <strong style="color:var(--text);">Claude</strong> (the cream &amp; coral signature), the brand-new <strong style="color:var(--text);">Racing Green</strong> (graphite greys with black chrome and forest-green accents, Aston Martin inspired), <strong style="color:var(--text);">Espresso</strong> (the warm grey + brown look), and <strong style="color:var(--text);">Classic Blue</strong> (the original). The ☀️ / 🌙 button still flips whichever theme you pick between light and dark, and your choice is remembered.</div></div><div class="changelog-row"><div class="changelog-ver">v1.1.0</div><div class="muted-sm">Each property's <strong style="color:var(--text);">Buyers panel</strong> now shows three tiers: <strong style="color:var(--text);">Offer candidates</strong> (buyers you've flagged as likely to offer), <strong style="color:var(--text);">Inspected</strong> (anyone who attended an open home for that property, pulled automatically from your Inspections records), and <strong style="color:var(--text);">Enquired only</strong>. Hit <strong style="color:var(--text);">＋ Offer candidate</strong> to move a buyer up when they get serious. Every buyer card also shows their <strong style="color:var(--text);">fit score</strong> and inspection count at a glance, and the property row shows a <strong style="color:var(--text);"># offering</strong> count so you can see offer momentum without clicking in.</div></div><div class="changelog-row"><div class="changelog-ver">v1.0.1</div><div class="muted-sm">The Google Sheets box now shows the <strong style="color:var(--text);">Client ID and secret</strong> you're connected with (secret hidden behind a Show button), each with a Copy button, so you can check or move your credentials.</div></div><div class="changelog-row"><div class="changelog-ver">v1.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 1.0 🎉</strong> — the first full release. Fresh <strong style="color:var(--text);">Claude-inspired look</strong>: a warm cream background with a coral/clay accent (and a matching warm dark mode). Everything from the journey is in: prospecting scripts, the smart Tracker, Buyers, Properties with matching, and Inspections.</div></div><div class="changelog-row"><div class="changelog-ver">v0.28</div><div class="muted-sm">New <strong style="color:var(--text);">Inspections</strong> section for open homes: create an inspection for a property + date/time, then add the buyers who attended. As you type a name it searches your buyer database to <strong style="color:var(--text);">link an existing buyer</strong> (or create a new one, warning you about likely duplicates), so you don't get doubles. Keep notes and a follow-up flag against each attendee, and hit <strong style="color:var(--text);">Report</strong> to copy a clean, email-ready summary. Inspection history shows on each buyer and property, and there's a tool to <strong style="color:var(--text);">merge duplicate buyers</strong>.</div></div><div class="changelog-row"><div class="changelog-ver">v0.27</div><div class="muted-sm">Properties now have an <strong style="color:var(--text);">Enquiries</strong> panel that opens out under each property to list every buyer who enquired. For each one you can jot <strong style="color:var(--text);">notes</strong> and toggle whether they're still an <strong style="color:var(--text);">active buyer</strong> of that property (vs just a past enquiry), and add or remove buyers right there.</div></div><div class="changelog-row"><div class="changelog-ver">v0.26.3</div><div class="muted-sm">The <strong style="color:var(--text);">Prospecting</strong> menu now opens on hover and stays open as you move down to pick a method, and the top tabs show a clear outline when you hover them.</div></div><div class="changelog-row"><div class="changelog-ver">v0.26</div><div class="muted-sm">A fresh look and a smarter workspace: clean <strong style="color:var(--text);">tabs across the top</strong> (with a Prospecting menu for your four methods), a calm <strong style="color:var(--text);">black-and-white design</strong> with subtle brown accents and a tidied dark mode, and a rebuilt <strong style="color:var(--text);">Tracker</strong> — each due person now shows you the exact call or text to use for their next step, with a one-tap <strong style="color:var(--text);">Copy SMS</strong>, so you never have to go hunting through the script pages.</div></div><div class="changelog-row"><div class="changelog-ver">v0.25</div><div class="muted-sm">Big one: a proper <strong style="color:var(--text);">Buyers database</strong> (budget, preferences, preferred suburbs, and the properties each buyer enquired on) and a <strong style="color:var(--text);">Properties</strong> inventory (on market / off market / archived). Hit <strong style="color:var(--text);">Match</strong> on any buyer or property to instantly see the best fits, ranked — including off-market properties. Everything syncs to Google Sheets too (new Buyers and Properties tabs).</div></div><div class="changelog-row"><div class="changelog-ver">v0.24.1</div><div class="muted-sm">Behind-the-scenes tidy-up of the app's styling so it's quicker and safer to improve from here — nothing changed in how the app looks or works.</div></div><div class="changelog-row"><div class="changelog-ver">v0.24</div><div class="muted-sm">Sync your contacts to a <strong style="color:var(--text);">Google Sheet</strong>: connect once from the Storage box and your contacts stay in step on every computer — and you can view or edit them right in Google Sheets, even from your phone. Also added <strong style="color:var(--text);">Linux support</strong> (Linux Mint), so the app now runs on Windows, Mac and Linux.</div></div><div class="changelog-row"><div class="changelog-ver">v0.23</div><div class="muted-sm">Made updating easy on Mac: added a <strong style="color:var(--text);">Check for updates</strong> button on this page (and an automatic check when you open the app). When a new version is out it tells you and opens the download — just open the .dmg and drag the app into Applications. Windows keeps installing updates by itself.</div></div><div class="changelog-row"><div class="changelog-ver">v0.22</div><div class="muted-sm">Share your contacts across computers: point the tracker at a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) from the Storage box, then choose the same folder on your other computer. Also turned on automatic updates (via GitHub) so new versions can install themselves.</div></div><div class="changelog-row"><div class="changelog-ver">v0.21</div><div class="muted-sm">Windows support is back: the app now installs and runs on Windows as well as Mac. Added a Windows installer build (<strong style="color:var(--text);">npm run build:win</strong>) and double-click launchers, and fixed a first-time setup issue where the app engine sometimes didn't finish installing.</div></div><div class="changelog-row"><div class="changelog-ver">v0.20.1</div><div class="muted-sm">Brought Just listed, Buyer database and Steal listings up to the same standard as Just sold — branched follow-ups (no answer / interested / not interested) and HOT / WARM / COLD nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.18</div><div class="muted-sm">Rebuilt as a cross-platform desktop app (Electron) with a local database and native Excel/CSV export &amp; import — no browser, no sandbox.</div></div><div class="changelog-row"><div class="changelog-ver">v0.17</div><div class="muted-sm">Added a call-outcome option (no answer / interested / not interested) when logging a contact, so the follow-up reminders use the right branch. You can also change a contact's outcome later and the schedule restarts from that day.</div></div><div class="changelog-row"><div class="changelog-ver">v0.16</div><div class="muted-sm">Added this About &amp; what's new page, with version history.</div></div><div class="changelog-row"><div class="changelog-ver">v0.15</div><div class="muted-sm">Renamed to a stable filename so data survives updates; added optional project-folder data file (auto-saves to prospecting-data.json on Chrome/Edge).</div></div><div class="changelog-row"><div class="changelog-ver">v0.14</div><div class="muted-sm">Split the Just sold follow-up into three branches: no answer (voicemail + SMS), answered &amp; interested, answered &amp; not interested.</div></div><div class="changelog-row"><div class="changelog-ver">v0.13</div><div class="muted-sm">Rewrote the Just sold openers to feel warmer and more genuine — dropped the "this is a cold call" line while keeping the research behind each one.</div></div><div class="changelog-row"><div class="changelog-ver">v0.12</div><div class="muted-sm">Added a search box to the contact tracker.</div></div><div class="changelog-row"><div class="changelog-ver">v0.11</div><div class="muted-sm">Built the contact tracker: quick logging, automatic due/overdue reminders from each call date, and Excel export/import (one sheet per method).</div></div><div class="changelog-row"><div class="changelog-ver">v0.10</div><div class="muted-sm">Added dark mode with a light/dark toggle and a full themed colour system.</div></div><div class="changelog-row"><div class="changelog-ver">v0.9</div><div class="muted-sm">Gave each prospect method its own openers, objections, closes, follow-up and nurture; removed the old shared sections. Stripped all email steps — calls and messages only.</div></div><div class="changelog-row"><div class="changelog-ver">v0.8</div><div class="muted-sm">Moved Just listed into the prospect methods with its own openers, objections and closes.</div></div><div class="changelog-row"><div class="changelog-ver">v0.7</div><div class="muted-sm">Consolidated the core openers, objections and closes into the Just sold street method.</div></div><div class="changelog-row"><div class="changelog-ver">v0.6</div><div class="muted-sm">Added two new prospect methods: Buyer database and Steal listings.</div></div><div class="changelog-row"><div class="changelog-ver">v0.5</div><div class="muted-sm">Reorganised into prospect methods and a special opens section.</div></div><div class="changelog-row"><div class="changelog-ver">v0.4</div><div class="muted-sm">Rebuilt the openers around proven psychology and cold-calling data.</div></div><div class="changelog-row"><div class="changelog-ver">v0.3</div><div class="muted-sm">Added the HOT / WARM / COLD SMS nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.2</div><div class="muted-sm">Added voicemail scripts, the follow-up sequence and the no-answer nurture.</div></div><div class="changelog-row"><div class="changelog-ver">v0.1</div><div class="muted-sm">First downloadable version with the core just-sold scripts.</div></div></div>
 </div>
 
 <!-- Reusable modal (matching results + enquiry pickers) -->
@@ -2213,7 +2240,10 @@ function nextMilestone(c){
   if(steps>=sched.length) return null;
   var cd=sinceDate(c); if(!cd) return null;
   var ms=sched[steps];
-  return { index:steps, label:ms.t, due:addDays(cd, ms.d) };
+  var due=addDays(cd, ms.d), snoozed=false;
+  // A snooze only pushes the due date out, never forward; cleared on done/outcome change.
+  if(c.snoozeUntil){ var sz=parseDate(c.snoozeUntil); if(sz && sz>due){ due=sz; snoozed=true; } }
+  return { index:steps, label:ms.t, due:due, snoozed:snoozed };
 }
 
 function crmAdd(){
@@ -2226,11 +2256,16 @@ function crmAdd(){
     var outcome=val('f-outcome')||'noanswer';
     cur.method=method; cur.first=first; cur.last=last; cur.mobile=mobile;
     cur.email=val('f-email'); cur.address=val('f-address'); cur.callDate=callDate; cur.notes=val('f-notes');
-    if(outcome!==cur.outcome){ cur.outcome=outcome; cur.stepsDone=0; cur.archived=false; cur.branchDate=todayISO(); }
+    if(outcome!==cur.outcome){ cur.outcome=outcome; cur.stepsDone=0; cur.archived=false; cur.branchDate=todayISO(); cur.snoozeUntil=''; }
     crmSave(arr); crmClearForm();
     msg('f-msg', '✓ '+(first||last||mobile)+' updated ('+METHODS[method].label+').', false);
   } else {
-    arr.push({ id:crmUid(), method:method, outcome:val('f-outcome')||'noanswer', first:first, last:last, address:val('f-address'), mobile:mobile, email:val('f-email'), callDate:callDate, stepsDone:0, archived:false, notes:val('f-notes') });
+    if(mobile){
+      var dup=arr.find(function(x){ return normMobile(x.mobile)===normMobile(mobile); });
+      if(dup && !confirm('You’re already tracking '+((dup.first+' '+dup.last).trim()||dup.mobile)+' with this mobile ('+METHODS[dup.method].label+'). Add a second entry anyway?')) return;
+    }
+    arr.push({ id:crmUid(), method:method, outcome:val('f-outcome')||'noanswer', first:first, last:last, address:val('f-address'), mobile:mobile, email:val('f-email'), callDate:callDate, stepsDone:0, branchDate:'', snoozeUntil:'', archived:false, notes:val('f-notes') });
+    actLog('call');
     crmSave(arr); crmClearForm();
     msg('f-msg', '✓ '+(first||last||mobile)+' added to '+METHODS[method].label+'.', false);
   }
@@ -2254,12 +2289,21 @@ function crmMarkDone(id){
   var c=arr.find(function(x){return x.id===id;}); if(!c) return;
   var sched=schedFor(c)||[];
   c.stepsDone=(c.stepsDone||0)+1;
+  c.snoozeUntil='';
   if(c.stepsDone>=sched.length) c.archived=true;
+  actLog('call');
   crmSave(arr); crmRenderAll();
 }
 function crmSetOutcome(id, value){
   var arr=crmLoad(); var c=arr.find(function(x){return x.id===id;}); if(!c) return;
-  c.outcome=value; c.stepsDone=0; c.archived=false; c.branchDate=todayISO();
+  c.outcome=value; c.stepsDone=0; c.archived=false; c.branchDate=todayISO(); c.snoozeUntil='';
+  actLog('call');
+  crmSave(arr); crmRenderAll();
+}
+function crmSnooze(id, days){
+  var arr=crmLoad(); var c=arr.find(function(x){return x.id===id;}); if(!c) return;
+  var d=addDays(startOfToday(), days||3);
+  c.snoozeUntil=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
   crmSave(arr); crmRenderAll();
 }
 function crmArchive(id){
@@ -2306,10 +2350,200 @@ function crmCopySms(btn, id){
   var nm=nextMilestone(c); if(!nm) return;
   var sc=scriptForDue(c, nm); if(!sc || !sc.sms) return;
   var done=function(){ var o=btn.getAttribute('data-label')||btn.textContent; btn.setAttribute('data-label',o); btn.textContent='✓ Copied'; setTimeout(function(){ btn.textContent=o; }, 1600); };
+  actLog('sms');
   if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(sc.sms).then(done, function(){ _fallbackCopy(sc.sms); done(); }); }
   else { _fallbackCopy(sc.sms); done(); }
 }
 function _fallbackCopy(txt){ try{ var ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }catch(e){} }
+
+/* ----- Click-to-call / click-to-text (routes through shell.openExternal in the app) ----- */
+function normMobile(m){ return String(m==null?'':m).replace(/[^\d+]/g,''); }
+function openComm(href){ href=decodeURIComponent(href); if(window.api&&window.api.gsOpenSheet){ window.api.gsOpenSheet(href); } else { try{ location.href=href; }catch(e){} } }
+function telHref(mobile){ return 'tel:'+normMobile(mobile); }
+function smsHref(mobile, body){
+  var sep = (navigator.platform||'').indexOf('Mac')>-1 ? '&' : '?'; // iOS/macOS use &body=, others ?body=
+  return 'sms:'+normMobile(mobile)+(body?sep+'body='+encodeURIComponent(body):'');
+}
+function commLinkBtns(c, sc){
+  if(!c.mobile) return '';
+  var out='<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="actLog(\'call\');openComm(\''+encodeURIComponent(telHref(c.mobile))+'\')">📞 Call</button>';
+  out+='<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="actLog(\'sms\');openComm(\''+encodeURIComponent(smsHref(c.mobile, sc&&sc.sms?sc.sms:''))+'\')">💬 Text</button>';
+  return out;
+}
+
+/* ----- Activity log (local only) + "This week" stats ----- */
+var ACT_CACHE=[];
+function actLog(type){
+  ACT_CACHE.push({ ts:new Date().toISOString(), type:type });
+  if(ACT_CACHE.length>4000) ACT_CACHE=ACT_CACHE.slice(-4000);
+  if(window.api && window.api.saveActivity) window.api.saveActivity(ACT_CACHE);
+  crmRenderWeek();
+}
+function weekStart(offsetWeeks){
+  var d=startOfToday(); var dow=(d.getDay()+6)%7; // Monday=0
+  d.setDate(d.getDate()-dow+(offsetWeeks||0)*7); return d;
+}
+function crmRenderWeek(){
+  var host=document.getElementById('week-stats'); if(!host) return;
+  var w0=weekStart(0), wPrev=weekStart(-1);
+  var calls=0, sms=0, callsPrev=0, smsPrev=0;
+  ACT_CACHE.forEach(function(a){
+    var t=new Date(a.ts); if(isNaN(t)) return;
+    if(t>=w0){ if(a.type==='sms') sms++; else calls++; }
+    else if(t>=wPrev){ if(a.type==='sms') smsPrev++; else callsPrev++; }
+  });
+  var newC=0, interested=0;
+  crmLoad().forEach(function(c){
+    var cd=parseDate(c.callDate); if(cd && cd>=w0) newC++;
+    if(c.outcome==='interested' && !c.archived){ var sd=sinceDate(c); if(sd && sd>=w0) interested++; }
+  });
+  var tThis=calls+sms, tPrev=callsPrev+smsPrev;
+  var trend = tPrev>0 ? (tThis>=tPrev?'▲ ':'▼ ')+Math.abs(Math.round(100*(tThis-tPrev)/tPrev))+'% vs last wk' : (tThis>0?'first week tracked':'log calls to see trends');
+  host.innerHTML =
+    '<div class="stat"><div class="stat-n">'+calls+'</div><div class="stat-l">Calls &amp; touches</div></div>'+
+    '<div class="stat"><div class="stat-n">'+sms+'</div><div class="stat-l">Texts sent</div></div>'+
+    '<div class="stat"><div class="stat-n">'+newC+'</div><div class="stat-l">New contacts</div></div>'+
+    '<div class="stat"><div class="stat-n">'+interested+'</div><div class="stat-l">Now interested</div></div>'+
+    '<div class="muted-sm" style="grid-column:1/-1;">'+esc(trend)+'</div>';
+}
+
+/* ----- Call session: walk the due list one contact at a time ----- */
+var CS=null;
+function csQueue(){
+  var today=startOfToday(); var items=[];
+  crmLoad().forEach(function(c){
+    var nm=nextMilestone(c); if(!nm) return;
+    var diff=Math.round((nm.due-today)/86400000);
+    if(diff<=7) items.push({ id:c.id, diff:diff });
+  });
+  items.sort(function(a,b){ return a.diff-b.diff; });
+  return items.map(function(x){ return x.id; });
+}
+function startCallSession(){
+  var q=csQueue();
+  if(!q.length){ openModal('Call session', '<div class="crm-empty">Nothing due in the next 7 days — no one to call. 👌</div>'); return; }
+  CS={ q:q, i:0, done:0, snoozed:0, skipped:0, outcomes:0 };
+  csRender();
+}
+function csRender(){
+  if(!CS) return;
+  if(CS.i>=CS.q.length){ csSummary(); return; }
+  var c=crmLoad().find(function(x){return x.id===CS.q[CS.i];});
+  var nm=c?nextMilestone(c):null;
+  if(!c || !nm){ CS.i++; csRender(); return; } // handled outside the session — skip silently
+  var m=METHODS[c.method], sched=schedFor(c)||[], sc=scriptForDue(c, nm);
+  var name=(c.first+' '+c.last).trim()||c.mobile||'(no name)';
+  var body='<div class="muted-sm" style="margin-bottom:8px;">'+(CS.i+1)+' of '+CS.q.length+' · due '+fmtDate(nm.due)+'</div>'+
+    '<div style="font-size:20px;font-weight:700;color:var(--text);">'+esc(name)+' <span class="method-chip" style="background:'+m.chipBg+';color:'+m.chipFg+';">'+m.label+'</span></div>'+
+    '<div class="muted-sm" style="margin:4px 0 2px;">'+outcomeIcon(c.outcome)+' '+esc(OUTCOMES[c.outcome]||'No answer')+(c.address?' · '+esc(c.address):'')+'</div>'+
+    (c.mobile?'<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;">'+esc(c.mobile)+'</div>':'')+
+    (c.notes?'<div class="muted-sm" style="margin-bottom:6px;">📝 '+esc(c.notes)+'</div>':'')+
+    '<div class="ab-step" style="margin-top:12px;"><span class="dotacc"></span>Step '+(nm.index+1)+' of '+sched.length+' · '+esc(nm.label)+'</div>'+
+    (sc&&sc.call?'<div class="channel">On the call</div><div class="call">'+esc(sc.call)+'</div>':'')+
+    (sc&&sc.sms?'<div class="channel">'+(sc&&sc.call?'If no answer, text':'Text to send')+'</div><div class="sms">'+esc(sc.sms)+'</div>':'')+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;align-items:center;">'+
+      (c.mobile?commLinkBtns(c, sc):'')+
+      ((sc&&sc.sms)?'<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmCopySms(this,\''+c.id+'\')">📋 Copy SMS</button>':'')+
+    '</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center;border-top:1px solid var(--border);padding-top:14px;">'+
+      '<button class="crm-btn crm-btn-primary cs-big" onclick="csDone()">✓ Done — next</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="csOutcome(\'interested\')" title="Answered — interested">👍</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="csOutcome(\'notinterested\')" title="Answered — not interested">👋</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="csSnooze()" title="Snooze 3 days">⏰ 3d</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="csSkip()">Skip ›</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="csSummary()">End</button>'+
+    '</div>';
+  openModal('Call session', body);
+}
+function csDone(){ if(!CS) return; crmMarkDone(CS.q[CS.i]); CS.done++; CS.i++; csRender(); }
+function csOutcome(o){ if(!CS) return; crmSetOutcome(CS.q[CS.i], o); CS.outcomes++; CS.i++; csRender(); }
+function csSnooze(){ if(!CS) return; crmSnooze(CS.q[CS.i], 3); CS.snoozed++; CS.i++; csRender(); }
+function csSkip(){ if(!CS) return; CS.skipped++; CS.i++; csRender(); }
+function csSummary(){
+  if(!CS) return;
+  var worked=CS.done+CS.outcomes+CS.snoozed;
+  var body='<div style="font-size:34px;font-weight:750;color:var(--text);margin-bottom:4px;">'+worked+' worked 🎉</div>'+
+    '<div class="muted-sm" style="margin-bottom:14px;">out of '+CS.q.length+' due</div>'+
+    '<div class="stat-row" style="margin:0 0 6px;">'+
+      '<div class="stat"><div class="stat-n">'+CS.done+'</div><div class="stat-l">Steps done</div></div>'+
+      '<div class="stat"><div class="stat-n">'+CS.outcomes+'</div><div class="stat-l">Outcomes set</div></div>'+
+      '<div class="stat"><div class="stat-n">'+CS.snoozed+'</div><div class="stat-l">Snoozed</div></div>'+
+      '<div class="stat"><div class="stat-n">'+CS.skipped+'</div><div class="stat-l">Skipped</div></div>'+
+    '</div>'+
+    '<button class="crm-btn crm-btn-primary" onclick="closeModal()">Close</button>';
+  CS=null;
+  openModal('Session summary', body);
+}
+
+/* ----- Quick search everywhere (Ctrl/Cmd+K) ----- */
+function openQuickSearch(){
+  openModal('Search everything', '<input id="qs-input" class="qs-input" placeholder="Type a name, mobile, address or suburb…" oninput="qsRender(this.value)" autocomplete="off"><div id="qs-results" class="muted-sm">Contacts, buyers and properties — results appear as you type.</div>');
+  var inp=document.getElementById('qs-input'); if(inp) setTimeout(function(){ inp.focus(); }, 30);
+}
+function qsRender(q){
+  var host=document.getElementById('qs-results'); if(!host) return;
+  q=String(q||'').trim().toLowerCase();
+  if(q.length<2){ host.innerHTML='<div class="muted-sm">Keep typing…</div>'; return; }
+  var rows=[];
+  crmLoad().forEach(function(c){
+    var hay=((c.first||'')+' '+(c.last||'')+' '+(c.mobile||'')+' '+(c.email||'')+' '+(c.address||'')+' '+(c.notes||'')).toLowerCase();
+    if(hay.indexOf(q)>-1) rows.push({ kind:'Contact', bg:'var(--amber-bg)', fg:'var(--amber)', label:(c.first+' '+c.last).trim()||c.mobile||'—', sub:[METHODS[c.method]?METHODS[c.method].label:'',c.mobile||''].filter(Boolean).join(' · '), go:'contacts', term:(c.mobile||(c.first+' '+c.last)).trim() });
+  });
+  buyersLoad().forEach(function(b){
+    var hay=((b.first||'')+' '+(b.last||'')+' '+(b.mobile||'')+' '+(b.email||'')+' '+(b.suburbs||[]).join(' ')+' '+(b.notes||'')).toLowerCase();
+    if(hay.indexOf(q)>-1) rows.push({ kind:'Buyer', bg:'var(--pink-bg)', fg:'var(--pink)', label:buyerName(b)||b.mobile||'—', sub:[b.mobile||'',(b.suburbs||[]).slice(0,3).join(', ')].filter(Boolean).join(' · '), go:'buyers', term:(b.mobile||buyerName(b)).trim() });
+  });
+  propsLoadCache().forEach(function(p){
+    var hay=((p.address||'')+' '+(p.suburb||'')+' '+(p.postcode||'')+' '+(p.notes||'')).toLowerCase();
+    if(hay.indexOf(q)>-1) rows.push({ kind:'Property', bg:'var(--purple-bg)', fg:'var(--purple)', label:p.address||p.suburb||'—', sub:[p.suburb||'',propPriceLabel(p)].filter(Boolean).join(' · '), go:'properties', term:(p.address||p.suburb||'').trim() });
+  });
+  if(!rows.length){ host.innerHTML='<div class="crm-empty">No matches for “'+esc(q)+'”.</div>'; return; }
+  host.innerHTML=rows.slice(0,14).map(function(r){
+    return '<div class="qs-row" onclick="qsGo(\''+r.go+'\',\''+encodeURIComponent(r.term)+'\')">'+
+      '<span class="qs-kind" style="background:'+r.bg+';color:'+r.fg+';">'+r.kind+'</span>'+
+      '<span style="font-weight:600;color:var(--text);">'+esc(r.label)+'</span>'+
+      '<span class="muted-sm" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(r.sub)+'</span>'+
+    '</div>';
+  }).join('')+(rows.length>14?'<div class="muted-sm" style="padding:8px 10px;">+'+(rows.length-14)+' more — keep typing to narrow down.</div>':'');
+}
+function qsGo(panel, term){
+  term=decodeURIComponent(term); closeModal(); showPanel(panel);
+  if(panel==='contacts'){ var e=document.getElementById('crm-search'); if(e) e.value=term; crmDoSearch(term); }
+  else if(panel==='buyers'){ var e2=document.getElementById('buyer-search'); if(e2) e2.value=term; buyerDoSearch(term); }
+  else if(panel==='properties'){ var e3=document.getElementById('prop-search'); if(e3) e3.value=term; propDoSearch(term); }
+}
+document.addEventListener('keydown', function(e){
+  if((e.metaKey||e.ctrlKey) && String(e.key).toLowerCase()==='k'){ e.preventDefault(); openQuickSearch(); }
+  else if(e.key==='Escape'){ closeModal(); }
+});
+
+/* ----- Backup & restore (Settings → Data) ----- */
+function dataBackup(){
+  if(!window.api || !window.api.saveTextFile){ alert('Run this inside the desktop app to back up.'); return; }
+  var obj={ app:'declan-prospecting', exportedAt:new Date().toISOString(),
+    contacts:crmLoad(), buyers:buyersLoad(), properties:propsLoadCache(), inspections:inspectionsLoad(), activity:ACT_CACHE };
+  window.api.saveTextFile(JSON.stringify(obj, null, 2), 'Declan_Backup_'+todayISO()+'.json').then(function(res){
+    if(res && res.ok) msg('backup-msg','✓ Backup saved to '+res.path, false);
+  });
+}
+function dataRestore(){
+  if(!window.api || !window.api.openJsonFile){ alert('Run this inside the desktop app to restore.'); return; }
+  window.api.openJsonFile().then(function(res){
+    if(!res || !res.ok){ if(res && res.error) msg('backup-msg','Could not read that file: '+res.error, true); return; }
+    var d=res.data||{};
+    var ok=['contacts','buyers','properties','inspections'].some(function(k){ return Array.isArray(d[k]); });
+    if(!ok){ msg('backup-msg','That file doesn’t look like a Declan backup — nothing was changed.', true); return; }
+    var counts=(d.contacts||[]).length+' contacts, '+(d.buyers||[]).length+' buyers, '+(d.properties||[]).length+' properties, '+(d.inspections||[]).length+' inspections';
+    if(!confirm('Restore this backup ('+counts+')?\n\nThis REPLACES everything currently in the app.')) return;
+    crmSave(d.contacts||[]);
+    buyersSaveCache(normalizeBuyers(d.buyers||[]));
+    propsSaveCache(d.properties||[]);
+    inspectionsSaveCache(normalizeInspections(d.inspections||[]));
+    if(Array.isArray(d.activity)){ ACT_CACHE=d.activity; if(window.api.saveActivity) window.api.saveActivity(ACT_CACHE); }
+    crmRenderAll(); buyerRenderTable(); propRenderTable(); inspRenderTable(); inspRefreshPropertyPickers();
+    msg('backup-msg','✓ Restored: '+counts+'.', false);
+  });
+}
 
 function crmRenderStats(){
   var host=document.getElementById('due-stats'); if(!host) return;
@@ -2348,20 +2582,23 @@ function crmRenderDue(){
     }
     if(!body){ body='<div class="muted-sm">Open the '+esc(m.label)+' → Follow-up scripts for the wording on this step.</div>'; }
     var copyBtn=(sc&&sc.sms)?'<button class="crm-btn crm-btn-primary crm-btn-sm" onclick="crmCopySms(this,\''+c.id+'\')">📋 Copy SMS</button>':'';
+    var commBtns=commLinkBtns(c, sc);
+    var snoozeSel='<select class="snooze-sel" onchange="if(this.value)crmSnooze(\''+c.id+'\',parseInt(this.value,10));"><option value="">⏰ Snooze…</option><option value="1">1 day</option><option value="3">3 days</option><option value="7">1 week</option></select>';
     return '<div class="due '+(diff<0?'is-overdue':'')+'">'+
       '<div class="due-top">'+
         '<div class="avatar">'+esc(initials(c))+'</div>'+
         '<div class="due-id">'+
           '<div class="due-name">'+esc(name)+' <span class="method-chip" style="background:'+m.chipBg+';color:'+m.chipFg+';">'+m.label+'</span></div>'+
-          '<div class="due-meta">'+outcomeIcon(c.outcome)+' '+esc(OUTCOMES[c.outcome]||'No answer')+(c.mobile?' · '+esc(c.mobile):'')+' · due '+fmtDate(nm.due)+'</div>'+
+          '<div class="due-meta">'+outcomeIcon(c.outcome)+' '+esc(OUTCOMES[c.outcome]||'No answer')+(c.mobile?' · '+esc(c.mobile):'')+' · due '+fmtDate(nm.due)+(nm.snoozed?' ⏰':'')+'</div>'+
         '</div>'+
         '<div class="due-when '+whenCls+'">'+whenTxt+'</div>'+
       '</div>'+
       '<div class="action-block">'+
         '<div class="ab-step"><span class="dotacc"></span>Step '+(nm.index+1)+' of '+sched.length+' · '+esc(nm.label)+'</div>'+
         body+
-        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px;">'+copyBtn+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px;align-items:center;">'+copyBtn+commBtns+
           '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmMarkDone(\''+c.id+'\')">✓ Mark done</button>'+
+          snoozeSel+
           '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmArchive(\''+c.id+'\')">Stop</button>'+
         '</div>'+
       '</div>'+
@@ -2421,7 +2658,7 @@ function outcomeSelect(c){
   var opts=Object.keys(OUTCOMES).map(function(k){ return '<option value="'+k+'"'+(k===cur?' selected':'')+'>'+OUTCOMES[k]+'</option>'; }).join('');
   return '<select onchange="crmSetOutcome(\''+c.id+'\', this.value)" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-size:12px;color:var(--text);max-width:160px;">'+opts+'</select>';
 }
-function crmRenderAll(){ crmRenderStats(); crmRenderDue(); crmRenderFilters(); crmRenderTable(); }
+function crmRenderAll(){ crmRenderStats(); crmRenderDue(); crmRenderFilters(); crmRenderTable(); crmRenderWeek(); }
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 /* ----- Export / Import ----- */
@@ -3177,6 +3414,7 @@ function enqPanelHtml(p){
 
 document.addEventListener('DOMContentLoaded', function(){
   propSyncTabButtons();
+  if(window.api && window.api.loadActivity){ window.api.loadActivity().then(function(r){ ACT_CACHE=r||[]; crmRenderWeek(); }).catch(function(){}); }
   if(window.api && window.api.loadBuyers){ window.api.loadBuyers().then(function(r){ BUYERS_CACHE=normalizeBuyers(r||[]); buyerRenderTable(); inspRenderTable(); }).catch(function(){ buyerRenderTable(); }); } else { buyerRenderTable(); }
   if(window.api && window.api.loadProperties){ window.api.loadProperties().then(function(r){ PROPS_CACHE=r||[]; propRenderTable(); inspRefreshPropertyPickers(); inspRenderTable(); }).catch(function(){ propRenderTable(); }); } else { propRenderTable(); }
   if(window.api && window.api.loadInspections){ window.api.loadInspections().then(function(r){ INSPECTIONS_CACHE=normalizeInspections(r||[]); inspRenderTable(); }).catch(function(){ inspRenderTable(); }); } else { inspRenderTable(); }

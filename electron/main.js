@@ -31,11 +31,11 @@ function dataFile() { return path.join(dataDir(), DATA_FILENAME); }
 function readData() {
   try {
     const p = dataFile();
-    if (!fs.existsSync(p)) return { contacts: [], buyers: [], properties: [], inspections: [] };
+    if (!fs.existsSync(p)) return { contacts: [], buyers: [], properties: [], inspections: [], activity: [] };
     const raw = JSON.parse(fs.readFileSync(p, 'utf8') || '{}');
-    if (Array.isArray(raw)) return { contacts: raw, buyers: [], properties: [], inspections: [] };
-    return { contacts: raw.contacts || [], buyers: raw.buyers || [], properties: raw.properties || [], inspections: raw.inspections || [] };
-  } catch (e) { return { contacts: [], buyers: [], properties: [], inspections: [] }; }
+    if (Array.isArray(raw)) return { contacts: raw, buyers: [], properties: [], inspections: [], activity: [] };
+    return { contacts: raw.contacts || [], buyers: raw.buyers || [], properties: raw.properties || [], inspections: raw.inspections || [], activity: raw.activity || [] };
+  } catch (e) { return { contacts: [], buyers: [], properties: [], inspections: [], activity: [] }; }
 }
 function updateData(mutate) {
   const d = readData(); mutate(d);
@@ -231,7 +231,7 @@ ipcMain.handle('update:check', async () => {
 const GS_REDIRECT_PORT = 42813;
 const GS_REDIRECT_URI = 'http://localhost:' + GS_REDIRECT_PORT;
 const GS_SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
-const CONTACT_HEADERS = ['id','method','outcome','first','last','address','mobile','email','callDate','stepsDone','branchDate','archived','notes'];
+const CONTACT_HEADERS = ['id','method','outcome','first','last','address','mobile','email','callDate','stepsDone','branchDate','snoozeUntil','archived','notes'];
 const BUYER_HEADERS = ['id','first','last','mobile','email','buyerType','budgetMin','budgetMax','types','bedsMin','bathsMin','carMin','landMin','suburbs','enquiries','archived','notes'];
 const PROPERTY_HEADERS = ['id','status','archiveReason','address','suburb','postcode','type','price','priceType','priceMax','beds','baths','car','land','salePrice','saleDate','listingUrl','listedDate','notes'];
 const INSPECTION_HEADERS = ['id','propertyId','date','startTime','attendees','notes','createdAt','archived'];
@@ -380,6 +380,29 @@ makeCollectionHandlers('contacts', 'Contacts', CONTACT_HEADERS);
 makeCollectionHandlers('buyers', 'Buyers', BUYER_HEADERS);
 makeCollectionHandlers('properties', 'Properties', PROPERTY_HEADERS);
 makeCollectionHandlers('inspections', 'Inspections', INSPECTION_HEADERS);
+
+/* Activity log — LOCAL ONLY (never synced to Google Sheets; per-machine call/SMS
+   counters that power the Tracker's "This week" stats). */
+ipcMain.handle('activity:load', async () => {
+  try { return readData().activity || []; } catch (e) { return []; }
+});
+ipcMain.handle('activity:save', async (_e, arr) => {
+  try { updateData((d) => { d.activity = Array.isArray(arr) ? arr : []; }); return { ok: true }; }
+  catch (err) { return { ok: false, error: String(err) }; }
+});
+
+/* Open a .json backup file (restore is validated and applied renderer-side
+   through the normal collection save paths so caches + Sheets stay in step). */
+ipcMain.handle('data:openJson', async () => {
+  const r = await dialog.showOpenDialog(mainWin, {
+    title: 'Restore from backup',
+    filters: [{ name: 'JSON backup', extensions: ['json'] }],
+    properties: ['openFile']
+  });
+  if (r.canceled || !r.filePaths.length) return { ok: false, canceled: true };
+  try { return { ok: true, data: JSON.parse(fs.readFileSync(r.filePaths[0], 'utf8')) }; }
+  catch (e) { return { ok: false, error: String(e) }; }
+});
 
 /* ---------------- Data location (share across computers via a cloud folder) ---------------- */
 ipcMain.handle('data:getLocation', () => {

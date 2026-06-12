@@ -132,6 +132,8 @@ The renderer NEVER touches Node/fs directly. Everything goes through:
 - `loadBuyers()` / `saveBuyers(arr)` — the standalone Buyers database
 - `loadProperties()` / `saveProperties(arr)` — the Properties inventory
 - `loadInspections()` / `saveInspections(arr)` — the Inspections (open-home attendees)
+- `loadActivity()` / `saveActivity(arr)` — the local-only activity log (v2.0; no GS sync)
+- `openJsonFile()` -> { ok, data } — file picker for a .json backup (v2.0 restore)
 - `getDataLocation()` -> { path, dir, custom } — where contacts are stored
 - `setDataLocation()` -> picks a folder (use a cloud-synced one to share across
   computers); adopts an existing file there or migrates the current one. Returns { ok, path, adopted }
@@ -188,6 +190,8 @@ The renderer NEVER touches Node/fs directly. Everything goes through:
 ```js
 { id, method, outcome, first, last, address, mobile, email,
   callDate /* yyyy-mm-dd */, stepsDone /* int */, branchDate /* optional yyyy-mm-dd */,
+  snoozeUntil /* optional yyyy-mm-dd (v2.0) — pushes the due date out; cleared by
+                mark-done / outcome change; in CONTACT_HEADERS so it GS-syncs */,
   archived /* bool */, notes }
 ```
 - `method`: 'justsold' | 'listed' | 'buyerdb' | 'steallist'
@@ -303,6 +307,26 @@ Follow-up, Nurture.
   "✓ Update contact"); `crmAdd` updates in place when `crm-edit-id` is set. Editing keeps
   `stepsDone`/`branchDate`/`archived` UNLESS the outcome changed — then it applies the
   `crmSetOutcome` reset semantics. Method/callDate edits keep progress (schedule recomputes).
+- **v2.0 agent features** (all in the renderer unless noted):
+  - **Call session**: `startCallSession()`/`csRender()` walk `csQueue()` (the due-within-7-days
+    list) one contact at a time in `#modal-overlay`, reusing `scriptForDue`; buttons call the
+    normal `crmMarkDone`/`crmSetOutcome`/`crmSnooze`; ends with a summary.
+  - **Snooze**: `crmSnooze(id, days)` sets `snoozeUntil`; `nextMilestone` returns
+    `due=max(computed, snoozeUntil)` + `snoozed:true`; cleared by done/outcome change.
+  - **Call/Text links**: `commLinkBtns(c, sc)` → `tel:`/`sms:` (SMS body pre-filled from the
+    step's script; `&body=` on Mac, `?body=` elsewhere) via `openComm` → `gsOpenSheet`
+    (shell.openExternal). Each click logs activity.
+  - **Activity log**: `ACT_CACHE` + `actLog(type)` ({ts, type:'call'|'sms'}, capped 4000),
+    persisted via `activity:load/save` IPC — LOCAL ONLY, never synced to Google Sheets.
+    Powers `crmRenderWeek()` ("This week" strip: calls, texts, new contacts, interested,
+    trend vs last week; weeks start Monday).
+  - **Quick search**: `openQuickSearch()` (🔍 button or Ctrl/Cmd+K) searches contacts/buyers/
+    properties; `qsGo` jumps to the panel and pre-fills its search box. Escape closes any modal.
+  - **Backup/restore**: `dataBackup()` saves one JSON of all collections; `dataRestore()` uses
+    the `data:openJson` IPC (file picker) and replaces all collections through the normal
+    save paths after a confirm. Settings → Data section.
+  - **Duplicate guard**: `crmAdd` (create path) confirms before adding a second contact with
+    the same `normMobile` mobile.
 - Search box: `crmSearch` filters table across name/mobile/email/address/notes.
 - Export: `crmExportXlsx` (one sheet per method), `crmExportCsv`; Import: `crmImport`.
   All go through `window.api`.
@@ -312,7 +336,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **1.4.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **2.0.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
