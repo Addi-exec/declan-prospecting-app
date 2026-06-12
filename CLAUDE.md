@@ -134,6 +134,9 @@ The renderer NEVER touches Node/fs directly. Everything goes through:
 - `loadInspections()` / `saveInspections(arr)` — the Inspections (open-home attendees)
 - `loadActivity()` / `saveActivity(arr)` — the local-only activity log (v2.0; no GS sync)
 - `openJsonFile()` -> { ok, data } — file picker for a .json backup (v2.0 restore)
+- `fetchListing(url)` -> { ok, meta:{title,image,desc,site,fetchedAt} } | { ok:false, error } —
+  fetches a listing page in main (built-in https, browser UA, 4 redirects, 800KB cap) and
+  parses OpenGraph meta (v3.0 listing previews)
 - `getDataLocation()` -> { path, dir, custom } — where contacts are stored
 - `setDataLocation()` -> picks a folder (use a cloud-synced one to share across
   computers); adopts an existing file there or migrates the current one. Returns { ok, path, adopted }
@@ -218,7 +221,13 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
   address, suburb, postcode, type /* 'house'|'townhouse'|'unit'|'land' */,
   price /* number, used for matching */, priceType /* 'fixed'|'range'|'auction'|'eoi' */, priceMax,
   beds, baths, car, land /* numbers */, salePrice, saleDate /* for sold */,
-  listingUrl, listedDate, notes }
+  listingUrl, listedDate,
+  listingMeta /* '' or {title,image,desc,site,fetchedAt} (v3.0) — OpenGraph preview fetched
+                 from listingUrl via the listing:fetch IPC (propFetchPreview; auto on save,
+                 cleared when the link changes). In PROPERTY_HEADERS + GS_JSON_OBJ_FIELDS
+                 (object-as-JSON cell). NOT exported to Excel. Some sites (REA) may block
+                 the fetch — UI degrades to the plain link + ↻ Preview button */,
+  notes }
 ```
 
 ### Buyer↔property matching (renderer, pure functions)
@@ -336,7 +345,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **2.0.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **3.0.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
@@ -377,6 +386,18 @@ Follow-up, Nurture.
   release with `npm run release` (needs `GH_TOKEN`). Each shipped version must bump
   the 3 version spots. Code signing (self-signed cert in `signing/`, or a CA cert)
   keeps the publisher consistent so electron-updater's signature check passes.
+
+## Look & motion (v3.0 overhaul)
+Sharp, modern, boxy: **border-radius is 0 everywhere** (only the 8px wayfinding dots stay
+`50%` circles) — keep new UI square. A motion layer at the END of the `<style>` block adds:
+panel/card entrance animations, hover lift + accent-glow on `.stat/.due/.theme-card`,
+button press states, themed scrollbars, a sharp 1px accent focus ring, a **frosted-glass
+topbar** (`color-mix` + backdrop-filter), and `#bg-fx` — a fixed dot-grid background with an
+accent spotlight that follows the mouse (`--mx`/`--my` CSS vars set by an rAF-throttled
+mousemove listener; `main` is `z-index:1` above it). All effect colours derive from theme
+vars via `color-mix(in srgb, var(--x) N%, transparent)` so every palette × light/dark works —
+keep using `color-mix`+vars (never hex) for new glows/translucency. `animateStats(hostId)`
+counts `.stat-n` numbers up when values change.
 
 ## Brand / look (v0.26 redesign)
 **Monochrome** UI: warm dark-greys (not black) in dark mode, whites/light-greys in light,

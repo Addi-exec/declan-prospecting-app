@@ -233,7 +233,7 @@ const GS_REDIRECT_URI = 'http://localhost:' + GS_REDIRECT_PORT;
 const GS_SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const CONTACT_HEADERS = ['id','method','outcome','first','last','address','mobile','email','callDate','stepsDone','branchDate','snoozeUntil','archived','notes'];
 const BUYER_HEADERS = ['id','first','last','mobile','email','buyerType','budgetMin','budgetMax','types','bedsMin','bathsMin','carMin','landMin','suburbs','enquiries','archived','notes'];
-const PROPERTY_HEADERS = ['id','status','archiveReason','address','suburb','postcode','type','price','priceType','priceMax','beds','baths','car','land','salePrice','saleDate','listingUrl','listedDate','notes'];
+const PROPERTY_HEADERS = ['id','status','archiveReason','address','suburb','postcode','type','price','priceType','priceMax','beds','baths','car','land','salePrice','saleDate','listingUrl','listedDate','listingMeta','notes'];
 const INSPECTION_HEADERS = ['id','propertyId','date','startTime','attendees','notes','createdAt','archived'];
 // Per-request timeout so a hung network never freezes contacts:load / contacts:save —
 // the callers all fall back to the local JSON file when a Sheets call rejects.
@@ -271,6 +271,7 @@ function getAuthClient() {
 const GS_TABS = ['Contacts', 'Buyers', 'Properties', 'Inspections'];
 const GS_ARRAY_FIELDS = { types: 1, suburbs: 1 };
 const GS_JSON_FIELDS = { enquiries: 1, attendees: 1 }; // arrays of objects → stored as JSON in one cell
+const GS_JSON_OBJ_FIELDS = { listingMeta: 1 }; // single objects → stored as JSON in one cell ('' when absent)
 const GS_NUM_FIELDS = { stepsDone:1, budgetMin:1, budgetMax:1, bedsMin:1, bathsMin:1, carMin:1, landMin:1, price:1, priceMax:1, beds:1, baths:1, car:1, land:1, salePrice:1 };
 const GS_BOOL_FIELDS = { archived: 1 };
 
@@ -291,6 +292,10 @@ async function gsLoadTab(auth, sheetId, tab) {
           try { const j = JSON.parse(v); o[h] = Array.isArray(j) ? j : []; }
           catch (e) { o[h] = v ? v.split(',').map((s) => ({ id: s.trim(), active: true, notes: '' })).filter((x) => x.id) : []; }
         }
+        else if (GS_JSON_OBJ_FIELDS[h]) {
+          try { const j = JSON.parse(v); o[h] = (j && typeof j === 'object' && !Array.isArray(j)) ? j : ''; }
+          catch (e) { o[h] = ''; }
+        }
         else if (GS_NUM_FIELDS[h]) o[h] = v === '' ? '' : (parseFloat(v) || 0);
         else if (GS_BOOL_FIELDS[h]) o[h] = v === 'true';
         else o[h] = v;
@@ -307,6 +312,7 @@ async function gsSaveTab(auth, sheetId, tab, headers, rows) {
       const v = rec[h];
       if (v == null) return '';
       if (GS_JSON_FIELDS[h]) return JSON.stringify(v || []);
+      if (GS_JSON_OBJ_FIELDS[h]) return v ? JSON.stringify(v) : '';
       if (Array.isArray(v)) return v.join(',');
       return String(v);
     }))
@@ -402,6 +408,78 @@ ipcMain.handle('data:openJson', async () => {
   if (r.canceled || !r.filePaths.length) return { ok: false, canceled: true };
   try { return { ok: true, data: JSON.parse(fs.readFileSync(r.filePaths[0], 'utf8')) }; }
   catch (e) { return { ok: false, error: String(e) }; }
+});
+
+/* ---------------- Listing preview (REA / Domain / any listing link) ----------------
+   Fetches the page and reads its OpenGraph meta tags (title / image / description).
+   No API keys, no scraping libs. Some sites (notably realestate.com.au) gate bots —
+   then this returns ok:false and the UI just shows the plain link instead. */
+function fetchPage(url, redirectsLeft) {
+  return new Promise((resolve, reject) => {
+    let u;
+    try { u = new URL(url); } catch (e) { return reject(new Error('Bad URL')); }
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return reject(new Error('Not a web link'));
+    const mod = u.protocol === 'https:' ? https : http;
+    const req = mod.get(u, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml',
+        'Accept-Language': 'en-AU,en;q=0.9'
+      },
+      timeout: 12000
+    }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location && redirectsLeft > 0) {
+        res.resume();
+        return resolve(fetchPage(new URL(res.headers.location, u).toString(), redirectsLeft - 1));
+      }
+      if (res.statusCode >= 400) { res.resume(); return resolve({ status: res.statusCode, body: '' }); }
+      let body = '', size = 0;
+      res.setEncoding('utf8');
+      res.on('data', (chunk) => {
+        size += chunk.length;
+        if (size > 800000) { res.destroy(); resolve({ status: res.statusCode, body }); return; }
+        body += chunk;
+      });
+      res.on('end', () => resolve({ status: res.statusCode, body }));
+    });
+    req.on('timeout', () => { req.destroy(new Error('Timed out')); });
+    req.on('error', reject);
+  });
+}
+function decodeEntities(s) {
+  return String(s || '')
+    .replace(/&#x([0-9a-f]+);/gi, (m, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (m, d) => String.fromCodePoint(parseInt(d, 10)))
+    .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ');
+}
+function parseOgMeta(html) {
+  const out = {};
+  const tags = html.match(/<meta\s[^>]*>/gi) || [];
+  for (const tag of tags) {
+    const keyM = tag.match(/(?:property|name)\s*=\s*["']([^"']+)["']/i);
+    const valM = tag.match(/content\s*=\s*["']([^"']*)["']/i);
+    if (!keyM || !valM) continue;
+    const key = keyM[1].toLowerCase();
+    if (out[key] == null) out[key] = decodeEntities(valM[1]);
+  }
+  const titleM = html.match(/<title[^>]*>([^<]*)<\/title>/i);
+  return {
+    title: out['og:title'] || (titleM ? decodeEntities(titleM[1]).trim() : ''),
+    image: out['og:image'] || out['twitter:image'] || '',
+    desc: out['og:description'] || out['description'] || '',
+    site: out['og:site_name'] || ''
+  };
+}
+ipcMain.handle('listing:fetch', async (_e, url) => {
+  try {
+    const { status, body } = await fetchPage(String(url || ''), 4);
+    if (status >= 400 || !body) return { ok: false, error: 'The site responded with ' + (status || 'nothing') + ' — it may block previews.' };
+    const meta = parseOgMeta(body);
+    if (!meta.title && !meta.image) return { ok: false, error: 'No preview details found on that page.' };
+    meta.fetchedAt = new Date().toISOString();
+    return { ok: true, meta };
+  } catch (e) { return { ok: false, error: String(e && e.message || e) }; }
 });
 
 /* ---------------- Data location (share across computers via a cloud folder) ---------------- */
