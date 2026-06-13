@@ -345,7 +345,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **3.0.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **3.1.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
@@ -398,6 +398,13 @@ mousemove listener; `main` is `z-index:1` above it). All effect colours derive f
 vars via `color-mix(in srgb, var(--x) N%, transparent)` so every palette × light/dark works —
 keep using `color-mix`+vars (never hex) for new glows/translucency. `animateStats(hostId)`
 counts `.stat-n` numbers up when values change.
+
+**v3.1 readability layer** (the LAST block in `<style>` — it must stay last so its overrides
+win): every `.panel.active` is a solid `--surface` SHEET (border + padding); text NEVER sits
+on the dotted backdrop, which is faint and masked to the gutters. Cards inside the sheet
+(`.stat/.due/.theme-card/...`) use `--bg` so they read as inset blocks. The block also holds
+the readability type scale (scripts 15px/1.8, sms 14.5, tables 14, headers 27 …) — if you add
+new text components, size them there to match, and keep new surfaces solid.
 
 ## Brand / look (v0.26 redesign)
 **Monochrome** UI: warm dark-greys (not black) in dark mode, whites/light-greys in light,
