@@ -235,7 +235,7 @@ const CONTACT_HEADERS = ['id','method','outcome','first','last','address','mobil
 const BUYER_HEADERS = ['id','first','last','mobile','email','buyerType','budgetMin','budgetMax','types','bedsMin','bathsMin','carMin','landMin','suburbs','enquiries','archived','notes'];
 const PROPERTY_HEADERS = ['id','status','archiveReason','address','suburb','postcode','type','price','priceType','priceMax','beds','baths','car','land','salePrice','saleDate','listingUrl','listedDate','listingMeta','notes'];
 const INSPECTION_HEADERS = ['id','propertyId','date','startTime','attendees','notes','createdAt','archived'];
-const DROP_HEADERS = ['id','type','address','propertyId','lastDropped','intervalDays','timesDropped','count','archived','notes'];
+const DROP_HEADERS = ['id','type','address','lastDropped','intervalDays','timesDropped','archived','notes'];
 // Per-request timeout so a hung network never freezes contacts:load / contacts:save —
 // the callers all fall back to the local JSON file when a Sheets call rejects.
 const GS_REQ_OPTS = { timeout: 20000 };
