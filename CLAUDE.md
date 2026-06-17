@@ -261,19 +261,21 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
 
 ### Drop record shape (Letterbox drops — panel `id="drops"`, v3.2)
 ```js
-{ id /* 'd…' */, type /* 'pocket'|'newlisting'|'stale' */, area /* street/suburb text */,
-  propertyId /* optional link to a Properties record */, lastDropped /* yyyy-mm-dd */,
-  intervalDays /* re-drop cadence; prefilled from the type, editable per zone */,
+{ id /* 'd…' */, type /* 'pocket'(monthly/30d) | 'newlisting'(14d) | 'stale'(14d) */,
+  address /* the targeted drop address */, propertyId /* optional link to a Properties record */,
+  lastDropped /* yyyy-mm-dd */, intervalDays /* mirror of DROP_TYPES[type].days; NOT user-editable */,
   timesDropped /* int, ++ on "Dropped again" */, count /* optional letterbox count (string) */,
   archived /* bool ("Stop") */, notes }
 ```
-- A "drop zone" is a maintained area, not a one-off event: `dropNextDue(d)` = `lastDropped + intervalDays`;
-  the Due list + stats flag anything due within 7 days. **`dropAgain(id)`** sets `lastDropped=today` and
-  `timesDropped++` (resets the timer). `DROP_TYPES` config holds each type's `label`, wayfinding chip
-  colours, default `days` cadence, a form `blurb`, and the `due` play shown on the reminder card.
-  `dropTypeChanged()` prefills `d-intervalDays` from the selected type. `normalizeDrops` coerces type/
-  interval/timesDropped on load. All fields are in `DROP_HEADERS` (intervalDays/timesDropped also in
-  `GS_NUM_FIELDS`) so the zone GS-syncs to the `Drops` tab. `count` is a free-text letterbox tally (string).
+- Each drop targets a single **address** (v3.2.1; the v3.2.0 `area` field auto-migrates to `address`
+  in `normalizeDrops`). **Cadence is a fixed per-type rule** — `dropNextDue(d)` =
+  `lastDropped + DROP_TYPES[type].days`, so changing a type's `days` reschedules every existing drop of
+  that type (there is no per-drop interval field; `intervalDays` is stored only as a synced mirror).
+  The Due list + stats flag anything due within 7 days. **`dropAgain(id)`** sets `lastDropped=today` and
+  `timesDropped++`. `DROP_TYPES` holds each type's `label`, wayfinding chip colours, `days` cadence
+  (pocket 30 / newlisting 14 / stale 14), a form `blurb`, and the `due` play shown on the reminder card.
+  `dropTypeChanged()` updates the form hint. All fields are in `DROP_HEADERS` (intervalDays/timesDropped
+  also in `GS_NUM_FIELDS`) so a drop GS-syncs to the `Drops` tab. `count` is a free-text letterbox tally.
 
 ## The four prospect methods
 Each is a top-level `.panel` with 5 sub-tabs: Openers, Objections, Closes,
@@ -363,7 +365,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **3.2.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **3.2.1**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
