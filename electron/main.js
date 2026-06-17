@@ -31,11 +31,11 @@ function dataFile() { return path.join(dataDir(), DATA_FILENAME); }
 function readData() {
   try {
     const p = dataFile();
-    if (!fs.existsSync(p)) return { contacts: [], buyers: [], properties: [], inspections: [], activity: [] };
+    if (!fs.existsSync(p)) return { contacts: [], buyers: [], properties: [], inspections: [], drops: [], activity: [] };
     const raw = JSON.parse(fs.readFileSync(p, 'utf8') || '{}');
-    if (Array.isArray(raw)) return { contacts: raw, buyers: [], properties: [], inspections: [], activity: [] };
-    return { contacts: raw.contacts || [], buyers: raw.buyers || [], properties: raw.properties || [], inspections: raw.inspections || [], activity: raw.activity || [] };
-  } catch (e) { return { contacts: [], buyers: [], properties: [], inspections: [], activity: [] }; }
+    if (Array.isArray(raw)) return { contacts: raw, buyers: [], properties: [], inspections: [], drops: [], activity: [] };
+    return { contacts: raw.contacts || [], buyers: raw.buyers || [], properties: raw.properties || [], inspections: raw.inspections || [], drops: raw.drops || [], activity: raw.activity || [] };
+  } catch (e) { return { contacts: [], buyers: [], properties: [], inspections: [], drops: [], activity: [] }; }
 }
 function updateData(mutate) {
   const d = readData(); mutate(d);
@@ -235,6 +235,7 @@ const CONTACT_HEADERS = ['id','method','outcome','first','last','address','mobil
 const BUYER_HEADERS = ['id','first','last','mobile','email','buyerType','budgetMin','budgetMax','types','bedsMin','bathsMin','carMin','landMin','suburbs','enquiries','archived','notes'];
 const PROPERTY_HEADERS = ['id','status','archiveReason','address','suburb','postcode','type','price','priceType','priceMax','beds','baths','car','land','salePrice','saleDate','listingUrl','listedDate','listingMeta','notes'];
 const INSPECTION_HEADERS = ['id','propertyId','date','startTime','attendees','notes','createdAt','archived'];
+const DROP_HEADERS = ['id','type','area','propertyId','lastDropped','intervalDays','timesDropped','count','archived','notes'];
 // Per-request timeout so a hung network never freezes contacts:load / contacts:save —
 // the callers all fall back to the local JSON file when a Sheets call rejects.
 const GS_REQ_OPTS = { timeout: 20000 };
@@ -268,11 +269,11 @@ function getAuthClient() {
    single comma-separated cell; numeric/boolean fields are coerced back on load.
    gsLoadTab THROWS on a missing tab or API error so callers fall back to local
    data instead of mirroring an empty result over it. */
-const GS_TABS = ['Contacts', 'Buyers', 'Properties', 'Inspections'];
+const GS_TABS = ['Contacts', 'Buyers', 'Properties', 'Inspections', 'Drops'];
 const GS_ARRAY_FIELDS = { types: 1, suburbs: 1 };
 const GS_JSON_FIELDS = { enquiries: 1, attendees: 1 }; // arrays of objects → stored as JSON in one cell
 const GS_JSON_OBJ_FIELDS = { listingMeta: 1 }; // single objects → stored as JSON in one cell ('' when absent)
-const GS_NUM_FIELDS = { stepsDone:1, budgetMin:1, budgetMax:1, bedsMin:1, bathsMin:1, carMin:1, landMin:1, price:1, priceMax:1, beds:1, baths:1, car:1, land:1, salePrice:1 };
+const GS_NUM_FIELDS = { stepsDone:1, budgetMin:1, budgetMax:1, bedsMin:1, bathsMin:1, carMin:1, landMin:1, price:1, priceMax:1, beds:1, baths:1, car:1, land:1, salePrice:1, intervalDays:1, timesDropped:1 };
 const GS_BOOL_FIELDS = { archived: 1 };
 
 async function gsLoadTab(auth, sheetId, tab) {
@@ -386,6 +387,7 @@ makeCollectionHandlers('contacts', 'Contacts', CONTACT_HEADERS);
 makeCollectionHandlers('buyers', 'Buyers', BUYER_HEADERS);
 makeCollectionHandlers('properties', 'Properties', PROPERTY_HEADERS);
 makeCollectionHandlers('inspections', 'Inspections', INSPECTION_HEADERS);
+makeCollectionHandlers('drops', 'Drops', DROP_HEADERS);
 
 /* Activity log — LOCAL ONLY (never synced to Google Sheets; per-machine call/SMS
    counters that power the Tracker's "This week" stats). */

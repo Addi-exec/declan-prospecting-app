@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld('api', {
   saveProperties: (arr) => ipcRenderer.invoke('properties:save', arr),
   loadInspections: () => ipcRenderer.invoke('inspections:load'),
   saveInspections: (arr) => ipcRenderer.invoke('inspections:save', arr),
+  loadDrops: () => ipcRenderer.invoke('drops:load'),
+  saveDrops: (arr) => ipcRenderer.invoke('drops:save', arr),
   loadActivity: () => ipcRenderer.invoke('activity:load'),
   saveActivity: (arr) => ipcRenderer.invoke('activity:save', arr),
   openJsonFile: () => ipcRenderer.invoke('data:openJson'),
