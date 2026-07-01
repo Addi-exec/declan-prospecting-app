@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld('api', {
   saveActivity: (arr) => ipcRenderer.invoke('activity:save', arr),
   openJsonFile: () => ipcRenderer.invoke('data:openJson'),
   fetchListing: (url) => ipcRenderer.invoke('listing:fetch', url),
+  geocode: (query) => ipcRenderer.invoke('geo:code', query),
   getDataLocation: () => ipcRenderer.invoke('data:getLocation'),
   setDataLocation: () => ipcRenderer.invoke('data:setLocation'),
   useDefaultDataLocation: () => ipcRenderer.invoke('data:useDefault'),

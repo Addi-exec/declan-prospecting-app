@@ -235,7 +235,7 @@ const CONTACT_HEADERS = ['id','method','outcome','first','last','address','mobil
 const BUYER_HEADERS = ['id','first','last','mobile','email','buyerType','budgetMin','budgetMax','types','bedsMin','bathsMin','carMin','landMin','suburbs','enquiries','archived','notes'];
 const PROPERTY_HEADERS = ['id','status','archiveReason','address','suburb','postcode','type','price','priceType','priceMax','beds','baths','car','land','salePrice','saleDate','listingUrl','listedDate','listingMeta','notes'];
 const INSPECTION_HEADERS = ['id','propertyId','date','startTime','attendees','notes','createdAt','archived'];
-const DROP_HEADERS = ['id','type','address','lastDropped','intervalDays','timesDropped','archived','notes'];
+const DROP_HEADERS = ['id','type','address','lastDropped','intervalDays','timesDropped','archived','notes','lat','lng','geoAddr'];
 // Per-request timeout so a hung network never freezes contacts:load / contacts:save —
 // the callers all fall back to the local JSON file when a Sheets call rejects.
 const GS_REQ_OPTS = { timeout: 20000 };
@@ -273,7 +273,7 @@ const GS_TABS = ['Contacts', 'Buyers', 'Properties', 'Inspections', 'Drops'];
 const GS_ARRAY_FIELDS = { types: 1, suburbs: 1 };
 const GS_JSON_FIELDS = { enquiries: 1, attendees: 1 }; // arrays of objects → stored as JSON in one cell
 const GS_JSON_OBJ_FIELDS = { listingMeta: 1 }; // single objects → stored as JSON in one cell ('' when absent)
-const GS_NUM_FIELDS = { stepsDone:1, budgetMin:1, budgetMax:1, bedsMin:1, bathsMin:1, carMin:1, landMin:1, price:1, priceMax:1, beds:1, baths:1, car:1, land:1, salePrice:1, intervalDays:1, timesDropped:1 };
+const GS_NUM_FIELDS = { stepsDone:1, budgetMin:1, budgetMax:1, bedsMin:1, bathsMin:1, carMin:1, landMin:1, price:1, priceMax:1, beds:1, baths:1, car:1, land:1, salePrice:1, intervalDays:1, timesDropped:1, lat:1, lng:1 };
 const GS_BOOL_FIELDS = { archived: 1 };
 
 async function gsLoadTab(auth, sheetId, tab) {
@@ -481,6 +481,48 @@ ipcMain.handle('listing:fetch', async (_e, url) => {
     if (!meta.title && !meta.image) return { ok: false, error: 'No preview details found on that page.' };
     meta.fetchedAt = new Date().toISOString();
     return { ok: true, meta };
+  } catch (e) { return { ok: false, error: String(e && e.message || e) }; }
+});
+
+/* ---------------- Geocoding (address → lat/lng for the Drops map) ----------------
+   Uses OpenStreetMap's free Nominatim service (no API key). Respects its usage policy:
+   a descriptive User-Agent and one request at a time (the renderer throttles to ~1/sec).
+   Returns { ok, lat, lng, displayName } or { ok:false, error }. Coordinates get cached on
+   each drop record so an address is only ever looked up once. */
+function geocodeAddress(query) {
+  return new Promise((resolve, reject) => {
+    const q = String(query || '').trim();
+    if (!q) return reject(new Error('No address'));
+    const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=au&q=' + encodeURIComponent(q);
+    const req = https.get(url, {
+      headers: {
+        'User-Agent': 'DeclanProspectingApp/3.5 (real-estate letterbox-drop map; contact via app)',
+        'Accept': 'application/json',
+        'Accept-Language': 'en-AU,en;q=0.9'
+      },
+      timeout: 12000
+    }, (res) => {
+      if (res.statusCode >= 400) { res.resume(); return resolve({ status: res.statusCode, body: '' }); }
+      let body = '', size = 0;
+      res.setEncoding('utf8');
+      res.on('data', (c) => { size += c.length; if (size > 400000) { res.destroy(); return; } body += c; });
+      res.on('end', () => resolve({ status: res.statusCode, body }));
+    });
+    req.on('timeout', () => { req.destroy(new Error('Timed out')); });
+    req.on('error', reject);
+  });
+}
+ipcMain.handle('geo:code', async (_e, query) => {
+  try {
+    const { status, body } = await geocodeAddress(query);
+    if (status >= 400 || !body) return { ok: false, error: 'Lookup service responded with ' + (status || 'nothing') + '.' };
+    let arr;
+    try { arr = JSON.parse(body); } catch (e) { return { ok: false, error: 'Bad response from lookup service.' }; }
+    if (!Array.isArray(arr) || !arr.length) return { ok: false, error: 'notfound' };
+    const hit = arr[0];
+    const lat = parseFloat(hit.lat), lng = parseFloat(hit.lon);
+    if (isNaN(lat) || isNaN(lng)) return { ok: false, error: 'notfound' };
+    return { ok: true, lat, lng, displayName: String(hit.display_name || '') };
   } catch (e) { return { ok: false, error: String(e && e.message || e) }; }
 });
 
