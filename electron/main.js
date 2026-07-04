@@ -297,7 +297,7 @@ async function gsLoadTab(auth, sheetId, tab) {
           try { const j = JSON.parse(v); o[h] = (j && typeof j === 'object' && !Array.isArray(j)) ? j : ''; }
           catch (e) { o[h] = ''; }
         }
-        else if (GS_NUM_FIELDS[h]) o[h] = v === '' ? '' : (parseFloat(v) || 0);
+        else if (GS_NUM_FIELDS[h]) { const n = parseFloat(v); o[h] = Number.isFinite(n) ? n : ''; } // unparseable cell → '' (never a bogus 0 — a 0,0 lat/lng would pin off Africa)
         else if (GS_BOOL_FIELDS[h]) o[h] = v === 'true';
         else o[h] = v;
       });

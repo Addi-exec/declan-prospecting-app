@@ -9,7 +9,7 @@ file and CLAUDE.md overlap, trust CLAUDE.md for code detail.
 
 ## 0) CURRENT STATUS (June 2026)
 
-- **Version: currently 3.2.2.** Semver throughout (see §5). `CLAUDE.md` is the live technical
+- **Version: currently 3.6.0.** Semver throughout (see §5). `CLAUDE.md` is the live technical
   source of truth and tracks the current version + full feature set — trust it over this file
   for code detail.
 - **Repo:** https://github.com/Addi-exec/declan-prospecting-app (public). This project folder is
@@ -118,7 +118,12 @@ tracker untouched).
 colours + first release** · 1.0.1 Sheets creds · 1.1 property offer pipeline · 1.2 theme picker (+Racing
 Green) · 1.3 Noir theme + topbar fix · 1.3.1 dd/mm/yyyy dates · 1.3.2 import fix · 1.4 contact editing ·
 2.0 call session/snooze/links/week-stats/quick-search/backup · 3.0 sharp UI + listing previews · 3.1
-readability · 3.2 Drops · 3.2.1 drop cadences + address · **3.2.2 (current)** simplified drop form.
+readability · 3.2 Drops · 3.2.1 drop cadences + address · 3.2.2 simplified drop form · 3.3 living UI
+(aurora background, tactile tilt/glow cards, click ripple, toast) · 3.4 inspections auto-archive after
+reporting (+ Active/Archived/All filter) · 3.5 Drops duplicate-proof (address+type identity, live hint,
+retro-merge) + interactive Leaflet/OSM map (vendored, geocoded pins) · **3.6.0 (current)** review-pass
+polish: drops in backup/restore + Excel, map keeps your view, Victoria-St geocoding, failed lookups
+retry, tilt fixed on due cards, batched geocode saves.
 
 ---
 
@@ -209,7 +214,7 @@ over http, so data calls no-op — fine for checking layout/JS/tabs in light + d
 | Thing | Value |
 |------|------|
 | Repo | https://github.com/Addi-exec/declan-prospecting-app (public) |
-| Current version | 3.2.2 |
+| Current version | 3.6.0 |
 | Push | `git push origin main` (gh authed) · release: `gh release create vX.Y.Z` |
 | Data file | `<dataDir>/prospecting-data.json` = `{contacts,buyers,properties,inspections,drops}` (+local `activity`) |
 | Default data path | Win `%APPDATA%\Declan Prospecting App\` · Mac `~/Library/Application Support/Declan Prospecting App/` · Linux `~/.config/Declan Prospecting App/` |

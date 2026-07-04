@@ -110,7 +110,9 @@ electron/main.js      BrowserWindow; IPC: contacts load/save, Excel import/expor
                       Windows = electron-updater auto-install; macOS = manual
                       (queries GitHub Releases, opens the .dmg download)
 electron/preload.js   contextBridge -> window.api (the only renderer<->main surface)
-renderer/index.html   THE ENTIRE APP (UI, styles, all logic). ~2600 lines.
+renderer/index.html   THE ENTIRE APP (UI, styles, all logic). ~4200 lines.
+renderer/vendor/leaflet/  vendored Leaflet 1.9.4 (leaflet.js/.css + images/) — powers the
+                      Drops map; local, no CDN or API key. Tiles come from openstreetmap.org.
 assets/               icon.ico (Win), icon.icns (Mac), icon.png/icon_512.png (Linux), make_icon.py
 Start (Windows).bat   dev-mode launcher (Windows)
 Setup (Windows).bat   one-time Windows installer (downloads Electron via mirror)
@@ -138,6 +140,9 @@ The renderer NEVER touches Node/fs directly. Everything goes through:
 - `fetchListing(url)` -> { ok, meta:{title,image,desc,site,fetchedAt} } | { ok:false, error } —
   fetches a listing page in main (built-in https, browser UA, 4 redirects, 800KB cap) and
   parses OpenGraph meta (v3.0 listing previews)
+- `geocode(query)` -> { ok, lat, lng, displayName } | { ok:false, error } — address→coords via
+  OpenStreetMap Nominatim (`geo:code` IPC in main; countrycodes=au, descriptive UA). The Drops
+  map queue calls it ≈1/sec and caches results on the record, so an address is looked up once (v3.5)
 - `getDataLocation()` -> { path, dir, custom } — where contacts are stored
 - `setDataLocation()` -> picks a folder (use a cloud-synced one to share across
   computers); adopts an existing file there or migrates the current one. Returns { ok, path, adopted }
@@ -245,8 +250,14 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
 ```js
 { id /* 'i…' */, propertyId, date /* yyyy-mm-dd */, startTime /* HH:MM */, notes,
   attendees /* [{ buyerId, notes, followUp /*bool*/, ts /*ISO*/ }] */,
-  createdAt /* ISO */, archived }
+  createdAt /* ISO */, archived /* bool — auto-set when a report is Copied/Saved (v3.4) */ }
 ```
+- **Archive lifecycle (v3.4):** an Active/Archived/All `inspStatusFilter` select (default Active) +
+  an Archive/Reopen button per row. **Auto-archive on report:** Copying or Saving a report archives
+  the covered inspections (Silent + Undo via `showToast`; `inspArchiveAfterReport`), but only
+  past-or-today ones — a future-dated open home in a report is never archived (v3.6). The jump
+  links from buyer/property rows force the filter to All so the jumped list matches the counted N.
+  `showToast(msg, actionLabel, fn, ms)` is the app-wide snackbar (role="status", one at a time).
 - Source of truth for attendance + per-inspection notes = `inspection.attendees`. A buyer's inspection
   history is COMPUTED by scanning inspections: `inspForBuyer(bid)` / `inspForProp(pid)`. Attendees normalise
   via `normalizeInspections`; GS stores `attendees` as JSON (`GS_JSON_FIELDS`).
@@ -259,13 +270,30 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
   `inspCopyReport` (one) / `inspReportAll` (combined over the active filter) open `#modal-overlay` with a
   copyable textarea (`crmCopySms`-style clipboard) + Save‑as‑.txt. Filter by property/buyer/date range.
 
-### Drop record shape (Letterbox drops — panel `id="drops"`, v3.2)
+### Drop record shape (Letterbox drops — panel `id="drops"`, v3.2; dedupe + map v3.5)
 ```js
 { id /* 'd…' */, type /* 'pocket'(monthly/30d) | 'newlisting'(14d) | 'stale'(14d) */,
   address /* the targeted drop address (required) */, lastDropped /* yyyy-mm-dd, defaults today */,
   intervalDays /* mirror of DROP_TYPES[type].days; NOT user-editable */,
-  timesDropped /* int, ++ on "Dropped again" */, archived /* bool ("Stop") */, notes }
+  timesDropped /* int, ++ on "Dropped again" */, archived /* bool ("Stop") */, notes,
+  lat, lng /* cached geocode result; null until located; in GS_NUM_FIELDS */,
+  geoAddr /* the address the coords were geocoded FOR — mismatch clears them */ }
 ```
+- **Duplicate-proof (v3.5):** a drop's identity is **(normalised address + type)** — `dropNormAddr`
+  lower-cases and maps `, . # /` to spaces. The same address may hold one drop of EACH type, never two
+  of the same: `dropSave`'s create path offers to record a re-drop on the existing record instead
+  (latest-date-wins), the edit path rejects a clash, `dropAddressInput` shows a live hint (different
+  wording in edit mode), and `normalizeDrops` retroactively merges any stored dupes on load (sums
+  `timesDropped`, keeps the newest `lastDropped`, joins notes).
+- **Map (v3.5):** `#drop-map` — Leaflet (vendored) + OSM tiles; a `divIcon` pin per located active
+  drop, coloured by `DROP_TYPES[type].chipFg`, pulsing when due; themed popup with a "Dropped again"
+  action. `dropGeocodeQueue` looks up missing coords one-at-a-time (1.1s apart, Nominatim policy) and
+  saves ONCE when the queue drains (not per address — Sheets quota). `_geoFail` is a session-only
+  in-memory marker (stripped by `normalizeDrops`, cleared on address edit) so failures retry next
+  launch; the map note offers "Retry failed" (just failures) and "Re-locate all" (confirm; full wipe).
+  `dropMapRefresh` only re-fits the view when the pin SET changes (`_dropFitSig`) so a re-render
+  never discards the user's pan/zoom. Map init is deferred until the panel is visible (`showPanel`
+  hook re-fires it). (0,0) coords are treated as corrupt and nulled on load.
 - Targeted **address** drops only — the form is just type + date + address + notes (v3.2.2 removed the
   `count` letterbox tally and the optional `propertyId` link; v3.2.0's `area` auto-migrates to `address`
   in `normalizeDrops`). The date input defaults to today (`dropClearForm`/init) but is editable.
@@ -274,8 +302,10 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
   `intervalDays` is stored only as a synced mirror). The Due list + stats flag anything due within 7 days.
   **`dropAgain(id)`** sets `lastDropped=today` and `timesDropped++`. `DROP_TYPES` holds each type's
   `label`, chip colours, `days` cadence (pocket 30 / newlisting 14 / stale 14), a form `blurb`, and the
-  `due` play shown on the reminder card. All fields are in `DROP_HEADERS` (intervalDays/timesDropped also
-  in `GS_NUM_FIELDS`) so a drop GS-syncs to the `Drops` tab.
+  `due` play shown on the reminder card. All fields are in `DROP_HEADERS` (intervalDays/timesDropped/
+  lat/lng in `GS_NUM_FIELDS`) so a drop GS-syncs to the `Drops` tab. Drops are included in
+  backup/restore and get their own sheet in the Excel export (v3.6; lat/lng/geoAddr stay internal,
+  like listingMeta, and the import skip-list `NON_CONTACT_SHEETS` covers the Drops sheet).
 
 ## The four prospect methods
 Each is a top-level `.panel` with 5 sub-tabs: Openers, Objections, Closes,
@@ -365,7 +395,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **3.2.2**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **3.6.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
@@ -407,7 +437,15 @@ Follow-up, Nurture.
   the 3 version spots. Code signing (self-signed cert in `signing/`, or a CA cert)
   keeps the publisher consistent so electron-updater's signature check passes.
 
-## Look & motion (v3.0 overhaul)
+## Look & motion (v3.0 overhaul; v3.3 living-UI layer)
+**v3.3 living UI**: an `#aurora` fixed layer (two slow-drifting color-mix glows) sits behind
+`#bg-fx` with gentle pointer parallax; `.stat/.due/.theme-card` get a cursor-tracking accent
+glow (`--gx`/`--gy` on `::before`) + a ~6° 3D tilt set as an INLINE transform by the pointermove
+handler — so those cards' entrance animations must use `animation-fill-mode: backwards`, never
+`both`/`forwards` (a filling animation's final `transform:none` overrides inline styles and kills
+the tilt). Buttons/nav get a `currentColor` click ripple. All of it checks
+`prefers-reduced-motion` LIVE (CSS block + `reducedMotion()` in the JS handlers).
+
 Sharp, modern, boxy: **border-radius is 0 everywhere** (only the 8px wayfinding dots stay
 `50%` circles) — keep new UI square. A motion layer at the END of the `<style>` block adds:
 panel/card entrance animations, hover lift + accent-glow on `.stat/.due/.theme-card`,
