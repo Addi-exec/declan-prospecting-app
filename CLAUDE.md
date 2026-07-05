@@ -397,7 +397,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **4.0.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **4.1.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
@@ -440,10 +440,16 @@ Follow-up, Nurture.
   keeps the publisher consistent so electron-updater's signature check passes.
 
 ## Look & motion (v4.0 Liquid Glass redesign)
-**v4.0 (current look):** research-backed Liquid Glass. GLASS IS CHROME ONLY — the frosted
-topbar (blur on a masked `.topbar-backdrop` child), the Prospecting dropdown, the modal
-shell, the toast, and the `.mini-menu` popovers; every text surface (panel sheets, cards,
-tables, forms, scripts) stays SOLID. Tokens (radii `--r-xs/sm/md/pill`, glass recipes
+**v4.0/v4.1 (current look):** research-backed Liquid Glass. Blur lives on CHROME — the
+frosted topbar (blur on a masked `.topbar-backdrop` child), the Prospecting dropdown, the
+modal shell, the toast, the `.mini-menu` popovers — plus (v4.1) the `.panel.active` SHEET
+itself as heavy glass: ≥86% `--surface` (90% dark) + blur(26px) saturate(160%), which keeps
+text contrast safe because the backdrop is only the calm aurora. Cards/tables/forms inside
+add NO further blur (inner tiles are translucent `--bg` mixes over the uniform sheet).
+v4.1 also condensed the Drops due list: `dropRenderDue` renders `.ddr-group` blocks per
+type (the type's `due` play shown ONCE per group), one compact `.ddr` row per address with
+✓ Dropped + a ⋯ `dropRowMenu`, and `dropAllDone(type)` bulk-marks a whole group with an
+Undo toast. Tokens (radii `--r-xs/sm/md/pill`, glass recipes
 `--glass-*`, elevation `--e1/2/3`, `--hover-ink`/`--accent-tint`) are DERIVED from palette
 vars via color-mix and defined once in :root + one dark override — the documented exemption
 to the 10-palette-block rule. Buttons/nav/chips/filters are capsules (`--r-pill`);

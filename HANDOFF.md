@@ -9,7 +9,7 @@ file and CLAUDE.md overlap, trust CLAUDE.md for code detail.
 
 ## 0) CURRENT STATUS (June 2026)
 
-- **Version: currently 4.0.0.** Semver throughout (see §5). `CLAUDE.md` is the live technical
+- **Version: currently 4.1.0.** Semver throughout (see §5). `CLAUDE.md` is the live technical
   source of truth and tracks the current version + full feature set — trust it over this file
   for code detail.
 - **Repo:** https://github.com/Addi-exec/declan-prospecting-app (public). This project folder is
@@ -218,7 +218,7 @@ over http, so data calls no-op — fine for checking layout/JS/tabs in light + d
 | Thing | Value |
 |------|------|
 | Repo | https://github.com/Addi-exec/declan-prospecting-app (public) |
-| Current version | 4.0.0 |
+| Current version | 4.1.0 |
 | Push | `git push origin main` (gh authed) · release: `gh release create vX.Y.Z` |
 | Data file | `<dataDir>/prospecting-data.json` = `{contacts,buyers,properties,inspections,drops}` (+local `activity`) |
 | Default data path | Win `%APPDATA%\Declan Prospecting App\` · Mac `~/Library/Application Support/Declan Prospecting App/` · Linux `~/.config/Declan Prospecting App/` |
