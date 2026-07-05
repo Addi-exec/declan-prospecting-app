@@ -328,6 +328,10 @@ Follow-up, Nurture.
   **Buyers**, **Properties**, **Inspections** (`id="inspections"`), **Drops** (`id="drops"`); the Prospecting dropdown is JS-driven
   (`prospOpen`/`prospCloseSoon` on `.nav-wrap` hover + `prospectingClick` toggle). Older line follows:
   **Buyers**, **Properties**. The dead sidebar/`.tab-bar-mobile`/`.layout` CSS is left in place.
+- Since v4.0: the Prospecting nav item shows the CURRENT method ("Prospecting · Just sold")
+  in that method's colour via `prospSetLabel`; the caret rotates via `.nav-wrap.open`;
+  Settings has a visible text label ≥980px; the Storage + Google Sheets cards live in
+  Settings → "Data & sync" (Tracker keeps a one-line `#tracker-sync-pill`).
 - **Prospecting** is a `.nav-wrap` containing the `#nav-prospecting` button + a hover/click
   `#prospecting-dd` dropdown of the 4 methods. `prospectingClick()` toggles it (touch);
   `pickMethod(m)` opens a method panel. `showPanel` marks `#nav-prospecting` active for any
@@ -338,11 +342,9 @@ Follow-up, Nurture.
 - `showPanel(id, el)` — switches top-level panels (contacts, justsold, listed,
   buyerdb, steallist, buyers, properties, about) + top-tab highlight.
 - `showJsTab/showJlTab/showBdTab/showSlTab` — method sub-tabs (built by `makeTabFn`).
-- `showJsfTab(id, el)` — follow-up BRANCH tabs. Generalised: derives the group
-  prefix from the id (`jsf`/`jlf`/`bdf`/`slf`) and toggles `.{prefix}-track` /
-  `.{prefix}-tab`. ids look like `jlf-noanswer`, `bdf-interested`, etc.
-- `showJsnTab(id, el)` — nurture TEMPERATURE tabs. Same generalisation
-  (`jsn`/`jln`/`bdn`/`sln`); ids like `jln-hot`, `sln-cold`.
+- `showJsfTab(id, el)` — follow-up BRANCH tabs (ids like `jlf-noanswer`); since v4.0 it
+  derives the prefix and calls the shared `switchTab` (class-based `.active`, no inline
+  styles). `showJsnTab` (nurture ids like `jln-hot`) is the SAME function (aliased).
 - Branch/temperature track classes follow `{prefix}-track`, tabs `{prefix}-tab`.
 
 ## CRM engine (renderer)
@@ -395,7 +397,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **3.6.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **4.0.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
@@ -437,7 +439,35 @@ Follow-up, Nurture.
   the 3 version spots. Code signing (self-signed cert in `signing/`, or a CA cert)
   keeps the publisher consistent so electron-updater's signature check passes.
 
-## Look & motion (v3.0 overhaul; v3.3 living-UI layer)
+## Look & motion (v4.0 Liquid Glass redesign)
+**v4.0 (current look):** research-backed Liquid Glass. GLASS IS CHROME ONLY — the frosted
+topbar (blur on a masked `.topbar-backdrop` child), the Prospecting dropdown, the modal
+shell, the toast, and the `.mini-menu` popovers; every text surface (panel sheets, cards,
+tables, forms, scripts) stays SOLID. Tokens (radii `--r-xs/sm/md/pill`, glass recipes
+`--glass-*`, elevation `--e1/2/3`, `--hover-ink`/`--accent-tint`) are DERIVED from palette
+vars via color-mix and defined once in :root + one dark override — the documented exemption
+to the 10-palette-block rule. Buttons/nav/chips/filters are capsules (`--r-pill`);
+`.crm-btn-primary` is the accent-filled capsule (ONE per panel), `.crm-btn-tint` the
+per-card primary (Copy SMS), ghosts for the rest; press = scale(.98) (the Material ripple
+was REMOVED in v4). ALL tab groups share one class-based active treatment (`.active` +
+per-method `--tab-accent` set on the panel ids) via `switchTab`/`makeTabFn` — never inline
+styles. Filter rows use `.filter-bar`+`.filter-chip` (incl. property status tabs and the
+Inspections status chips). Due cards are reading surfaces: NO tilt/glow, a 3px
+`--card-accent` method spine instead. Accessibility: global :focus-visible ring,
+`prefers-reduced-transparency`/`prefers-contrast` fallbacks solidify the glass, and a
+"Calm mode" toggle (Settings → Appearance, `data-calm` on <html> + localStorage
+`declan-calm`) kills aurora/spotlight/tilt in-app. Structural v4 changes: Storage +
+Google Sheets cards MOVED from the Tracker into Settings → "Data & sync" (the Tracker
+shows a one-line `#tracker-sync-pill` written by `gsApplyState`); `formEditState` renders
+an "Editing: X — Cancel" banner on all five add/edit forms; `propFormSync` hides
+sale/archive fields unless status=archived and price-max unless type=range; `miniMenu`
+powers the snooze + outcome popovers (the per-row outcome <select> became a chip);
+every list search has a ✕ (`.search-clear` + :has()); the call-session outcome buttons
+are labelled. The style layer order is now: base → v3.0 → v3.3 → v3.5 → v3.1 readability
+→ **v4.0 glass (LAST — its chrome overrides win; never override v3.1 text rules)**.
+
+### Historical layers (still in the file, superseded where v4.0 overrides)
+(v3.0 overhaul; v3.3 living-UI layer)
 **v3.3 living UI**: an `#aurora` fixed layer (two slow-drifting color-mix glows) sits behind
 `#bg-fx` with gentle pointer parallax; `.stat/.due/.theme-card` get a cursor-tracking accent
 glow (`--gx`/`--gy` on `::before`) + a ~6° 3D tilt set as an INLINE transform by the pointermove
@@ -446,8 +476,8 @@ handler — so those cards' entrance animations must use `animation-fill-mode: b
 the tilt). Buttons/nav get a `currentColor` click ripple. All of it checks
 `prefers-reduced-motion` LIVE (CSS block + `reducedMotion()` in the JS handlers).
 
-Sharp, modern, boxy: **border-radius is 0 everywhere** (only the 8px wayfinding dots stay
-`50%` circles) — keep new UI square. A motion layer at the END of the `<style>` block adds:
+(Superseded by v4.0: the boxy 0-radius rule is RETIRED — use the `--r-*` tokens; only the
+8px wayfinding dots stay `50%` circles.) A motion layer at the END of the `<style>` block adds:
 panel/card entrance animations, hover lift + accent-glow on `.stat/.due/.theme-card`,
 button press states, themed scrollbars, a sharp 1px accent focus ring, a **frosted-glass
 topbar** (`color-mix` + backdrop-filter), and `#bg-fx` — a fixed dot-grid background with an
