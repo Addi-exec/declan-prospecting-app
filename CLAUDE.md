@@ -262,7 +262,9 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
   history is COMPUTED by scanning inspections: `inspForBuyer(bid)` / `inspForProp(pid)`. Attendees normalise
   via `normalizeInspections`; GS stores `attendees` as JSON (`GS_JSON_FIELDS`).
 - **Dedup add‑attendee:** the attendee typeahead (`taSearch`) searches `BUYERS_CACHE`; `taPick` LINKS an
-  existing buyer, `taCreateNew` creates one (warns on same mobile/name). One buyer record everywhere.
+  existing buyer, `taCreateNew` (v4.2) opens a pre-filled details modal (email/type/budget/suburbs/notes,
+  ids `nb-*`) and `taNewBuyerSave` creates the buyer (dupe-warn on same mobile/name at save time) AND
+  adds them as the attendee in one step. One buyer record everywhere.
 - **Merge (`mergeBuyers(primaryId, dupId)`):** fills primary blanks from the dup, unions `enquiries`/`types`/
   `suburbs`, joins notes, RE‑POINTS every inspection attendee `buyerId` dup→primary (de‑duping within an
   inspection), then removes the dup. Reached via the "Merge duplicate buyers" button.
@@ -397,7 +399,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **4.1.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **4.2.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
