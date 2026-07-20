@@ -2527,7 +2527,10 @@
 <script>
 (function(){
     try { if (localStorage.getItem('declan-theme') === 'dark') document.documentElement.setAttribute('data-theme','dark'); } catch(e){}
-    try { var p = localStorage.getItem('declan-palette'); if (p && p !== 'claude') document.documentElement.setAttribute('data-palette', p); } catch(e){}
+    try {
+      if (!localStorage.getItem('declan-v5-migrated')) { localStorage.removeItem('declan-palette'); localStorage.setItem('declan-v5-migrated','1'); }
+      var p = localStorage.getItem('declan-palette'); if (p && p !== 'claude') document.documentElement.setAttribute('data-palette', p);
+    } catch(e){}
   })();
   function toggleTheme(){
     var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -2575,7 +2578,7 @@
   }
   /* ===== Theme palettes (Settings → Appearance) ===== */
   var PALETTES = [
-    { id:'claude',  name:'Claude',       desc:'Warm cream & coral — the signature look (v1.0).' },
+    { id:'claude',  name:'Classic minimal', desc:'The v5 signature look — clean greys & whites, colour only for status.' },
     { id:'aston',   name:'Racing Green', desc:'Graphite greys, black chrome & forest green — Aston Martin inspired.' },
     { id:'noir',    name:'Noir',         desc:'Pure greyscale — blacks, whites and greys, nothing else.' },
     { id:'mono',    name:'Espresso',     desc:'Calm warm greys with a subtle brown accent (the v0.26 look).' },
