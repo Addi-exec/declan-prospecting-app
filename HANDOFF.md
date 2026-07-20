@@ -7,6 +7,62 @@ file and CLAUDE.md overlap, trust CLAUDE.md for code detail.
 
 ---
 
+## ⏭ NEXT SESSION — v6.0.0 LAYOUT redesign (approved direction, not yet started)
+
+The v5.0.0 redesign changed the SKIN (Claude-app minimal: greys/whites + state colours, Times New
+Roman, SVG sprite icons, a11y pass — see `design-system/declan-prospecting-app/MASTER.md`). The
+owner wants the next step to change the LAYOUT/STRUCTURE. All features and the data layer stay
+exactly as they are — this is rearrangement, not a rewrite.
+
+### Target layout ("workbench")
+1. **Left sidebar navigation** replaces the topbar: icon+label items (use the existing `#i-*`
+   sprite), collapsible to icons-only; Prospecting's 4 methods become an expandable nav GROUP
+   (kills the hover dropdown); bottom of sidebar = Settings · About · light/dark · Calm mode ·
+   version chip. Quick search stays Ctrl/Cmd+K + a sidebar button. Frees horizontal width for
+   tables on Declan's wide screen; collapses gracefully <900px.
+2. **Add/edit forms become a right-side DRAWER** (slide-over, reuse .modal focus-trap pattern),
+   opened from ONE "+ New …" primary button per screen — forms no longer permanently sit between
+   the page title and the list (today they push every list ~2 screens down). CRITICAL: MOVE the
+   existing form DOM nodes into the drawer shell at open (appendChild — ids stay unique, all
+   existing JS keeps working); never duplicate the markup.
+3. **Tracker becomes a dashboard**: wide windows get a 2-column grid — LEFT: "Due now & overdue"
+   queue + call session; RIGHT rail (sticky): 4 due stats, "This week", sync pill, "+ Log contact"
+   (opens the drawer). "All contacts" table below full-width. Narrow = stacked (current order).
+4. **Buyers / Properties / Inspections go master-detail**: list (left, compact rows) + DETAIL pane
+   (right) showing the selected record's info + its expandable sub-panels (enquiries / offer tiers /
+   attendees) instead of inline row-expansion; row "Match" stays a modal. Falls back to the current
+   stacked behaviour <1100px. Selection = .active row (blue tint + weight, noir-safe).
+5. **Drops**: wide = map LEFT (sticky) + due-checklist RIGHT side-by-side; log-drop via the drawer;
+   all-drops table below.
+6. **Script pages (4 methods)**: keep content untouched; make the method sub-tab row STICKY under
+   the top of the sheet while scrolling scripts.
+
+### Phasing (one commit per phase; app must boot cleanly after each)
+- **A — Shell**: sidebar + main grid, retire topbar (keep `showPanel` API + panel ids +
+  `METHOD_PANELS` untouched; nav re-renders active state from the same calls). Move topbar-only
+  CSS to a historical layer. ~Also: `prospSetLabel` becomes the sidebar group header state.
+- **B — Drawer**: one shared drawer component (open/close/focus-trap/Escape, 320-420px, solid
+  surface) + convert the 5 add/edit forms (crm/buyer/prop/insp/drop) + edit-banner inside it.
+- **C — Tracker dashboard** grid + right rail.
+- **D — Master-detail** for Buyers/Properties/Inspections (renderers split list/detail; the
+  detail pane re-renders on selection id — derive from existing row-expand functions).
+- **E — Drops split + sticky script tabs + responsive passes + pre-delivery checklist
+  (MASTER.md gates) in all 5 palettes × light/dark → version 6.0.0 ×3 spots + changelog + docs.**
+
+### Hard rules for the session
+Read `CLAUDE.md` + `design-system/declan-prospecting-app/MASTER.md` first. Keep ALL features;
+storage only via window.api; every colour a var (5 palettes × light/dark); SVG sprite icons only;
+dd/mm dates; validate (node --check + parse/dup-id/stray-hex script in CLAUDE.md) + live-check
+light/dark before each commit; version bump ×3 + changelog only in the final phase-E commit.
+Biggest risks: duplicate ids if form markup is copied instead of MOVED; breaking `showPanel`
+callers (grep all `showPanel(` sites); the single-file renderer — small validated commits.
+
+### Paste this to start the session
+> Read HANDOFF.md ("NEXT SESSION — v6 layout redesign") and CLAUDE.md, then implement the v6
+> workbench layout phase by phase (A→E) exactly as planned, committing after each phase.
+
+---
+
 ## 0) CURRENT STATUS (June 2026)
 
 - **Version: currently 5.0.0.** Semver throughout (see §5). `CLAUDE.md` is the live technical
@@ -21,7 +77,8 @@ file and CLAUDE.md overlap, trust CLAUDE.md for code detail.
   attached yet**, and no release exists for later versions — auto-update has nothing to fetch
   until installers are published (see §4).
 - **Everything is built, validated (parse / no dup IDs / no stray hex / clean Electron boot /
-  live-browser checks in light+dark), committed, and pushed.**
+  live-browser checks in light+dark), committed, and pushed.** Next up: the v6 LAYOUT redesign —
+  full plan in the section above.
 
 ### Moving the folder (or to a new machine)
 - **Same machine, new location:** just move it. Git (remote URL is absolute), `.claude/` config,
