@@ -917,6 +917,14 @@
   .ta-item:hover, .ta-item:focus-visible { background: var(--hover-ink); }
   .crm-table-wrap { overflow-x: auto; }
   .crm-btn .ic { margin-right: 2px; }
+
+  /* --- v5.0 Inspections screen (pages/inspections.md) --- */
+  .ic-caret { transition: transform .16s ease; }
+  .ic-caret.closed { transform: rotate(-90deg); }
+  @media (prefers-reduced-motion: reduce) { .ic-caret { transition: none; } }
+  .insp-filter-row select, .insp-filter-row input[type="date"], .insp-filter-row input { height: 38px; }
+  .insp-filter-row .crm-field { gap: 2px; }
+  .insp-filter-row .crm-field label { font-size: 12px; }
 </style>
 </head>
 <body>
@@ -2409,10 +2417,10 @@
   <div class="crm-section">
     <div class="script-label">All inspections</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="inspReportAll()">📋 Copy report (filtered)</button>
-      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="openMergeModal()">🔀 Merge duplicate buyers</button>
+      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="inspReportAll()"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg> Copy report (filtered)</button>
+      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="openMergeModal()"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg> Merge duplicate buyers</button>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-end;">
+    <div class="insp-filter-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
       <div style="position:relative;flex:1;min-width:180px;"><input id="insp-search" oninput="inspSetSearch(this.value)" placeholder="Search property, buyer or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:8px 30px 8px 10px;font-size:13.5px;color:var(--text);font-family:inherit;"><button type="button" class="search-clear" onclick="document.getElementById('insp-search').value='';inspSetSearch('');" aria-label="Clear search"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></div>
       <select id="insp-prop-filter" onchange="inspSetPropFilter(this.value)" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:8px 10px;font-size:13px;color:var(--text);font-family:inherit;max-width:200px;"><option value="">All properties</option></select>
       <div class="filter-bar" id="insp-status-chips"><button class="filter-chip" data-v="active" onclick="inspSetStatusFilter('active')">Active</button><button class="filter-chip" data-v="archived" onclick="inspSetStatusFilter('archived')">Archived</button><button class="filter-chip" data-v="all" onclick="inspSetStatusFilter('all')">All</button></div>
@@ -3646,8 +3654,8 @@ function inspRenderTable(){
       '<td>'+esc(inspDateLabel(i))+'</td>'+
       '<td style="text-align:center;">'+n+'</td>'+
       '<td><div class="due-actions">'+
-        '<button class="crm-btn '+(expanded?'crm-btn-primary':'crm-btn-ghost')+' crm-btn-sm" onclick="inspToggleAttendees(\''+i.id+'\')">'+(expanded?'▾':'▸')+' Attendees ('+n+')</button>'+
-        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="inspCopyReport(\''+i.id+'\')">📋 Report</button>'+
+        '<button class="crm-btn '+(expanded?'crm-btn-primary':'crm-btn-ghost')+' crm-btn-sm" onclick="inspToggleAttendees(\''+i.id+'\')">'+'<svg class="ic ic-caret'+(expanded?'':' closed')+'" aria-hidden="true"><use href="#i-chevron"/></svg> Attendees ('+n+')</button>'+
+        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="inspCopyReport(\''+i.id+'\')"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg> Report</button>'+
         '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="inspEdit(\''+i.id+'\')">Edit</button>'+
         '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="inspArchive(\''+i.id+'\')">'+(i.archived?'Reopen':'Archive')+'</button>'+
         '<button class="crm-btn crm-btn-danger crm-btn-sm" onclick="inspDelete(\''+i.id+'\')">Delete</button>'+
@@ -3810,7 +3818,7 @@ function openReportModal(title, text, fname, archiveIds){
   _REPORT_ARCHIVE_IDS = archiveIds || []; _REPORT_ARCHIVE_DONE = false;
   var body='<div class="muted-sm" style="margin-bottom:8px;">Copy and paste straight into an email.</div>'+
     '<textarea class="report-text" id="report-text" readonly>'+esc(text)+'</textarea>'+
-    '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;"><button class="crm-btn crm-btn-primary crm-btn-sm" onclick="copyReportText(this)">📋 Copy</button>'+
+    '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;"><button class="crm-btn crm-btn-primary crm-btn-sm" onclick="copyReportText(this)"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg> Copy</button>'+
     ((window.api&&window.api.saveTextFile)?'<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="saveReportText(\''+esc(fname)+'\')">Save as .txt</button>':'')+
     '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="closeModal()">Close</button></div>';
   openModal(title, body);
