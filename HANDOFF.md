@@ -9,7 +9,7 @@ file and CLAUDE.md overlap, trust CLAUDE.md for code detail.
 
 ## 0) CURRENT STATUS (June 2026)
 
-- **Version: currently 4.1.0.** Semver throughout (see §5). `CLAUDE.md` is the live technical
+- **Version: currently 5.0.0.** Semver throughout (see §5). `CLAUDE.md` is the live technical
   source of truth and tracks the current version + full feature set — trust it over this file
   for code detail.
 - **Repo:** https://github.com/Addi-exec/declan-prospecting-app (public). This project folder is
@@ -127,7 +127,11 @@ retry, tilt fixed on due cards, batched geocode saves · **4.0.0 (current)** Liq
 research-backed (multi-agent usability/HIG research + app audit): glass chrome (frosted topbar/menus/
 modal/toast), rounded capsule design system via tokens, one selection language for all tabs/filters,
 setup cards moved to Settings → Data & sync, edit-mode banners, progressive-disclosure property form,
-search ✕ everywhere, labelled call-session buttons, Calm mode, reduced-transparency fallbacks.
+search ✕ everywhere, labelled call-session buttons, Calm mode, reduced-transparency fallbacks ·
+4.2 buyer-details modal from inspections · **5.0.0 (current)** ui-ux-pro-max redesign: Claude-app
+minimal (neutral greys/whites + state hues), Times New Roman, full SVG icon sprite (no emoji in
+controls), a11y pass (keyboard menus/typeahead/modal trap, 4.5:1 text3 in all palettes, hit
+targets, en-AU date inputs). Design system: design-system/declan-prospecting-app/.
 
 ---
 
@@ -218,7 +222,7 @@ over http, so data calls no-op — fine for checking layout/JS/tabs in light + d
 | Thing | Value |
 |------|------|
 | Repo | https://github.com/Addi-exec/declan-prospecting-app (public) |
-| Current version | 4.1.0 |
+| Current version | 5.0.0 |
 | Push | `git push origin main` (gh authed) · release: `gh release create vX.Y.Z` |
 | Data file | `<dataDir>/prospecting-data.json` = `{contacts,buyers,properties,inspections,drops}` (+local `activity`) |
 | Default data path | Win `%APPDATA%\Declan Prospecting App\` · Mac `~/Library/Application Support/Declan Prospecting App/` · Linux `~/.config/Declan Prospecting App/` |

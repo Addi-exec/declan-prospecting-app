@@ -399,7 +399,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **4.2.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **5.0.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
@@ -441,8 +441,23 @@ Follow-up, Nurture.
   the 3 version spots. Code signing (self-signed cert in `signing/`, or a CA cert)
   keeps the publisher consistent so electron-updater's signature check passes.
 
-## Look & motion (v4.0 Liquid Glass redesign)
-**v4.0/v4.1 (current look):** research-backed Liquid Glass. Blur lives on CHROME — the
+## Look & motion (v5.0 "Claude-app minimal" — ui-ux-pro-max redesign)
+**v5.0 (current look):** guided by the ui-ux-pro-max skill's priority rules + the owner-approved
+`design-system/declan-prospecting-app/MASTER.md` (read it before UI work; per-screen overrides in
+`pages/`). DEFAULT palette = neutral greys/whites; colour is STATE ONLY (blue=action/active/info,
+green=success, yellow=warning/buyerdb, red=danger/overdue/steallist); entity badges are neutral.
+Font: "Times New Roman", Times, "Liberation Serif", Georgia, serif — app-wide. ICONS: the inline
+SVG sprite at the top of <body> (`#i-*`, 20px grid, stroke 1.75, currentColor) — NEVER emoji in
+controls (emoji allowed only in prose/SMS content; ★/☆ follow-up is a sanctioned text glyph).
+Sheets are SOLID again; glass remains only on chrome (topbar/dropdown/modal/toast/mini-menu).
+A11y baked in: mini-menus + typeahead have full keyboard paths, the modal focus-traps and
+restores, all search ✕ are real buttons, --text3 is >=4.5:1 in every palette block, hit targets
+36-44px, 12px type floor, tables scroll inside .crm-table-wrap. Native date inputs render
+dd/mm/yyyy via app.commandLine.appendSwitch('lang','en-AU') in electron/main.js.
+The v5.0 block is the LAST CSS layer.
+
+### Previous layer (v4.0/v4.1 Liquid Glass — superseded where v5.0 overrides)
+**v4.0/v4.1:** research-backed Liquid Glass. Blur lives on CHROME — the
 frosted topbar (blur on a masked `.topbar-backdrop` child), the Prospecting dropdown, the
 modal shell, the toast, the `.mini-menu` popovers — plus (v4.1) the `.panel.active` SHEET
 itself as heavy glass: ≥86% `--surface` (90% dark) + blur(26px) saturate(160%), which keeps
