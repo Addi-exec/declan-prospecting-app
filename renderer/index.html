@@ -11,46 +11,43 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root, [data-palette="claude"] {
     color-scheme: light;
-    /* Claude-inspired: warm cream base + coral/clay accent */
-    --bg:#f3f1e9; --surface:#fcfbf7; --surface2:#efece2;
-    --text:#2a2823; --text2:#5a574e; --text3:#8d897d;
-    --border:#e4e0d4; --border2:#d6d1c2;
-    /* Primary chrome + accent = Claude coral/clay */
-    --primary:#cc7857; --accent:#cc7857; --accent-bg:#f6e6dd; --accent-strong:#9a4a2f;
-    /* Section / functional colours (muted — wayfinding only) */
-    --blue:#3a5d8f; --blue-bg:#e7ecf3;
-    --teal:#2a6b62; --teal-bg:#e1edeb;
-    --purple:#5a4b9c; --purple-bg:#eae7f4;
-    --green:#2f6b43; --green-bg:#e4efe7; --green-border:#d2e3d6;
-    --pink:#9c4577; --pink-bg:#f3e6ee;
-    --coral:#b5402f; --coral-bg:#f4e3e0;
-    --danger:#bb3b2b; --danger-bg:#f6e4e1; --danger-soft:#fbf1ef; --danger-border:#e8c5be; --hot-strong:#8a2b1e;
-    --warm:#9a4a2f; --warm-bg:#f6e6dd;
-    --cold:#3a5d8f; --cold-bg:#e7ecf3;
-    /* Old warm/gold tokens repointed to the coral accent */
-    --amber:#9a4a2f; --amber-bg:#f6e6dd;
-    --sms-bubble:#cc7857; --tip-strong:#9a4a2f;
-    --on-accent:#fcfbf7; --scrim:rgba(20,18,16,0.45);
+    /* v5.0 Claude-app minimal: neutral greys/whites; colour = state only
+       (blue=active/info, green=success, yellow=warning, red=danger). All pairs >=4.5:1. */
+    --bg:#f7f7f8; --surface:#ffffff; --surface2:#f1f1f2;
+    --text:#18181b; --text2:#52525b; --text3:#6b7280;
+    --border:#e4e4e7; --border2:#d4d4d8;
+    --primary:#18181b; --accent:#2563eb; --accent-bg:#e8effd; --accent-strong:#1d4ed8;
+    --blue:#2563eb; --blue-bg:#e8effd;
+    --teal:#0f766e; --teal-bg:#e2f1ef;
+    --purple:#52525b; --purple-bg:#f1f1f2;
+    --green:#15803d; --green-bg:#e4f4e8; --green-border:#cde8d4;
+    --pink:#52525b; --pink-bg:#f1f1f2;
+    --coral:#dc2626; --coral-bg:#fdeaea;
+    --danger:#dc2626; --danger-bg:#fdeaea; --danger-soft:#fef5f5; --danger-border:#f3c5c5; --hot-strong:#b91c1c;
+    --warm:#a16207; --warm-bg:#fbf3d9;
+    --cold:#2563eb; --cold-bg:#e8effd;
+    --amber:#a16207; --amber-bg:#fbf3d9;
+    --sms-bubble:#2563eb; --tip-strong:#1d4ed8;
+    --on-accent:#ffffff; --scrim:rgba(24,24,27,0.45);
   }
   [data-theme="dark"], [data-palette="claude"][data-theme="dark"] {
     color-scheme: dark;
-    /* Claude dark: warm near-black + coral accent */
-    --bg:#211f1d; --surface:#2b2a27; --surface2:#34322e;
-    --text:#f2f0e9; --text2:#b0aca1; --text3:#7e7a6f;
-    --border:#3b3934; --border2:#4a473f;
-    --primary:#cc7857; --accent:#d4866a; --accent-bg:#3a2820; --accent-strong:#e8a98e;
-    --blue:#88abda; --blue-bg:#1d2838;
-    --teal:#70c0b3; --teal-bg:#173029;
-    --purple:#a99adf; --purple-bg:#272341;
-    --green:#7bbf93; --green-bg:#1d2c22; --green-border:#33503090;
-    --pink:#d690b6; --pink-bg:#321f2a;
-    --coral:#e0937f; --coral-bg:#341f1b;
-    --danger:#e6917c; --danger-bg:#3a201b; --danger-soft:#2d1b18; --danger-border:#5c302b; --hot-strong:#f0a08c;
-    --warm:#e8a98e; --warm-bg:#3a2820;
-    --cold:#88abda; --cold-bg:#1d2838;
-    --amber:#e8a98e; --amber-bg:#3a2820;
-    --sms-bubble:#d4866a; --tip-strong:#e8a98e;
-    --on-accent:#ffffff; --scrim:rgba(0,0,0,0.6);
+    --bg:#131316; --surface:#1b1b1f; --surface2:#232327;
+    --text:#f4f4f5; --text2:#b6b6bd; --text3:#9a9aa3;
+    --border:#2a2a30; --border2:#3f3f46;
+    --primary:#f4f4f5; --accent:#60a5fa; --accent-bg:#1c2b47; --accent-strong:#93c5fd;
+    --blue:#60a5fa; --blue-bg:#1c2b47;
+    --teal:#2dd4bf; --teal-bg:#12302c;
+    --purple:#9a9aa3; --purple-bg:#232327;
+    --green:#4ade80; --green-bg:#14301f; --green-border:#1f4a2f;
+    --pink:#9a9aa3; --pink-bg:#232327;
+    --coral:#f87171; --coral-bg:#3a1a1a;
+    --danger:#f87171; --danger-bg:#3a1a1a; --danger-soft:#2a1516; --danger-border:#5f2b2b; --hot-strong:#fca5a5;
+    --warm:#fbbf24; --warm-bg:#3a2d0d;
+    --cold:#60a5fa; --cold-bg:#1c2b47;
+    --amber:#fbbf24; --amber-bg:#3a2d0d;
+    --sms-bubble:#60a5fa; --tip-strong:#93c5fd;
+    --on-accent:#0f172a; --scrim:rgba(0,0,0,0.6);
   }
   /* ===== Theme palettes (Settings → Appearance). data-palette on <html> picks the
      theme; data-theme="dark" still flips each theme between light and dark. Every
@@ -60,7 +57,7 @@
     color-scheme: light;
     /* Sterling silver + racing green (Aston Martin inspired) */
     --bg:#eceeec; --surface:#f8faf8; --surface2:#e3e7e4;
-    --text:#1b201d; --text2:#525b55; --text3:#848d86;
+    --text:#1b201d; --text2:#525b55; --text3:#5f6a63;
     --border:#d9ded9; --border2:#c4ccc6;
     --primary:#1a1e1c; --accent:#175943; --accent-bg:#dcebe2; --accent-strong:#0c3f2d;
     --blue:#34597f; --blue-bg:#e3eaf1;
@@ -80,7 +77,7 @@
     color-scheme: dark;
     /* Race night: graphite greys, black chrome, forest green */
     --bg:#191b1a; --surface:#212422; --surface2:#292d2a;
-    --text:#e9ece9; --text2:#a7b0a9; --text3:#758078;
+    --text:#e9ece9; --text2:#a7b0a9; --text3:#8f9a92;
     --border:#323733; --border2:#414843;
     --primary:#e9ece9; --accent:#5fb38c; --accent-bg:#1d2f26; --accent-strong:#8ed4b2;
     --blue:#7fa6c9; --blue-bg:#1d2731;
@@ -100,7 +97,7 @@
     color-scheme: light;
     /* The v0.26 monochrome look: warm greys + a single brown accent */
     --bg:#e7e5e1; --surface:#fbfaf8; --surface2:#f0eee9;
-    --text:#1c1a16; --text2:#56524a; --text3:#8a857b;
+    --text:#1c1a16; --text2:#56524a; --text3:#6a655b;
     --border:#dbd8d1; --border2:#cac6bd;
     --primary:#1c1a16; --accent:#6f5640; --accent-bg:#ece3d8; --accent-strong:#523d2b;
     --blue:#3a5d8f; --blue-bg:#e7ecf3;
@@ -119,7 +116,7 @@
   [data-palette="mono"][data-theme="dark"] {
     color-scheme: dark;
     --bg:#1e1c1a; --surface:#27241f; --surface2:#302d28;
-    --text:#f1efea; --text2:#aaa49a; --text3:#7a756b;
+    --text:#f1efea; --text2:#aaa49a; --text3:#959087;
     --border:#3a362f; --border2:#494339;
     --primary:#f1efea; --accent:#c0a486; --accent-bg:#322a20; --accent-strong:#dcc6a9;
     --blue:#88abda; --blue-bg:#1d2838;
@@ -139,7 +136,7 @@
     color-scheme: light;
     /* The original (pre-v0.26) bright look with blue accents */
     --bg:#f7f6f2; --surface:#ffffff; --surface2:#f2f1ed;
-    --text:#1a1916; --text2:#6b6960; --text3:#9b9a94;
+    --text:#1a1916; --text2:#6b6960; --text3:#6d6c64;
     --border:#e2e0d8; --border2:#d0cec6;
     --primary:#1a5fb4; --accent:#1a5fb4; --accent-bg:#e8f0fb; --accent-strong:#12498f;
     --blue:#1a5fb4; --blue-bg:#e8f0fb;
@@ -158,7 +155,7 @@
   [data-palette="classic"][data-theme="dark"] {
     color-scheme: dark;
     --bg:#15151a; --surface:#1e1e25; --surface2:#27272f;
-    --text:#ececf1; --text2:#a8a7a0; --text3:#76766f;
+    --text:#ececf1; --text2:#a8a7a0; --text3:#93938c;
     --border:#35353e; --border2:#474750;
     --primary:#2f8fe6; --accent:#2f8fe6; --accent-bg:#1b2c47; --accent-strong:#a3c8f5;
     --blue:#74acef; --blue-bg:#1b2c47;
@@ -178,7 +175,7 @@
     color-scheme: light;
     /* Pure greyscale — blacks, whites and greys only. Urgency = contrast, not colour. */
     --bg:#f2f2f2; --surface:#ffffff; --surface2:#e9e9e9;
-    --text:#161616; --text2:#4f4f4f; --text3:#8a8a8a;
+    --text:#161616; --text2:#4f4f4f; --text3:#646464;
     --border:#dedede; --border2:#c9c9c9;
     --primary:#161616; --accent:#161616; --accent-bg:#e4e4e4; --accent-strong:#000000;
     --blue:#3d3d3d; --blue-bg:#e9e9e9;
@@ -197,7 +194,7 @@
   [data-palette="noir"][data-theme="dark"] {
     color-scheme: dark;
     --bg:#121212; --surface:#1b1b1b; --surface2:#242424;
-    --text:#f2f2f2; --text2:#b3b3b3; --text3:#7d7d7d;
+    --text:#f2f2f2; --text2:#b3b3b3; --text3:#989898;
     --border:#303030; --border2:#3f3f3f;
     --primary:#f2f2f2; --accent:#e6e6e6; --accent-bg:#2c2c2c; --accent-strong:#ffffff;
     --blue:#c4c4c4; --blue-bg:#222222;
@@ -213,7 +210,7 @@
     --sms-bubble:#e6e6e6; --tip-strong:#ffffff;
     --on-accent:#121212; --scrim:rgba(0,0,0,0.7);
   }
-  body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0; }
+  body { font-family: "Times New Roman", Times, "Liberation Serif", Georgia, serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0; }
   body, header, nav, .panel, .script-block, .tag, .tip-box, .objection-a, .xyz-card, .email-card, button { transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
   header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .header-left h1 { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
@@ -827,7 +824,7 @@
 
   .sec-hd { font-size: 17px; font-weight: 650; text-transform: none; letter-spacing: -0.2px; color: var(--text); margin: 0; }
   .search-clear { display: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text3); font-size: 15px; line-height: 1; }
-  div:has(> input:not(:placeholder-shown)) > .search-clear { display: block; }
+  div:has(> input:not(:placeholder-shown)) > .search-clear { display: flex; }
 
   /* --- Drops due list v4.1: grouped compact checklist (play shown ONCE per type) --- */
   .ddr-group { border: 1px solid var(--border); border-radius: var(--r-sm); background: color-mix(in srgb, var(--bg) 50%, transparent); margin-bottom: 14px; overflow: hidden; }
@@ -865,9 +862,88 @@
     .modal-overlay.open .modal-card { animation: none; }
     .nav-item .caret { transition: none; }
   }
+
+  /* ===== v5.0 — "Claude-app minimal" (ui-ux-pro-max pass, screen 1: foundations + Tracker) =====
+     Neutral greys/whites; colour = state; Times New Roman; SVG icons; a11y + hit-target lifts.
+     LAST layer — after v3.1 readability and the v4 glass layer. */
+  .ic { width: 18px; height: 18px; flex: none; vertical-align: -3.5px; }
+  .ic-sm { width: 14px; height: 14px; vertical-align: -2.5px; }
+  .oc-g { color: var(--green); } .oc-r { color: var(--danger); } .oc-n { color: var(--text3); }
+  body { font-size: 15px; }
+  .panel.active { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none;
+    border-color: var(--border); box-shadow: var(--e1); }
+  .stat, .due, .theme-card, .card-box, .email-card { background: var(--bg); }
+  .crm-btn-ghost { background: var(--surface); }
+  .ddr-group { background: var(--bg); }
+  .ddr-play { background: var(--surface2); }
+  #aurora::before { background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 62%); }
+  #aurora::after { background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--text3) 5%, transparent), transparent 62%); }
+  #bg-fx { background-image:
+      radial-gradient(720px circle at var(--mx, 50%) var(--my, 25%), color-mix(in srgb, var(--accent) 4%, transparent), transparent 65%),
+      radial-gradient(color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px);
+    background-size: auto, 36px 36px; }
+  :root { --glass-fill: color-mix(in srgb, var(--surface) 86%, transparent); --glass-fill-heavy: color-mix(in srgb, var(--surface) 96%, transparent); }
+  [data-theme="dark"] { --glass-fill: color-mix(in srgb, var(--surface) 88%, transparent); --glass-fill-heavy: color-mix(in srgb, var(--surface) 96%, transparent); }
+  .nav-dot { display: none; }
+  .script-block { font-size: 16px; }
+  .sms, .call, .sms-bubble { font-size: 15.5px; }
+  .crm-field input, .crm-field select, .crm-field textarea { font-size: 15.5px; }
+  .qs-input { font-size: 16px; }
+  .crm-table { font-size: 14.5px; }
+  .crm-table th { font-size: 12px; letter-spacing: .06em; }
+  .stat-l, .ddr-count { font-size: 12px; letter-spacing: .05em; }
+  .cell-sub, .ddr-meta, .due-meta { font-size: 12px; }
+  #app-version { font-size: 12px; }
+  .script-label { letter-spacing: .06em; }
+  .dd-s, .muted-sm { font-size: 13px; }
+  .panel-header h2 { font-size: 28px; letter-spacing: 0; }
+  .crm-section > .script-label, #about > .script-label, .sec-hd { font-size: 18px; letter-spacing: 0; }
+  .crm-btn { min-height: 36px; font-size: 14px; }
+  .crm-btn-sm { min-height: 32px; position: relative; }
+  .crm-btn-sm::after { content: ""; position: absolute; inset: -5px 0; }
+  .icon-btn { width: 40px; height: 40px; font-size: 15px; }
+  .filter-chip { min-height: 32px; position: relative; }
+  .filter-chip::after { content: ""; position: absolute; inset: -4px 0; }
+  .mini-item { min-height: 36px; }
+  .dd-item { min-height: 44px; }
+  .nav-item { min-height: 36px; }
+  input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+  .search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 38px; height: 38px;
+    display: none; align-items: center; justify-content: center; background: none; border: none; cursor: pointer;
+    color: var(--text3); border-radius: var(--r-pill); font-family: inherit; }
+  .search-clear:hover { background: var(--hover-ink); color: var(--text); }
+  .ta-item { display: block; width: 100%; text-align: left; background: none; border: none; font-family: inherit;
+    font-size: 14px; color: var(--text); padding: 10px 12px; cursor: pointer; min-height: 40px; }
+  .ta-item:hover, .ta-item:focus-visible { background: var(--hover-ink); }
+  .crm-table-wrap { overflow-x: auto; }
+  .crm-btn .ic { margin-right: 2px; }
 </style>
 </head>
 <body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="i-search" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="5.5"/><path d="M13.2 13.2 17 17"/></symbol>
+<symbol id="i-settings" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M3 6h14M3 14h14"/><circle cx="8" cy="6" r="2" fill="var(--surface)"/><circle cx="12.5" cy="14" r="2" fill="var(--surface)"/></symbol>
+<symbol id="i-sun" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="10" cy="10" r="3.4"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><path d="M13.5 3.5a7 7 0 1 0 3 8.5 5.5 5.5 0 0 1-3-8.5Z"/></symbol>
+<symbol id="i-help" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="10" cy="10" r="7.2"/><path d="M7.8 7.8a2.2 2.2 0 1 1 3.2 2c-.8.5-1 1-1 1.7"/><path d="M10 14.4h.01"/></symbol>
+<symbol id="i-phone" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5.2 3h2.6L9 6.8 7.2 8.1a10.5 10.5 0 0 0 4.7 4.7l1.3-1.8 3.8 1.2v2.6a1.7 1.7 0 0 1-1.9 1.7A14.8 14.8 0 0 1 3.5 4.9 1.7 1.7 0 0 1 5.2 3Z"/></symbol>
+<symbol id="i-message" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="14" height="9.5" rx="2"/><path d="M6.5 13.5V17l4.2-3.5"/></symbol>
+<symbol id="i-copy" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="9.5" height="10" rx="1.5"/><path d="M4.5 13V4.8A1.8 1.8 0 0 1 6.3 3H13"/></symbol>
+<symbol id="i-clock" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><path d="M10 5.8V10l2.6 1.6"/></symbol>
+<symbol id="i-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.2 10.6l3.7 3.7 7.9-8.2"/></symbol>
+<symbol id="i-x" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M5 5l10 10M15 5 5 15"/></symbol>
+<symbol id="i-dots" viewBox="0 0 20 20" fill="currentColor" stroke="none"><circle cx="4.5" cy="10" r="1.6"/><circle cx="10" cy="10" r="1.6"/><circle cx="15.5" cy="10" r="1.6"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8l4 4 4-4"/></symbol>
+<symbol id="i-play" viewBox="0 0 20 20" fill="currentColor" stroke="none"><path d="M7 5.2v9.6l7.6-4.8Z"/></symbol>
+<symbol id="i-download" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5V12m0 0 3-3.2M10 12 6.8 8.8"/><path d="M4 16.5h12"/></symbol>
+<symbol id="i-upload" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12.5V4m0 0L6.8 7.2M10 4l3.2 3.2"/><path d="M4 16.5h12"/></symbol>
+<symbol id="i-home" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9.5 10 3.5l6.5 6V16a1 1 0 0 1-1 1h-3.6v-4.4H8.1V17H4.5a1 1 0 0 1-1-1Z"/></symbol>
+<symbol id="i-list" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M7 5.5h9.5M7 10h9.5M7 14.5h9.5"/><path d="M3.5 5.5h.01M3.5 10h.01M3.5 14.5h.01"/></symbol>
+<symbol id="i-users" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7" r="2.8"/><path d="M2.8 16.5a4.7 4.7 0 0 1 9.4 0"/><path d="M13.2 4.6a2.8 2.8 0 0 1 0 4.9M14.6 12.1a4.7 4.7 0 0 1 2.6 4.4"/></symbol>
+<symbol id="i-target" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="3.8"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-pencil" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12.8 4 3.2 3.2L8.4 14.8l-4 .8.8-4Z"/></symbol>
+<symbol id="i-trash" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h12M8.4 3.5h3.2M6.5 6l.7 10a1 1 0 0 0 1 .9h3.6a1 1 0 0 0 1-.9l.7-10"/></symbol>
+</defs></svg>
 
 <div id="aurora" aria-hidden="true"></div>
 <div id="bg-fx" aria-hidden="true"></div>
@@ -884,10 +960,10 @@
       <div class="nav-wrap" onmouseenter="prospOpen()" onmouseleave="prospCloseSoon()">
         <button class="nav-item" id="nav-prospecting" onclick="prospectingClick()">Prospecting <span class="caret">▾</span></button>
         <div class="dropdown" id="prospecting-dd">
-          <div class="dd-item" onclick="pickMethod('justsold')"><div class="dd-ic" style="background:var(--blue-bg);color:var(--blue)">🏠</div><div><div class="dd-t">Just sold street</div><div class="dd-s">Neighbour buzz around a sale</div></div></div>
-          <div class="dd-item" onclick="pickMethod('listed')"><div class="dd-ic" style="background:var(--green-bg);color:var(--green)">📋</div><div><div class="dd-t">Just listed</div><div class="dd-s">Drum up buyers &amp; nearby sellers</div></div></div>
-          <div class="dd-item" onclick="pickMethod('buyerdb')"><div class="dd-ic" style="background:var(--teal-bg);color:var(--teal)">👥</div><div><div class="dd-t">Buyer database</div><div class="dd-s">Re-activate past enquiries</div></div></div>
-          <div class="dd-item" onclick="pickMethod('steallist')"><div class="dd-ic" style="background:var(--danger-bg);color:var(--danger)">🎯</div><div><div class="dd-t">Steal listings</div><div class="dd-s">Win expired / withdrawn stock</div></div></div>
+          <div class="dd-item" onclick="pickMethod('justsold')"><div class="dd-ic" style="background:var(--blue-bg);color:var(--blue)"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg></div><div><div class="dd-t">Just sold street</div><div class="dd-s">Neighbour buzz around a sale</div></div></div>
+          <div class="dd-item" onclick="pickMethod('listed')"><div class="dd-ic" style="background:var(--green-bg);color:var(--green)"><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg></div><div><div class="dd-t">Just listed</div><div class="dd-s">Drum up buyers &amp; nearby sellers</div></div></div>
+          <div class="dd-item" onclick="pickMethod('buyerdb')"><div class="dd-ic" style="background:var(--amber-bg);color:var(--amber)"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></div><div><div class="dd-t">Buyer database</div><div class="dd-s">Re-activate past enquiries</div></div></div>
+          <div class="dd-item" onclick="pickMethod('steallist')"><div class="dd-ic" style="background:var(--danger-bg);color:var(--danger)"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg></div><div><div class="dd-t">Steal listings</div><div class="dd-s">Win expired / withdrawn stock</div></div></div>
         </div>
       </div>
       <button class="nav-item" onclick="showPanel('buyers',this)"><span class="nav-dot" style="background:var(--pink)"></span>Buyers</button>
@@ -896,10 +972,10 @@
       <button class="nav-item" onclick="showPanel('drops',this)"><span class="nav-dot" style="background:var(--blue)"></span>Drops</button>
     </div>
     <div class="top-spacer"></div>
-    <button class="icon-btn" onclick="openQuickSearch()" title="Search everything (Ctrl/Cmd+K)" aria-label="Search everything">🔍</button>
-    <button class="icon-btn" id="settings-btn" onclick="showPanel('settings')" title="Settings" aria-label="Settings">⚙️<span class="icon-label">Settings</span></button>
-    <button class="icon-btn" onclick="showPanel('about')" title="About &amp; what's new" aria-label="About and what's new">?</button>
-    <button class="icon-btn" id="theme-toggle" onclick="toggleTheme()" title="Light / dark" aria-label="Switch light or dark mode">🌙</button>
+    <button class="icon-btn" onclick="openQuickSearch()" title="Search everything (Ctrl/Cmd+K)" aria-label="Search everything"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></button>
+    <button class="icon-btn" id="settings-btn" onclick="showPanel('settings')" title="Settings" aria-label="Settings"><svg class="ic" aria-hidden="true"><use href="#i-settings"/></svg><span class="icon-label">Settings</span></button>
+    <button class="icon-btn" onclick="showPanel('about')" title="About &amp; what's new" aria-label="About and what's new"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg></button>
+    <button class="icon-btn" id="theme-toggle" onclick="toggleTheme()" title="Light / dark" aria-label="Switch light or dark mode"><svg class="ic" aria-hidden="true"><use href="#i-moon"/></svg></button>
   </div>
 </div>
 
@@ -917,7 +993,7 @@
   <div class="crm-section">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
       <div class="script-label sec-hd">Due now &amp; overdue</div>
-      <button id="cs-start-btn" class="crm-btn crm-btn-primary" onclick="startCallSession()">▶ Start call session</button>
+      <button id="cs-start-btn" class="crm-btn crm-btn-primary" onclick="startCallSession()"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg> Start call session</button>
     </div>
     <div id="due-list"></div>
   </div>
@@ -944,9 +1020,9 @@
       <div class="crm-field"><label>Call date</label><input type="date" id="f-callDate"></div>
       <div class="crm-field" style="grid-column:1/-1;"><label>Call outcome — sets the follow-up reminders</label>
         <select id="f-outcome">
-          <option value="noanswer">📵 No answer — left voicemail / will retry</option>
-          <option value="interested">👍 Answered — interested</option>
-          <option value="notinterested">👋 Answered — not interested</option>
+          <option value="noanswer">No answer — left voicemail / will retry</option>
+          <option value="interested">Answered — interested</option>
+          <option value="notinterested">Answered — not interested</option>
         </select>
       </div>
       <div class="crm-field"><label>First name</label><input id="f-first" placeholder="First name"></div>
@@ -968,12 +1044,12 @@
     <div class="filter-bar" id="filter-bar"></div>
     <div style="position:relative;margin-bottom:12px;">
       <input id="crm-search" oninput="crmDoSearch(this.value)" placeholder="Search name, mobile, email, address or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:9px 32px 9px 11px;font-size:14px;color:var(--text);font-family:inherit;">
-      <span id="crm-search-clear" onclick="crmClearSearch()" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text3);font-size:16px;line-height:1;">✕</span>
+      <button type="button" id="crm-search-clear" class="search-clear" onclick="crmClearSearch()" aria-label="Clear search" style="display:none;"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmExportXlsx()">⬇ Export Excel (.xlsx)</button>
-      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmExportCsv()">⬇ Export CSV (offline)</button>
-      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmImport()">⬆ Import file</button>
+      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmExportXlsx()"><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg> Export Excel (.xlsx)</button>
+      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmExportCsv()"><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg> Export CSV (offline)</button>
+      <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmImport()"><svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg> Import file</button>
     </div>
     <div id="table-wrap"></div>
   </div>
@@ -1148,7 +1224,7 @@
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches what happened on the call. Each one is a ready-made sequence of calls and texts.</div>
 
     <div class="btn-bar">
-      <button class="jsf-tab branch-tab active" onclick="showJsfTab('jsf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">📵 No answer</button>
+      <button class="jsf-tab branch-tab active" onclick="showJsfTab('jsf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">No answer</button>
       <button class="jsf-tab branch-tab" onclick="showJsfTab('jsf-interested',this)">👍 Answered — interested</button>
       <button class="jsf-tab branch-tab" onclick="showJsfTab('jsf-notinterested',this)">👋 Answered — not interested</button>
     </div>
@@ -1429,7 +1505,7 @@
   <div id="jl-followup" class="jl-track" style="display:none;">
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches the call. The just-listed window is short — move fast.</div>
     <div class="btn-bar">
-      <button class="jlf-tab branch-tab active" onclick="showJsfTab('jlf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">📵 No answer</button>
+      <button class="jlf-tab branch-tab active" onclick="showJsfTab('jlf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">No answer</button>
       <button class="jlf-tab branch-tab" onclick="showJsfTab('jlf-interested',this)">👍 Answered — interested</button>
       <button class="jlf-tab branch-tab" onclick="showJsfTab('jlf-notinterested',this)">👋 Answered — not interested</button>
     </div>
@@ -1700,7 +1776,7 @@
   <div id="bd-followup" class="bd-track" style="display:none;">
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches the call. Always lead with value, never a pitch.</div>
     <div class="btn-bar">
-      <button class="bdf-tab branch-tab active" onclick="showJsfTab('bdf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">📵 No answer</button>
+      <button class="bdf-tab branch-tab active" onclick="showJsfTab('bdf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">No answer</button>
       <button class="bdf-tab branch-tab" onclick="showJsfTab('bdf-interested',this)">👍 Answered — interested</button>
       <button class="bdf-tab branch-tab" onclick="showJsfTab('bdf-notinterested',this)">👋 Answered — not interested</button>
     </div>
@@ -1988,7 +2064,7 @@
   <div id="sl-followup" class="sl-track" style="display:none;">
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches the call. The agreement-expiry window is everything — time your run to it.</div>
     <div class="btn-bar">
-      <button class="slf-tab branch-tab active" onclick="showJsfTab('slf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">📵 No answer</button>
+      <button class="slf-tab branch-tab active" onclick="showJsfTab('slf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">No answer</button>
       <button class="slf-tab branch-tab" onclick="showJsfTab('slf-interested',this)">👍 Answered — interested</button>
       <button class="slf-tab branch-tab" onclick="showJsfTab('slf-notinterested',this)">👋 Answered — not interested</button>
     </div>
@@ -2219,7 +2295,7 @@
     <div class="filter-bar" id="buyer-filter-bar"></div>
     <div style="position:relative;margin-bottom:12px;">
       <input id="buyer-search" oninput="buyerDoSearch(this.value)" placeholder="Search name, mobile, email, suburb or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:9px 32px 9px 11px;font-size:14px;color:var(--text);font-family:inherit;">
-      <span class="search-clear" onclick="document.getElementById('buyer-search').value='';buyerDoSearch('');">✕</span>
+      <button type="button" class="search-clear" onclick="document.getElementById('buyer-search').value='';buyerDoSearch('');" aria-label="Clear search"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
     </div>
     <div id="buyer-table-wrap"></div>
   </div>
@@ -2298,7 +2374,7 @@
     </div>
     <div style="position:relative;margin-bottom:12px;">
       <input id="prop-search" oninput="propDoSearch(this.value)" placeholder="Search address, suburb, postcode or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:9px 32px 9px 11px;font-size:14px;color:var(--text);font-family:inherit;">
-      <span class="search-clear" onclick="document.getElementById('prop-search').value='';propDoSearch('');">✕</span>
+      <button type="button" class="search-clear" onclick="document.getElementById('prop-search').value='';propDoSearch('');" aria-label="Clear search"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
     </div>
     <div id="prop-table-wrap"></div>
   </div>
@@ -2337,7 +2413,7 @@
       <button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="openMergeModal()">🔀 Merge duplicate buyers</button>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-end;">
-      <div style="position:relative;flex:1;min-width:180px;"><input id="insp-search" oninput="inspSetSearch(this.value)" placeholder="Search property, buyer or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:8px 30px 8px 10px;font-size:13.5px;color:var(--text);font-family:inherit;"><span class="search-clear" onclick="document.getElementById('insp-search').value='';inspSetSearch('');">✕</span></div>
+      <div style="position:relative;flex:1;min-width:180px;"><input id="insp-search" oninput="inspSetSearch(this.value)" placeholder="Search property, buyer or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:8px 30px 8px 10px;font-size:13.5px;color:var(--text);font-family:inherit;"><button type="button" class="search-clear" onclick="document.getElementById('insp-search').value='';inspSetSearch('');" aria-label="Clear search"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></div>
       <select id="insp-prop-filter" onchange="inspSetPropFilter(this.value)" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:8px 10px;font-size:13px;color:var(--text);font-family:inherit;max-width:200px;"><option value="">All properties</option></select>
       <div class="filter-bar" id="insp-status-chips"><button class="filter-chip" data-v="active" onclick="inspSetStatusFilter('active')">Active</button><button class="filter-chip" data-v="archived" onclick="inspSetStatusFilter('archived')">Archived</button><button class="filter-chip" data-v="all" onclick="inspSetStatusFilter('all')">All</button></div>
       <div class="crm-field" style="gap:2px;"><label style="font-size:10px;">From</label><input type="date" id="insp-from" onchange="inspSetFrom(this.value)"></div>
@@ -2399,7 +2475,7 @@
     <div class="filter-bar" id="drop-filter-bar"></div>
     <div style="position:relative;margin-bottom:12px;">
       <input id="drop-search" oninput="dropDoSearch(this.value)" placeholder="Search address, property or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:9px 32px 9px 11px;font-size:14px;color:var(--text);font-family:inherit;">
-      <span class="search-clear" onclick="document.getElementById('drop-search').value='';dropDoSearch('');">✕</span>
+      <button type="button" class="search-clear" onclick="document.getElementById('drop-search').value='';dropDoSearch('');" aria-label="Clear search"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
     </div>
     <div id="drop-table-wrap"></div>
   </div>
@@ -2550,7 +2626,7 @@
 <!-- Reusable modal (matching results + enquiry pickers) -->
 <div id="modal-overlay" class="modal-overlay" onclick="if(event.target===this)closeModal()">
   <div class="modal-card">
-    <div class="modal-head"><div class="modal-title" id="modal-title"></div><button class="modal-close" onclick="closeModal()" title="Close">✕</button></div>
+    <div class="modal-head"><div class="modal-title" id="modal-title"></div><button class="modal-close" onclick="closeModal()" title="Close" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></div>
     <div id="modal-body"></div>
   </div>
 </div>
@@ -2571,7 +2647,7 @@
   function updateToggleLabel(){
     var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     var btn = document.getElementById('theme-toggle');
-    if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+    if (btn) btn.innerHTML = isDark ? '<svg class="ic" aria-hidden="true"><use href="#i-sun"/></svg>' : '<svg class="ic" aria-hidden="true"><use href="#i-moon"/></svg>';
   }
   document.addEventListener('DOMContentLoaded', updateToggleLabel);
   /* Accent spotlight follows the mouse (rAF-throttled; pure CSS vars, theme-safe) */
@@ -2732,7 +2808,7 @@ var METHODS = {
     interested:[{d:0,t:'Recap SMS'},{d:1,t:'Preview invite SMS'},{d:3,t:'Call — confirm preview / buyer'},{d:7,t:'Post-open result SMS'},{d:21,t:'Post-sale result SMS'}],
     notinterested:[{d:0,t:'Gracious SMS'},{d:7,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:90,t:'Nurture touch'},{d:180,t:'Nurture touch'}]
   }},
-  buyerdb:{ label:'Buyer database', sheet:'Buyer Database', chipBg:'var(--teal-bg)', chipFg:'var(--teal)', ms:{
+  buyerdb:{ label:'Buyer database', sheet:'Buyer Database', chipBg:'var(--amber-bg)', chipFg:'var(--amber)', ms:{
     noanswer:[{d:1,t:'Voicemail + SMS'},{d:4,t:'SMS — value'},{d:8,t:'Voicemail + SMS'},{d:12,t:'SMS — check in'},{d:14,t:'Final SMS → nurture'},{d:60,t:'Nurture touch'},{d:120,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
     interested:[{d:0,t:'Reconnect SMS'},{d:3,t:'Market data SMS'},{d:7,t:'Call — was it useful'},{d:14,t:'Soft close SMS'}],
     notinterested:[{d:0,t:'Gracious SMS'},{d:14,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:120,t:'Nurture touch'},{d:240,t:'Nurture touch'}]
@@ -2851,7 +2927,7 @@ function crmDelete(id){
 var METHOD_PREFIX = { justsold:'js', listed:'jl', buyerdb:'bd', steallist:'sl' };
 function _seqTxt(el){ return el ? el.textContent.replace(/^\s*["']|["']\s*$/g,'').trim() : ''; }
 function initials(c){ var a=(c.first||'').trim(), b=(c.last||'').trim(); var s=(a?a[0]:'')+(b?b[0]:''); if(!s && c.mobile) s=String(c.mobile).slice(-2); return (s||'?').toUpperCase(); }
-function outcomeIcon(o){ return o==='interested'?'👍':(o==='notinterested'?'👋':'📵'); }
+function outcomeIcon(o){ var n=o==='interested'?'check':(o==='notinterested'?'x':'phone'); var c=o==='interested'?'oc-g':(o==='notinterested'?'oc-r':'oc-n'); return '<svg class="ic ic-sm '+c+'" aria-hidden="true"><use href="#i-'+n+'"/></svg>'; }
 
 // For a contact's current milestone, return {kind, heading, call, sms} from the live script DOM.
 function scriptForDue(c, nm){
@@ -2897,8 +2973,8 @@ function smsHref(mobile, body){
 }
 function commLinkBtns(c, sc){
   if(!c.mobile) return '';
-  var out='<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="actLog(\'call\');openComm(\''+encodeURIComponent(telHref(c.mobile))+'\')">📞 Call</button>';
-  out+='<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="actLog(\'sms\');openComm(\''+encodeURIComponent(smsHref(c.mobile, sc&&sc.sms?sc.sms:''))+'\')">💬 Text</button>';
+  var out='<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="actLog(\'call\');openComm(\''+encodeURIComponent(telHref(c.mobile))+'\')"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg> Call</button>';
+  out+='<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="actLog(\'sms\');openComm(\''+encodeURIComponent(smsHref(c.mobile, sc&&sc.sms?sc.sms:''))+'\')"><svg class="ic" aria-hidden="true"><use href="#i-message"/></svg> Text</button>';
   return out;
 }
 
@@ -2975,13 +3051,13 @@ function csRender(){
     (sc&&sc.sms?'<div class="channel">'+(sc&&sc.call?'If no answer, text':'Text to send')+'</div><div class="sms">'+esc(sc.sms)+'</div>':'')+
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;align-items:center;">'+
       (c.mobile?commLinkBtns(c, sc):'')+
-      ((sc&&sc.sms)?'<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmCopySms(this,\''+c.id+'\')">📋 Copy SMS</button>':'')+
+      ((sc&&sc.sms)?'<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmCopySms(this,\''+c.id+'\')"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg> Copy SMS</button>':'')+
     '</div>'+
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center;border-top:1px solid var(--border);padding-top:14px;">'+
       '<button class="crm-btn crm-btn-primary cs-big" onclick="csDone()">✓ Done — next</button>'+
-      '<button class="crm-btn crm-btn-ghost crm-btn-sm btn-tint-green" onclick="csOutcome(\'interested\')" title="Answered — interested (restarts their follow-up schedule)">👍 Interested</button>'+
-      '<button class="crm-btn crm-btn-ghost crm-btn-sm btn-tint-red" onclick="csOutcome(\'notinterested\')" title="Answered — not interested (restarts their follow-up schedule)">👋 Not interested</button>'+
-      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="csSnooze()" title="Snooze 3 days">⏰ Snooze 3d</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm btn-tint-green" onclick="csOutcome(\'interested\')" title="Answered — interested (restarts their follow-up schedule)"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg> Interested</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm btn-tint-red" onclick="csOutcome(\'notinterested\')" title="Answered — not interested (restarts their follow-up schedule)"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg> Not interested</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="csSnooze()" title="Snooze 3 days"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg> Snooze 3d</button>'+
       '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="csSkip()">Skip ›</button>'+
       '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="csSummary()">End</button>'+
     '</div>';
@@ -3115,9 +3191,9 @@ function crmRenderDue(){
       if(sc.sms){ body+='<div class="channel">'+(sc.call?'If no answer, text':'Text to send')+'</div><div class="sms">'+esc(sc.sms)+'</div>'; }
     }
     if(!body){ body='<div class="muted-sm">Open the '+esc(m.label)+' → Follow-up scripts for the wording on this step.</div>'; }
-    var copyBtn=(sc&&sc.sms)?'<button class="crm-btn crm-btn-tint crm-btn-sm" onclick="crmCopySms(this,\''+c.id+'\')">📋 Copy SMS</button>':'';
+    var copyBtn=(sc&&sc.sms)?'<button class="crm-btn crm-btn-tint crm-btn-sm" onclick="crmCopySms(this,\''+c.id+'\')"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg> Copy SMS</button>':'';
     var commBtns=commLinkBtns(c, sc);
-    var snoozeBtn='<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="snoozeMenu(event,\''+c.id+'\')">⏰ Snooze</button>';
+    var snoozeBtn='<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="snoozeMenu(event,\''+c.id+'\')"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg> Snooze</button>';
     return '<div class="due '+(diff<0?'is-overdue':'')+'" style="--card-accent:'+m.chipFg+';">'+
       '<div class="due-top">'+
         '<div class="avatar">'+esc(initials(c))+'</div>'+
@@ -3131,7 +3207,7 @@ function crmRenderDue(){
         '<div class="ab-step"><span class="dotacc"></span>Step '+(nm.index+1)+' of '+sched.length+' · '+esc(nm.label)+'</div>'+
         body+
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px;align-items:center;">'+copyBtn+commBtns+
-          '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmMarkDone(\''+c.id+'\')">✓ Mark done</button>'+
+          '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmMarkDone(\''+c.id+'\')"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg> Mark done</button>'+
           snoozeBtn+
           '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="crmArchive(\''+c.id+'\')">Stop</button>'+
         '</div>'+
@@ -3179,7 +3255,7 @@ function crmRenderTable(){
 
 function crmDoSearch(v){
   crmSearch = (v||'').trim();
-  var clr=document.getElementById('crm-search-clear'); if(clr) clr.style.display = crmSearch ? 'block' : 'none';
+  var clr=document.getElementById('crm-search-clear'); if(clr) clr.style.display = crmSearch ? 'flex' : 'none';
   crmRenderTable();
 }
 function crmClearSearch(){
@@ -3361,7 +3437,7 @@ function gsApplyState(s){
   if(!s) s={};
   var pill=document.getElementById('tracker-sync-pill');
   if(pill){
-    var txt=(s.authenticated && s.sheetId) ? '☁ Syncing to Google Sheets' : (window._dataCustom ? '📁 Saving to a shared folder' : '💾 Saved on this computer');
+    var txt=(s.authenticated && s.sheetId) ? 'Syncing to Google Sheets' : (window._dataCustom ? 'Saving to a shared folder' : 'Saved on this computer');
     pill.innerHTML=txt+' · <a onclick="showPanel(\'settings\')">Manage in Settings</a>';
   }
   var badge=document.getElementById('gs-badge');
@@ -3592,7 +3668,7 @@ function toggleAttendeeFollowup(inspId, buyerId){ attendeeMutate(inspId, functio
 function inspAttendeePanel(i){
   var atts=i.attendees||[];
   var head='<div class="enq-head"><div class="enq-htitle">Attendees ('+atts.length+')</div></div>'+
-    '<div class="ta-wrap" style="margin:6px 0 4px;"><input class="ta-input" id="ta-'+i.id+'" placeholder="Add attendee — type a name or mobile…" oninput="taSearch(\''+i.id+'\',this.value)" autocomplete="off"><div class="ta-suggest" id="tas-'+i.id+'" style="display:none;"></div></div>';
+    '<div class="ta-wrap" style="margin:6px 0 4px;"><input class="ta-input" id="ta-'+i.id+'" placeholder="Add attendee — type a name or mobile…" oninput="taSearch(\''+i.id+'\',this.value)" onkeydown="taKey(event,\''+i.id+'\')" autocomplete="off"><div class="ta-suggest" id="tas-'+i.id+'" style="display:none;"></div></div>';
   var body = atts.length ? '<div class="enq-list">'+atts.map(function(a){ var b=buyerById(a.buyerId);
     var name=b?buyerName(b):'(buyer removed)'; var contact=b?[b.mobile||'',b.email||''].filter(Boolean).join(' · '):'';
     return '<div class="enq-buyer">'+
@@ -3614,11 +3690,27 @@ function taSearch(inspId, q){
   var ql=q.toLowerCase();
   var insp=inspectionsLoad().find(function(x){return x.id===inspId;}); var already={}; if(insp)(insp.attendees||[]).forEach(function(a){ already[a.buyerId]=1; });
   var matches=buyersLoad().filter(function(b){ if(already[b.id]) return false; return (buyerName(b)+' '+(b.mobile||'')+' '+(b.email||'')).toLowerCase().indexOf(ql)>-1; }).slice(0,6);
-  var html=matches.map(function(b){ return '<div class="ta-item" onclick="taPick(\''+inspId+'\',\''+b.id+'\')">'+esc(buyerName(b)||'—')+(b.mobile?' · <span class="muted-sm">'+esc(b.mobile)+'</span>':'')+'</div>'; }).join('');
-  html+='<div class="ta-item ta-new" onclick="taCreateNew(\''+inspId+'\')">+ New buyer “'+esc(q)+'” — add their details…</div>';
+  var html=matches.map(function(b){ return '<button type="button" class="ta-item" onclick="taPick(\''+inspId+'\',\''+b.id+'\')">'+esc(buyerName(b)||'—')+(b.mobile?' · <span class="muted-sm">'+esc(b.mobile)+'</span>':'')+'</button>'; }).join('');
+  html+='<button type="button" class="ta-item ta-new" onclick="taCreateNew(\''+inspId+'\')">+ New buyer “'+esc(q)+'” — add their details…</button>';
   box.innerHTML=html; box.style.display='block';
 }
 function taPick(inspId, buyerId){ addAttendee(inspId, buyerId); inspRenderTable(); }
+/* Keyboard path for the attendee typeahead: ArrowDown enters the list, arrows move, Escape closes. */
+function taKey(ev, inspId){
+  var box=document.getElementById('tas-'+inspId); if(!box) return;
+  if(ev.key==='Escape'){ box.style.display='none'; return; }
+  if(ev.key!=='ArrowDown') return;
+  ev.preventDefault();
+  var f=box.querySelector('.ta-item'); if(f) f.focus();
+}
+document.addEventListener('keydown', function(ev){
+  var t=ev.target;
+  if(!t || !t.classList || !t.classList.contains('ta-item')) return;
+  var box=t.parentNode; var its=[].slice.call(box.querySelectorAll('.ta-item')); var i=its.indexOf(t);
+  if(ev.key==='ArrowDown'){ ev.preventDefault(); (its[i+1]||its[0]).focus(); }
+  else if(ev.key==='ArrowUp'){ ev.preventDefault(); if(i===0){ var inp=box.parentNode.querySelector('.ta-input'); if(inp) inp.focus(); } else its[i-1].focus(); }
+  else if(ev.key==='Escape'){ box.style.display='none'; var inp2=box.parentNode.querySelector('.ta-input'); if(inp2) inp2.focus(); }
+});
 /* v4.2: creating a buyer from the attendee search opens a compact details form (pre-filled
    from what was typed) instead of silently making a bare name+mobile record — capture email /
    buyer type / budget / suburbs / notes at the open home, in one step. */
@@ -3760,8 +3852,29 @@ function buyerInspectedProp(buyerId, propId){ return inspForProp(propId).some(fu
 function setOfferCandidate(buyerId, propId, val){ var arr=buyersLoad(); var b=arr.find(function(x){return x.id===buyerId;}); if(!b) return; var e=enqFor(b,propId); if(e){ e.offerCandidate=!!val; buyersSaveCache(arr); } propRenderTable(); }
 
 /* ---- Modal ---- */
-function openModal(title, html){ var ov=document.getElementById('modal-overlay'); if(!ov) return; document.getElementById('modal-title').textContent=title; document.getElementById('modal-body').innerHTML=html; ov.classList.add('open'); }
-function closeModal(){ var ov=document.getElementById('modal-overlay'); if(ov) ov.classList.remove('open'); }
+var _modalOpener=null;
+function openModal(title, html){
+  var ov=document.getElementById('modal-overlay'); if(!ov) return;
+  _modalOpener=document.activeElement;
+  document.getElementById('modal-title').textContent=title; document.getElementById('modal-body').innerHTML=html; ov.classList.add('open');
+  setTimeout(function(){ var card=ov.querySelector('.modal-card'); if(!card) return;
+    var f=card.querySelector('#modal-body input, #modal-body select, #modal-body textarea, #modal-body button, #modal-body a[href]')||card.querySelector('.modal-close');
+    if(f&&f.focus) f.focus();
+  }, 40);
+}
+function closeModal(){ var ov=document.getElementById('modal-overlay'); if(ov) ov.classList.remove('open'); if(_modalOpener&&_modalOpener.focus){ try{_modalOpener.focus();}catch(e){} } _modalOpener=null; }
+/* Focus trap: while the modal is open, Tab cycles inside the card (a11y). */
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Tab') return;
+  var ov=document.getElementById('modal-overlay'); if(!ov||!ov.classList.contains('open')) return;
+  var card=ov.querySelector('.modal-card'); if(!card) return;
+  var els=[].slice.call(card.querySelectorAll('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])')).filter(function(el){ return el.offsetParent!==null; });
+  if(!els.length) return;
+  var first=els[0], last=els[els.length-1];
+  if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  else if(!card.contains(document.activeElement)){ e.preventDefault(); first.focus(); }
+});
 /* Toast / snackbar with an optional action (e.g. Undo). One at a time. */
 var _toastTimer=null;
 function showToast(message, actionLabel, actionFn, ms){
@@ -3783,28 +3896,38 @@ function dismissToast(immediate){
 
 /* ===== v4.0 shared helpers ===== */
 /* Small glass popover anchored to a button (snooze / outcome pickers). One at a time. */
+var _mmOpener=null;
 function miniMenu(anchor, items){
   closeMiniMenu();
-  var m=document.createElement('div'); m.id='mini-menu'; m.className='mini-menu';
+  _mmOpener=anchor;
+  var m=document.createElement('div'); m.id='mini-menu'; m.className='mini-menu'; m.setAttribute('role','menu');
   items.forEach(function(it){
-    var b=document.createElement('button'); b.className='mini-item'; b.textContent=it[0];
+    var b=document.createElement('button'); b.type='button'; b.className='mini-item'; b.setAttribute('role','menuitem'); b.textContent=it[0];
     b.onclick=function(ev){ ev.stopPropagation(); closeMiniMenu(); it[1](); };
     m.appendChild(b);
+  });
+  m.addEventListener('keydown', function(ev){
+    var its=[].slice.call(m.querySelectorAll('.mini-item')); var i=its.indexOf(document.activeElement);
+    if(ev.key==='ArrowDown'){ ev.preventDefault(); its[(i+1)%its.length].focus(); }
+    else if(ev.key==='ArrowUp'){ ev.preventDefault(); its[(i-1+its.length)%its.length].focus(); }
+    else if(ev.key==='Escape'){ ev.stopPropagation(); closeMiniMenu(true); }
   });
   document.body.appendChild(m);
   var r=anchor.getBoundingClientRect();
   m.style.top=(r.bottom+6+window.scrollY)+'px';
   m.style.left=Math.max(8, Math.min(r.left+window.scrollX, window.scrollX+window.innerWidth-m.offsetWidth-12))+'px';
-  setTimeout(function(){ document.addEventListener('click', closeMiniMenu, { once:true }); }, 0);
+  var f=m.querySelector('.mini-item'); if(f) f.focus();
+  setTimeout(function(){ document.addEventListener('click', _mmDocClose, { once:true }); }, 0);
 }
-function closeMiniMenu(){ var m=document.getElementById('mini-menu'); if(m&&m.parentNode) m.parentNode.removeChild(m); }
+function _mmDocClose(){ closeMiniMenu(); }
+function closeMiniMenu(restore){ var m=document.getElementById('mini-menu'); if(m&&m.parentNode) m.parentNode.removeChild(m); if(restore&&_mmOpener&&_mmOpener.focus) _mmOpener.focus(); _mmOpener=null; }
 function snoozeMenu(ev, id){ ev.stopPropagation(); miniMenu(ev.currentTarget, [
   ['1 day',  function(){ crmSnooze(id,1); }],
   ['3 days', function(){ crmSnooze(id,3); }],
   ['1 week', function(){ crmSnooze(id,7); }]
 ]); }
 function outcomeMenu(ev, id){ ev.stopPropagation(); miniMenu(ev.currentTarget, Object.keys(OUTCOMES).map(function(k){
-  return [outcomeIcon(k)+' '+OUTCOMES[k], function(){ crmSetOutcome(id,k); }];
+  return [OUTCOMES[k], function(){ crmSetOutcome(id,k); }];
 })); }
 /* Edit-mode banner — makes "you are editing X" unmistakable on the add/edit forms. */
 function formEditState(sectionId, label, cancelFn){

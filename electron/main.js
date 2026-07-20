@@ -190,6 +190,9 @@ async function macUpdateCheck(manual) {
   }
 }
 
+// Force en-AU locale so native <input type=date> renders dd/mm/yyyy (the app-wide format)
+app.commandLine.appendSwitch('lang', 'en-AU');
+
 app.whenReady().then(() => {
   createWindow();
   if (process.platform === 'darwin') {
