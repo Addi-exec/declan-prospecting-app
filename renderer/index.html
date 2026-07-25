@@ -1057,6 +1057,29 @@
   @media (prefers-reduced-motion: reduce) {
     .drawer { transition: none; } .drawer-scrim { transition: none; }
   }
+
+  /* --- Tracker DASHBOARD: the due queue gets the wide column, the glanceable
+         strips move into a sticky rail beside it. Under 1100px the grid collapses
+         to one column and the rail falls back underneath, so the stacked order
+         stays what it has always been. --- */
+  .dash { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+  .dash-main { min-width: 0; }
+  .dash-rail { position: sticky; top: 18px; min-width: 0; }
+  .dash-rail .crm-section { margin-bottom: 14px; }
+  .dash-rail .stat-row { grid-template-columns: repeat(2, 1fr); margin: 0; }
+  .dash-rail #tracker-sync-pill { margin: 0 0 4px; }
+  /* The rail's first heading sits in a row as tall as the queue's heading+button row, so
+     both columns' headings and their content start on the same line. */
+  .dash-rail > .crm-section:first-child > .script-label {
+    display: flex; align-items: center; min-height: 36px; margin: 0; }
+  @media (max-width: 1100px) {
+    .dash { grid-template-columns: 1fr; gap: 0; }
+    .dash-rail { position: static; }
+    .dash-rail .stat-row { grid-template-columns: repeat(4, 1fr); margin: 18px 0 26px; }
+    .dash-rail > .crm-section:first-child > .script-label { display: block; margin-bottom: 12px; }
+    .dash-rail #tracker-sync-pill { margin: -8px 0 18px; }
+  }
+  @media (max-width: 640px) { .dash-rail .stat-row { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
@@ -1139,6 +1162,10 @@
 <button class="crm-btn crm-btn-tint" onclick="drawerOpen('contact')"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> Log contact</button>
 </div>
 <div id="due-stats" class="stat-row"></div>
+<!-- v6.0 dashboard: the day's queue owns the wide column; "This week" and the sync
+     line sit in a sticky rail instead of pushing "All contacts" down the page. -->
+<div class="dash">
+<div class="dash-main">
 <div class="crm-section">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
 <div class="script-label sec-hd">Due now &amp; overdue</div>
@@ -1146,11 +1173,15 @@
 </div>
 <div id="due-list"></div>
 </div>
+</div>
+<aside class="dash-rail" aria-label="Tracker summary">
 <div class="crm-section">
 <div class="script-label">This week</div>
 <div id="week-stats" class="stat-row"></div>
 </div>
 <div id="tracker-sync-pill"></div>
+</aside>
+</div>
 <!-- The add/edit form is PARKED here (hidden) and MOVED into the right-side drawer when
      opened — same DOM nodes, so every id and every existing handler keeps working. -->
 <div class="form-home" id="crm-form-home">
