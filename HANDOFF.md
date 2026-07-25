@@ -7,65 +7,37 @@ file and CLAUDE.md overlap, trust CLAUDE.md for code detail.
 
 ---
 
-## ⏭ NEXT SESSION — v6.0.0 LAYOUT redesign (approved direction, not yet started)
+## ✅ JUST SHIPPED — v6.0.0 "workbench" LAYOUT redesign (July 2026)
 
-The v5.0.0 redesign changed the SKIN (Claude-app minimal: greys/whites + state colours, Times New
-Roman, SVG sprite icons, a11y pass — see `design-system/declan-prospecting-app/MASTER.md`). The
-owner wants the next step to change the LAYOUT/STRUCTURE. All features and the data layer stay
-exactly as they are — this is rearrangement, not a rewrite.
+The v5.0.0 pass changed the SKIN; **v6.0.0 changed the LAYOUT**. Every feature, id and data path
+is unchanged — this was rearrangement, not a rewrite. Delivered in five validated commits:
 
-### Target layout ("workbench")
-1. **Left sidebar navigation** replaces the topbar: icon+label items (use the existing `#i-*`
-   sprite), collapsible to icons-only; Prospecting's 4 methods become an expandable nav GROUP
-   (kills the hover dropdown); bottom of sidebar = Settings · About · light/dark · Calm mode ·
-   version chip. Quick search stays Ctrl/Cmd+K + a sidebar button. Frees horizontal width for
-   tables on Declan's wide screen; collapses gracefully <900px.
-2. **Add/edit forms become a right-side DRAWER** (slide-over, reuse .modal focus-trap pattern),
-   opened from ONE "+ New …" primary button per screen — forms no longer permanently sit between
-   the page title and the list (today they push every list ~2 screens down). CRITICAL: MOVE the
-   existing form DOM nodes into the drawer shell at open (appendChild — ids stay unique, all
-   existing JS keeps working); never duplicate the markup.
-3. **Tracker becomes a dashboard**: wide windows get a 2-column grid — LEFT: "Due now & overdue"
-   queue + call session; RIGHT rail (sticky): 4 due stats, "This week", sync pill, "+ Log contact"
-   (opens the drawer). "All contacts" table below full-width. Narrow = stacked (current order).
-4. **Buyers / Properties / Inspections go master-detail**: list (left, compact rows) + DETAIL pane
-   (right) showing the selected record's info + its expandable sub-panels (enquiries / offer tiers /
-   attendees) instead of inline row-expansion; row "Match" stays a modal. Falls back to the current
-   stacked behaviour <1100px. Selection = .active row (blue tint + weight, noir-safe).
-5. **Drops**: wide = map LEFT (sticky) + due-checklist RIGHT side-by-side; log-drop via the drawer;
-   all-drops table below.
-6. **Script pages (4 methods)**: keep content untouched; make the method sub-tab row STICKY under
-   the top of the sheet while scrolling scripts.
+- **A — Shell:** a left **sidebar** (`.sidebar`, sticky) replaces the topbar; the 4 prospecting
+  methods are an expandable nav GROUP (no hover dropdown); Settings · About · light/dark · Calm ·
+  version sit at its foot; collapses to a 68px icon rail (`data-sb="mini"`, remembered) and to a
+  horizontal strip ≤760px. `showPanel`/`pickMethod`/`METHOD_PANELS` untouched.
+- **B — Drawer:** all five add/edit forms now open in ONE right-side slide-over (`#drawer`,
+  focus-trapped, Escape closes) from a single "+ New …" button per screen. `drawerOpen` **MOVES**
+  the existing form DOM into the drawer (never copies it), so ids stay unique.
+- **C — Tracker dashboard:** due queue + call session left, sticky rail (stats, This week, sync
+  pill, + Log contact) right, All contacts full-width below; stacks ≤1100px.
+- **D — Master–detail:** Buyers / Properties / Inspections are a compact list + a detail pane that
+  holds the record's facts AND its sub-panel (enquiries / offer tiers / attendees). Row expansion
+  is gone; one selection id per panel (`BUYER_SEL`/`PROP_SEL`/`INSP_SEL`), which survives only
+  while the record is still in the filtered list. Match stays a modal. Stacks ≤1100px.
+- **E — Drops + scripts + ship:** Drops = sticky map left, due checklist right (checklist first
+  when stacked); the method sub-tab row (`.method-tabs`) is sticky while you scroll a script;
+  version 6.0.0 in all 3 spots + About changelog + docs.
 
-### Phasing (one commit per phase; app must boot cleanly after each)
-- **A — Shell**: sidebar + main grid, retire topbar (keep `showPanel` API + panel ids +
-  `METHOD_PANELS` untouched; nav re-renders active state from the same calls). Move topbar-only
-  CSS to a historical layer. ~Also: `prospSetLabel` becomes the sidebar group header state.
-- **B — Drawer**: one shared drawer component (open/close/focus-trap/Escape, 320-420px, solid
-  surface) + convert the 5 add/edit forms (crm/buyer/prop/insp/drop) + edit-banner inside it.
-- **C — Tracker dashboard** grid + right rail.
-- **D — Master-detail** for Buyers/Properties/Inspections (renderers split list/detail; the
-  detail pane re-renders on selection id — derive from existing row-expand functions).
-- **E — Drops split + sticky script tabs + responsive passes + pre-delivery checklist
-  (MASTER.md gates) in all 5 palettes × light/dark → version 6.0.0 ×3 spots + changelog + docs.**
-
-### Hard rules for the session
-Read `CLAUDE.md` + `design-system/declan-prospecting-app/MASTER.md` first. Keep ALL features;
-storage only via window.api; every colour a var (5 palettes × light/dark); SVG sprite icons only;
-dd/mm dates; validate (node --check + parse/dup-id/stray-hex script in CLAUDE.md) + live-check
-light/dark before each commit; version bump ×3 + changelog only in the final phase-E commit.
-Biggest risks: duplicate ids if form markup is copied instead of MOVED; breaking `showPanel`
-callers (grep all `showPanel(` sites); the single-file renderer — small validated commits.
-
-### Paste this to start the session
-> Read HANDOFF.md ("NEXT SESSION — v6 layout redesign") and CLAUDE.md, then implement the v6
-> workbench layout phase by phase (A→E) exactly as planned, committing after each phase.
+The v6 CSS is one block at the END of `<style>` and adds **no new palette variables** (everything
+derives from existing vars/tokens), so all 5 palettes × light/dark keep working. Full technical
+detail: `CLAUDE.md` → "Navigation + layout (v6.0 workbench)".
 
 ---
 
-## 0) CURRENT STATUS (June 2026)
+## 0) CURRENT STATUS (July 2026)
 
-- **Version: currently 5.0.0.** Semver throughout (see §5). `CLAUDE.md` is the live technical
+- **Version: currently 6.0.0.** Semver throughout (see §5). `CLAUDE.md` is the live technical
   source of truth and tracks the current version + full feature set — trust it over this file
   for code detail.
 - **Repo:** https://github.com/Addi-exec/declan-prospecting-app (public). This project folder is
@@ -178,17 +150,20 @@ Green) · 1.3 Noir theme + topbar fix · 1.3.1 dd/mm/yyyy dates · 1.3.2 import 
 readability · 3.2 Drops · 3.2.1 drop cadences + address · 3.2.2 simplified drop form · 3.3 living UI
 (aurora background, tactile tilt/glow cards, click ripple, toast) · 3.4 inspections auto-archive after
 reporting (+ Active/Archived/All filter) · 3.5 Drops duplicate-proof (address+type identity, live hint,
-retro-merge) + interactive Leaflet/OSM map (vendored, geocoded pins) · **3.6.0 (current)** review-pass
+retro-merge) + interactive Leaflet/OSM map (vendored, geocoded pins) · **3.6.0** review-pass
 polish: drops in backup/restore + Excel, map keeps your view, Victoria-St geocoding, failed lookups
-retry, tilt fixed on due cards, batched geocode saves · **4.0.0 (current)** Liquid Glass redesign —
+retry, tilt fixed on due cards, batched geocode saves · **4.0.0** Liquid Glass redesign —
 research-backed (multi-agent usability/HIG research + app audit): glass chrome (frosted topbar/menus/
 modal/toast), rounded capsule design system via tokens, one selection language for all tabs/filters,
 setup cards moved to Settings → Data & sync, edit-mode banners, progressive-disclosure property form,
 search ✕ everywhere, labelled call-session buttons, Calm mode, reduced-transparency fallbacks ·
-4.2 buyer-details modal from inspections · **5.0.0 (current)** ui-ux-pro-max redesign: Claude-app
+4.2 buyer-details modal from inspections · **5.0.0** ui-ux-pro-max redesign: Claude-app
 minimal (neutral greys/whites + state hues), Times New Roman, full SVG icon sprite (no emoji in
 controls), a11y pass (keyboard menus/typeahead/modal trap, 4.5:1 text3 in all palettes, hit
-targets, en-AU date inputs). Design system: design-system/declan-prospecting-app/.
+targets, en-AU date inputs). Design system: design-system/declan-prospecting-app/ ·
+**6.0.0 (current)** workbench LAYOUT redesign: left sidebar shell, slide-over drawer forms,
+Tracker dashboard, master-detail Buyers/Properties/Inspections, split Drops (map + due list),
+sticky script tabs — same skin, same features, rearranged.
 
 ---
 
@@ -264,7 +239,7 @@ over http, so data calls no-op — fine for checking layout/JS/tabs in light + d
 ## 8) CONTINUE IN A NEW SESSION — paste this
 
 > I'm continuing the Declan Prospecting App (Electron, vanilla JS, repo
-> github.com/Addi-exec/declan-prospecting-app, currently v3.2.2). Read `HANDOFF.md` and `CLAUDE.md`
+> github.com/Addi-exec/declan-prospecting-app, currently v6.0.0). Read `HANDOFF.md` and `CLAUDE.md`
 > first — they have the full context, architecture, data shapes, conventions and status. `git push`
 > works from here (gh authed). Use the project skills in `.claude/skills/`. Follow conventions:
 > semver + version in 3 places + About changelog; every colour a themed CSS var across all 5 palettes
@@ -279,7 +254,7 @@ over http, so data calls no-op — fine for checking layout/JS/tabs in light + d
 | Thing | Value |
 |------|------|
 | Repo | https://github.com/Addi-exec/declan-prospecting-app (public) |
-| Current version | 5.0.0 |
+| Current version | 6.0.0 |
 | Push | `git push origin main` (gh authed) · release: `gh release create vX.Y.Z` |
 | Data file | `<dataDir>/prospecting-data.json` = `{contacts,buyers,properties,inspections,drops}` (+local `activity`) |
 | Default data path | Win `%APPDATA%\Declan Prospecting App\` · Mac `~/Library/Application Support/Declan Prospecting App/` · Linux `~/.config/Declan Prospecting App/` |

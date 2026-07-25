@@ -7,7 +7,8 @@
 
 ## Style — "Claude-app minimal"
 - Calm, flat, editorial: white/near-white sheets, hairline borders, soft small shadows, generous
-  reading type. Glass survives ONLY as a light frost on the topbar + overlays (menus/modal/toast);
+  reading type. Glass survives ONLY as a light frost on the nav chrome (topbar pre-v6, sidebar since) +
+  overlays (menus/modal/toast);
   panel sheets return to solid `--surface`. Aurora becomes a barely-there grey-blue wash (Calm
   mode still kills it). No new blur layers.
 - **Icons: inline SVG sprite only** (20×20, stroke 1.75, currentColor, round caps). Emoji allowed
@@ -64,3 +65,18 @@ decorative colour on non-state elements.
 ## Screens
 Priority: 1) Tracker 2) Inspections 3) shared chrome/SVG sweep 4) Buyers/Properties/Drops/Settings.
 Overrides live in `pages/<screen>.md` as each is built. One commit per screen.
+
+## Layout addendum — v6.0 "workbench" (2026-07-25)
+The skin above is unchanged; v6 only rearranged it. Structure rules for new UI:
+- Navigation is a **left sidebar** (sticky, collapsible to a 68px icon rail; horizontal strip on
+  narrow windows). Nothing goes back in a topbar.
+- **One primary "+ New …" button per screen**, opening the shared right-side **drawer**; forms never
+  sit permanently between a page heading and its list. Move existing form DOM into the drawer
+  (appendChild) — never duplicate markup.
+- **Lists of records are master–detail**: compact list left, one record's full detail + its
+  sub-panel in a sticky pane right. No inline row expansion. Ranked/aggregate views stay modals.
+- Wide-window two-column layouts stack back to a single column at **1100px** (Tracker rail,
+  master–detail pane, Drops split); the ACTIONABLE column comes first when stacked.
+- Long scrolling content keeps its own tab/filter row **sticky** on a solid `--surface`.
+- v6 CSS is the LAST block in `<style>` and introduces **no new palette variables** — derive from
+  existing vars/tokens so all 5 palettes × light/dark keep working.

@@ -110,7 +110,7 @@ electron/main.js      BrowserWindow; IPC: contacts load/save, Excel import/expor
                       Windows = electron-updater auto-install; macOS = manual
                       (queries GitHub Releases, opens the .dmg download)
 electron/preload.js   contextBridge -> window.api (the only renderer<->main surface)
-renderer/index.html   THE ENTIRE APP (UI, styles, all logic). ~4200 lines.
+renderer/index.html   THE ENTIRE APP (UI, styles, all logic). ~5100 lines.
 renderer/vendor/leaflet/  vendored Leaflet 1.9.4 (leaflet.js/.css + images/) — powers the
                       Drops map; local, no CDN or API key. Tiles come from openstreetmap.org.
 assets/               icon.ico (Win), icon.icns (Mac), icon.png/icon_512.png (Linux), make_icon.py
@@ -324,21 +324,45 @@ Follow-up, Nurture.
   Every call is paired with an "SMS if no answer".
 - **Nurture** sub-tab = three temperature tracks: **HOT / WARM / COLD** (SMS + calls).
 
-## Navigation (v0.26 redesign)
-- A horizontal **`.topbar`** (brand + tabs + ? + theme toggle) replaced the old left
-  sidebar + mobile tab bar. Tabs: **Tracker** (panel id stays `contacts`), **Prospecting ▾**,
-  **Buyers**, **Properties**, **Inspections** (`id="inspections"`), **Drops** (`id="drops"`); the Prospecting dropdown is JS-driven
-  (`prospOpen`/`prospCloseSoon` on `.nav-wrap` hover + `prospectingClick` toggle). Older line follows:
-  **Buyers**, **Properties**. The dead sidebar/`.tab-bar-mobile`/`.layout` CSS is left in place.
-- Since v4.0: the Prospecting nav item shows the CURRENT method ("Prospecting · Just sold")
-  in that method's colour via `prospSetLabel`; the caret rotates via `.nav-wrap.open`;
-  Settings has a visible text label ≥980px; the Storage + Google Sheets cards live in
-  Settings → "Data & sync" (Tracker keeps a one-line `#tracker-sync-pill`).
-- **Prospecting** is a `.nav-wrap` containing the `#nav-prospecting` button + a hover/click
-  `#prospecting-dd` dropdown of the 4 methods. `prospectingClick()` toggles it (touch);
-  `pickMethod(m)` opens a method panel. `showPanel` marks `#nav-prospecting` active for any
-  `METHOD_PANELS` id, else matches the `.nav-item` whose onclick names the id; it closes the
-  dropdown + scrolls to top. An outside-click handler closes the dropdown.
+## Navigation + layout (v6.0 "workbench")
+The v6 redesign changed STRUCTURE only — every feature, id and data path is unchanged.
+CSS lives in one `/* v6.0 */` block at the END of `<style>` (after the v5.0 layer); the
+topbar CSS is left in place as a historical layer.
+
+- **Left sidebar** (`.sidebar`, sticky, 236px) replaces the topbar: `.sb-nav` items
+  (Tracker → panel id `contacts`, a **Prospecting group**, Buyers, Properties, Inspections,
+  Drops) + `.sb-foot` (quick search, Settings, About, light/dark, Calm, `#app-version`).
+  Collapses to a 68px icon rail — `sidebarToggle()` sets `data-sb="mini"` on `<html>`,
+  remembered in `localStorage['declan-sidebar']`; ≤1080px it auto-minis, ≤760px it becomes
+  a horizontal strip.
+- **Prospecting** is `#sb-prospecting-group` (`.open` class) holding `#nav-prospecting` +
+  a `.sb-sub` list of the 4 methods — an expandable GROUP, no hover dropdown. `_ddSet`
+  opens/closes it, `prospectingClick()` toggles, `prospSetLabel(mid)` writes the current
+  method into `#sb-prosp-current` in that method's `chipFg`. `showPanel` still marks
+  `#nav-prospecting` active for any `METHOD_PANELS` id and otherwise matches the `.nav-item`
+  whose onclick names the id — its API and every caller are unchanged.
+- **Drawer forms**: ONE right-side slide-over (`#drawer` + `#drawer-scrim`, focus-trapped,
+  Escape closes) hosts all five add/edit forms. `drawerOpen(key, isEdit)` **MOVES** (appendChild)
+  the form section out of its hidden `.form-home` into `#drawer-body`; `drawerClose()` moves it
+  back; `drawerSaved(msg)` closes + toasts. `DRAWER_FORMS` maps key → {section, home, titles,
+  first field, clear fn}. The markup is never duplicated, so ids stay unique and every existing
+  `crmAdd`/`buyerSave`/… keeps working; `showPanel` shuts an open drawer when you leave a panel.
+- **Tracker dashboard** (`.dash` / `.dash-main` / `.dash-rail`): due queue + call session on the
+  left, a sticky rail (stats, "This week", `#tracker-sync-pill`, "+ Log contact") on the right,
+  "All contacts" full-width below. ≤1100px it stacks back into the old order.
+- **Master–detail** (Buyers / Properties / Inspections): `.md` grid = `.md-list` of compact
+  `.md-row` buttons + a sticky `.md-detail` pane. One selection id per panel (`BUYER_SEL`,
+  `PROP_SEL`, `INSP_SEL`), resolved by `mdResolveSel(cur, filteredList)` (a selection survives
+  only while its record is still in the filtered list, else the first row opens); `mdRowHtml`,
+  `mdFacts`, `mdEmpty`, `mdByDateDesc` and `mdReveal(hostId)` (scrolls to the pane on the stacked
+  layout) are the shared helpers. The detail pane renders the record's facts plus its sub-panel —
+  the SAME `enqPanelHtml(p)` / `inspAttendeePanel(i)` as before, just relocated; row expansion
+  (`PROP_EXPANDED` / `INSP_EXPANDED`) is gone. `buyerSave`/`propSave`/`inspSave` select what they
+  just saved. Falls back to stacked ≤1100px.
+- **Drops** `.drops-split`: sticky map column left, due-to-re-drop checklist right, all-drops table
+  below; ≤1100px the checklist stacks ABOVE the map (`order`).
+- **Script pages**: the method sub-tab row is `.method-tabs` — sticky at the top of the sheet on a
+  solid `--surface` while you scroll a script.
 
 ## Tab system (JS functions in renderer)
 - `showPanel(id, el)` — switches top-level panels (contacts, justsold, listed,
@@ -399,7 +423,7 @@ Follow-up, Nurture.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **5.0.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **6.0.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
@@ -441,8 +465,15 @@ Follow-up, Nurture.
   the 3 version spots. Code signing (self-signed cert in `signing/`, or a CA cert)
   keeps the publisher consistent so electron-updater's signature check passes.
 
-## Look & motion (v5.0 "Claude-app minimal" — ui-ux-pro-max redesign)
-**v5.0 (current look):** guided by the ui-ux-pro-max skill's priority rules + the owner-approved
+## Look & motion (v6.0 layout over the v5.0 "Claude-app minimal" skin)
+**v6.0 (current):** the SKIN is still v5.0 — v6 only rearranged the app (sidebar shell, drawer
+forms, dashboard Tracker, master–detail lists, split Drops, sticky script tabs; see
+"Navigation + layout" above). Its CSS is one block at the END of `<style>` and introduces NO new
+palette variables — everything derives from existing vars/tokens, so all 5 palettes × light/dark
+keep working automatically. Keep it that way: new layout CSS goes in that block, uses vars only.
+
+### The skin (v5.0 "Claude-app minimal" — ui-ux-pro-max redesign)
+**v5.0:** guided by the ui-ux-pro-max skill's priority rules + the owner-approved
 `design-system/declan-prospecting-app/MASTER.md` (read it before UI work; per-screen overrides in
 `pages/`). DEFAULT palette = neutral greys/whites; colour is STATE ONLY (blue=action/active/info,
 green=success, yellow=warning/buyerdb, red=danger/overdue/steallist); entity badges are neutral.
