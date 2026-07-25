@@ -1033,6 +1033,30 @@
   }
   @media (prefers-contrast: more) { .sidebar { background: var(--surface); box-shadow: none; } }
   @media print { .sidebar { display: none; } main { max-width: 100%; padding: 20px; } }
+
+  /* --- Add/edit DRAWER: one slide-over for all five forms --- */
+  .form-home { display: none; }          /* where a form is parked when the drawer is shut */
+  .panel-cta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: -6px 0 22px; }
+  .drawer-scrim { position: fixed; inset: 0; z-index: 1300; background: var(--scrim);
+    opacity: 0; pointer-events: none; transition: opacity .22s ease; }
+  .drawer-scrim.open { opacity: 1; pointer-events: auto; }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 1310; width: min(460px, 100vw);
+    display: flex; flex-direction: column; visibility: hidden;
+    background: var(--surface); border-left: 1px solid var(--border); box-shadow: var(--e3);
+    transform: translateX(100%); transition: transform .24s cubic-bezier(.2,.7,.2,1), visibility .24s; }
+  .drawer.open { visibility: visible; transform: none; }
+  .drawer-head { display: flex; align-items: center; gap: 12px; flex: none;
+    padding: 16px 14px 14px 22px; border-bottom: 1px solid var(--border); }
+  .drawer-title { flex: 1; min-width: 0; font-size: 18px; font-weight: 650; color: var(--text); }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 20px 22px 28px; }
+  /* The moved form drops its own heading (the drawer title says it) and its page spacing. */
+  .drawer .crm-section { margin-bottom: 0; }
+  .drawer .crm-section > .script-label { display: none; }
+  .drawer .crm-grid { grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); }
+  @media (max-width: 520px) { .drawer { width: 100vw; border-left: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .drawer { transition: none; } .drawer-scrim { transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -1109,7 +1133,10 @@
 <div class="panel-header">
 <div class="badge" style="background:var(--amber-bg);color:var(--amber)">Contact tracker</div>
 <h2>Tracker</h2>
-<p>Everyone due for a touch — with exactly what to send or say for each person's next step. Log a call below; export anytime.</p>
+<p>Everyone due for a touch — with exactly what to send or say for each person's next step. Log a call anytime; export whenever you need it.</p>
+</div>
+<div class="panel-cta">
+<button class="crm-btn crm-btn-tint" onclick="drawerOpen('contact')"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> Log contact</button>
 </div>
 <div id="due-stats" class="stat-row"></div>
 <div class="crm-section">
@@ -1124,6 +1151,9 @@
 <div id="week-stats" class="stat-row"></div>
 </div>
 <div id="tracker-sync-pill"></div>
+<!-- The add/edit form is PARKED here (hidden) and MOVED into the right-side drawer when
+     opened — same DOM nodes, so every id and every existing handler keeps working. -->
+<div class="form-home" id="crm-form-home">
 <div class="crm-section" id="crm-form-section">
 <div class="script-label">Log / edit a contact</div>
 <input type="hidden" id="crm-edit-id">
@@ -1156,6 +1186,7 @@
 <button class="crm-btn crm-btn-ghost" onclick="crmClearForm()">Clear</button>
 </div>
 <div id="f-msg" style="font-size:12.5px;color:var(--teal);margin-top:8px;min-height:16px;"></div>
+</div>
 </div>
 <div class="crm-section">
 <div class="script-label">All contacts</div>
@@ -2290,6 +2321,10 @@
 <h2>Buyers</h2>
 <p>Keep every buyer's budget, preferences and the properties they've enquired on. Then hit <strong>Match</strong> to instantly rank the best properties for them — including off-market ones.</p>
 </div>
+<div class="panel-cta">
+<button class="crm-btn crm-btn-primary" onclick="drawerOpen('buyer')"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> New buyer</button>
+</div>
+<div class="form-home" id="buyer-form-home">
 <div class="crm-section" id="buyer-form-section">
 <div class="script-label">Add / edit a buyer</div>
 <input type="hidden" id="buyer-edit-id">
@@ -2330,6 +2365,7 @@
 </div>
 <div id="b-msg" style="font-size:12.5px;color:var(--teal);margin-top:8px;min-height:16px;"></div>
 </div>
+</div>
 <div class="crm-section">
 <div class="script-label">All buyers</div>
 <div class="filter-bar" id="buyer-filter-bar"></div>
@@ -2347,6 +2383,10 @@
 <h2>Properties</h2>
 <p>Track everything you have available — on market, off market, and archived. Hit <strong>Match</strong> to rank buyers by fit, or expand <strong>Buyers</strong> on any property to see who's enquired, who's inspected, and who's in the offer running.</p>
 </div>
+<div class="panel-cta">
+<button class="crm-btn crm-btn-primary" onclick="drawerOpen('property')"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> New property</button>
+</div>
+<div class="form-home" id="prop-form-home">
 <div class="crm-section" id="prop-form-section">
 <div class="script-label">Add / edit a property</div>
 <input type="hidden" id="prop-edit-id">
@@ -2402,6 +2442,7 @@
 </div>
 <div id="p-msg" style="font-size:12.5px;color:var(--teal);margin-top:8px;min-height:16px;"></div>
 </div>
+</div>
 <div class="crm-section">
 <div class="script-label">Inventory</div>
 <div class="filter-bar" style="margin-bottom:12px;">
@@ -2423,6 +2464,10 @@
 <h2>Inspections</h2>
 <p>Record who attended each open home or viewing, keep notes against each buyer, and copy a clean summary straight into an email.</p>
 </div>
+<div class="panel-cta">
+<button class="crm-btn crm-btn-primary" onclick="drawerOpen('inspection')"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> New inspection</button>
+</div>
+<div class="form-home" id="insp-form-home">
 <div class="crm-section" id="insp-form-section">
 <div class="script-label">Add / edit an inspection</div>
 <input type="hidden" id="insp-edit-id">
@@ -2439,6 +2484,7 @@
 <button class="crm-btn crm-btn-ghost" onclick="inspClearForm()">Clear</button>
 </div>
 <div id="i-msg" style="font-size:12.5px;color:var(--teal);margin-top:8px;min-height:16px;"></div>
+</div>
 </div>
 <div class="crm-section">
 <div class="script-label">All inspections</div>
@@ -2463,11 +2509,15 @@
 <h2>Drops</h2>
 <p>Track every address you've dropped, why you dropped it, and get a reminder when each one is due for another drop — with the right play for each drop type.</p>
 </div>
+<div class="panel-cta">
+<button class="crm-btn crm-btn-primary" onclick="drawerOpen('drop')"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> Log a drop</button>
+</div>
 <div id="drop-stats" class="stat-row"></div>
 <div class="crm-section">
 <div class="script-label">Due to re-drop</div>
 <div id="drop-due-list"></div>
 </div>
+<div class="form-home" id="drop-form-home">
 <div class="crm-section" id="drop-form-section">
 <div class="script-label">Log / edit a drop</div>
 <input type="hidden" id="drop-edit-id">
@@ -2491,6 +2541,7 @@
 <button class="crm-btn crm-btn-ghost" onclick="dropClearForm()">Clear</button>
 </div>
 <div id="d-msg" style="font-size:12.5px;color:var(--teal);margin-top:8px;min-height:16px;"></div>
+</div>
 </div>
 <div class="crm-section">
 <div class="script-label">Drop map</div>
@@ -2646,6 +2697,16 @@
 <div id="modal-body"></div>
 </div>
 </div>
+<!-- Shared right-side DRAWER (v6.0). Every add/edit form is moved in here on open (see the
+     .form-home containers) rather than sitting permanently above its list. -->
+<div id="drawer-scrim" class="drawer-scrim" onclick="drawerClose()" aria-hidden="true"></div>
+<aside id="drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true">
+<div class="drawer-head">
+<div class="drawer-title" id="drawer-title"></div>
+<button class="icon-btn" onclick="drawerClose()" title="Close" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+</div>
+<div class="drawer-body" id="drawer-body"></div>
+</aside>
 <script>
 (function(){
     try { if (localStorage.getItem('declan-theme') === 'dark') document.documentElement.setAttribute('data-theme','dark'); } catch(e){}
@@ -2766,6 +2827,8 @@
   var METHOD_PANELS = { justsold:1, listed:1, buyerdb:1, steallist:1 };
   var lastMethod = 'justsold';
   function showPanel(id, el) {
+    // A form left open in the drawer belongs to the panel you're leaving — shut it first.
+    if (typeof drawerIsOpen === 'function' && drawerIsOpen()) drawerClose();
     document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
     document.querySelectorAll('.nav-item, .tab-btn').forEach(function(a){ a.classList.remove('active'); });
     var panel = document.getElementById(id); if (panel) panel.classList.add('active');
@@ -2894,7 +2957,7 @@ function crmAdd(){
     cur.email=val('f-email'); cur.address=val('f-address'); cur.callDate=callDate; cur.notes=val('f-notes');
     if(outcome!==cur.outcome){ cur.outcome=outcome; cur.stepsDone=0; cur.archived=false; cur.branchDate=todayISO(); cur.snoozeUntil=''; }
     crmSave(arr); crmClearForm();
-    msg('f-msg', '✓ '+(first||last||mobile)+' updated ('+METHODS[method].label+').', false);
+    drawerSaved('✓ '+(first||last||mobile)+' updated ('+METHODS[method].label+').');
   } else {
     if(mobile){
       var dup=arr.find(function(x){ return normMobile(x.mobile)===normMobile(mobile); });
@@ -2903,7 +2966,7 @@ function crmAdd(){
     arr.push({ id:crmUid(), method:method, outcome:val('f-outcome')||'noanswer', first:first, last:last, address:val('f-address'), mobile:mobile, email:val('f-email'), callDate:callDate, stepsDone:0, branchDate:'', snoozeUntil:'', archived:false, notes:val('f-notes') });
     actLog('call');
     crmSave(arr); crmClearForm();
-    msg('f-msg', '✓ '+(first||last||mobile)+' added to '+METHODS[method].label+'.', false);
+    drawerSaved('✓ '+(first||last||mobile)+' added to '+METHODS[method].label+'.');
   }
   crmRenderAll();
 }
@@ -2916,7 +2979,7 @@ function crmEdit(id){
   set('f-mobile',c.mobile); set('f-email',c.email); set('f-address',c.address); set('f-notes',c.notes);
   var ab=document.getElementById('crm-add-btn'); if(ab) ab.textContent='✓ Update contact';
   formEditState('crm-form-section', (c.first+' '+c.last).trim()||c.mobile||'this contact', crmClearForm);
-  var sec=document.getElementById('crm-form-section'); if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'});
+  drawerOpen('contact', true);
 }
 function val(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
 function msg(id, text, isErr){ var e=document.getElementById(id); if(!e) return; e.textContent=text; e.style.color = isErr ? 'var(--danger)' : 'var(--teal)'; if(text){ setTimeout(function(){ if(e.textContent===text) e.textContent=''; }, 4000); } }
@@ -3152,7 +3215,12 @@ function qsGo(panel, term){
 }
 document.addEventListener('keydown', function(e){
   if((e.metaKey||e.ctrlKey) && String(e.key).toLowerCase()==='k'){ e.preventDefault(); openQuickSearch(); }
-  else if(e.key==='Escape'){ closeModal(); }
+  else if(e.key==='Escape'){
+    var ov=document.getElementById('modal-overlay');
+    if(ov && ov.classList.contains('open')) closeModal();
+    else if(typeof drawerIsOpen==='function' && drawerIsOpen()) drawerClose();
+    else closeModal();
+  }
 });
 
 /* ----- Backup & restore (Settings → Data) ----- */
@@ -3264,7 +3332,7 @@ function crmRenderTable(){
   }
   arr.sort(function(a,b){ return (parseDate(b.callDate)||0) - (parseDate(a.callDate)||0); });
   var wrap=document.getElementById('table-wrap');
-  if(!arr.length){ wrap.innerHTML='<div class="crm-empty">'+((crmSearch||crmFilter!=='all')?'No contacts match your search or filter.':'No contacts yet. Log your first one above. 📇')+'</div>'; return; }
+  if(!arr.length){ wrap.innerHTML='<div class="crm-empty">'+((crmSearch||crmFilter!=='all')?'No contacts match your search or filter.':'No contacts yet — hit “Log contact” to add your first.')+'</div>'; return; }
   var rows=arr.map(function(c){
     var m=METHODS[c.method]; var nm=nextMilestone(c);
     var name=(c.first+' '+c.last).trim()||'—';
@@ -3633,10 +3701,10 @@ function inspSave(){
   if(id){ var cur=arr.find(function(x){return x.id===id;}); if(cur){ cur.propertyId=pid; cur.date=date; cur.startTime=gv('i-startTime'); cur.notes=gv('i-notes'); } }
   else { arr.push({ id:iuid(), propertyId:pid, date:date, startTime:gv('i-startTime'), notes:gv('i-notes'), attendees:[], createdAt:new Date().toISOString(), archived:false }); }
   inspectionsSaveCache(arr); inspClearForm();
-  msg('i-msg','✓ Inspection '+(id?'updated':'saved')+'.', false); inspRenderTable();
+  drawerSaved('✓ Inspection '+(id?'updated':'saved')+'.'); inspRenderTable();
 }
 function inspClearForm(){ setv('insp-edit-id',''); setv('i-propertyId',''); setv('i-date',''); setv('i-startTime',''); setv('i-notes',''); var sb=document.getElementById('insp-save-btn'); if(sb) sb.textContent='＋ Save inspection'; formEditState('insp-form-section', null); }
-function inspEdit(id){ var i=inspectionsLoad().find(function(x){return x.id===id;}); if(!i) return; setv('insp-edit-id',i.id); setv('i-propertyId',i.propertyId); setv('i-date',i.date); setv('i-startTime',i.startTime); setv('i-notes',i.notes); var sb=document.getElementById('insp-save-btn'); if(sb) sb.textContent='✓ Update inspection'; formEditState('insp-form-section', (propById(i.propertyId)?propLabel(propById(i.propertyId)):'this inspection'), inspClearForm); var panel=document.getElementById('inspections'); if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'}); }
+function inspEdit(id){ var i=inspectionsLoad().find(function(x){return x.id===id;}); if(!i) return; setv('insp-edit-id',i.id); setv('i-propertyId',i.propertyId); setv('i-date',i.date); setv('i-startTime',i.startTime); setv('i-notes',i.notes); var sb=document.getElementById('insp-save-btn'); if(sb) sb.textContent='✓ Update inspection'; formEditState('insp-form-section', (propById(i.propertyId)?propLabel(propById(i.propertyId)):'this inspection'), inspClearForm); drawerOpen('inspection', true); }
 function inspDelete(id){ if(!confirm('Delete this inspection and its attendee notes?')) return; inspectionsSaveCache(inspectionsLoad().filter(function(x){return x.id!==id;})); inspRenderTable(); }
 function inspArchive(id){ var arr=inspectionsLoad(); var i=arr.find(function(x){return x.id===id;}); if(!i) return; i.archived=!i.archived; inspectionsSaveCache(arr); inspRenderTable(); }
 
@@ -3665,7 +3733,7 @@ function inspRenderTable(){
   var wrap=document.getElementById('insp-table-wrap'); if(!wrap) return;
   var arr=inspectionsLoad().filter(inspMatchesFilter).slice().sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); });
   var chip = inspBuyerFilter ? '<div style="margin-bottom:10px;"><span class="pill pill-off">Showing inspections for '+esc(buyerName(buyerById(inspBuyerFilter)||{})||'this buyer')+'</span> <a href="#" onclick="inspClearBuyerFilter();return false;" style="color:var(--blue);font-size:12px;">clear</a></div>' : '';
-  if(!arr.length){ wrap.innerHTML=chip+'<div class="crm-empty">No inspections'+((inspSearch||inspPropFilter||inspFrom||inspTo||inspBuyerFilter||inspectionsLoad().length)?' match your filters.':' yet. Add one above.')+'</div>'; return; }
+  if(!arr.length){ wrap.innerHTML=chip+'<div class="crm-empty">No inspections'+((inspSearch||inspPropFilter||inspFrom||inspTo||inspBuyerFilter||inspectionsLoad().length)?' match your filters.':' yet — hit “New inspection” to add one.')+'</div>'; return; }
   var rows=arr.map(function(i){
     var p=propById(i.propertyId); var n=(i.attendees||[]).length; var expanded=!!INSP_EXPANDED[i.id];
     var main='<tr>'+
@@ -3902,6 +3970,73 @@ document.addEventListener('keydown', function(e){
   else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
   else if(!card.contains(document.activeElement)){ e.preventDefault(); first.focus(); }
 });
+/* ---- v6.0 add/edit DRAWER ----
+   One slide-over shared by all five forms. The form's real DOM section is MOVED
+   (appendChild) out of its hidden .form-home and into the drawer body, then moved back on
+   close — ids stay unique and every existing handler (crmAdd, buyerSave, propFormSync,
+   formEditState, the drop dupe hint …) keeps working untouched. */
+var DRAWER_FORMS = {
+  contact:    { section:'crm-form-section',   home:'crm-form-home',   add:'Log a contact',       edit:'Edit contact',    first:'f-first',      clear:'crmClearForm' },
+  buyer:      { section:'buyer-form-section', home:'buyer-form-home', add:'Add a buyer',         edit:'Edit buyer',      first:'b-first',      clear:'buyerClearForm' },
+  property:   { section:'prop-form-section',  home:'prop-form-home',  add:'Add a property',      edit:'Edit property',   first:'p-address',    clear:'propClearForm' },
+  inspection: { section:'insp-form-section',  home:'insp-form-home',  add:'Add an inspection',   edit:'Edit inspection', first:'i-propertyId', clear:'inspClearForm' },
+  drop:       { section:'drop-form-section',  home:'drop-form-home',  add:'Log a drop',          edit:'Edit drop',       first:'d-address',    clear:'dropClearForm' }
+};
+var _drawerKey=null, _drawerOpener=null;
+function drawerIsOpen(){ var d=document.getElementById('drawer'); return !!(d && d.classList.contains('open')); }
+function drawerClear(key){ var cfg=DRAWER_FORMS[key]; if(cfg && typeof window[cfg.clear]==='function') window[cfg.clear](); }
+function drawerOpen(key, isEdit){
+  var cfg=DRAWER_FORMS[key]; if(!cfg) return;
+  var d=document.getElementById('drawer'), body=document.getElementById('drawer-body'),
+      scrim=document.getElementById('drawer-scrim'), sec=document.getElementById(cfg.section);
+  if(!d||!body||!sec) return;
+  if(_drawerKey && _drawerKey!==key) drawerPark();      // never hold two forms at once
+  if(!_drawerOpener) _drawerOpener=document.activeElement;
+  body.appendChild(sec);                                 // MOVE, never copy
+  _drawerKey=key;
+  // "+ New …" always opens a blank form; the edit paths fill the fields BEFORE calling us.
+  if(!isEdit) drawerClear(key);
+  document.getElementById('drawer-title').textContent = isEdit ? cfg.edit : cfg.add;
+  scrim.classList.add('open'); d.classList.add('open'); d.removeAttribute('aria-hidden');
+  body.scrollTop=0;
+  setTimeout(function(){
+    var f=document.getElementById(cfg.first);
+    if(f && f.focus){ try{ f.focus(); }catch(e){} }
+    else { var b=d.querySelector('button'); if(b) b.focus(); }
+  }, 260);
+}
+function drawerPark(){
+  if(!_drawerKey) return;
+  var cfg=DRAWER_FORMS[_drawerKey];
+  var sec=document.getElementById(cfg.section), home=document.getElementById(cfg.home);
+  if(sec && home) home.appendChild(sec);                  // back to its hidden home
+  _drawerKey=null;
+}
+function drawerClose(){
+  var d=document.getElementById('drawer'), scrim=document.getElementById('drawer-scrim');
+  if(d){ d.classList.remove('open'); d.setAttribute('aria-hidden','true'); }
+  if(scrim) scrim.classList.remove('open');
+  drawerClear(_drawerKey);   // closing = cancel: never leave a half-typed edit armed
+  drawerPark();
+  if(_drawerOpener && _drawerOpener.focus){ try{ _drawerOpener.focus(); }catch(e){} }
+  _drawerOpener=null;
+}
+/* Called by every form's save path: shut the drawer and confirm with a toast, since the
+   form's own inline message goes back into hiding with it. Errors keep the drawer open. */
+function drawerSaved(message){ drawerClose(); if(message) showToast(message); }
+/* Focus trap while the drawer is open (Tab cycles inside it). */
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Tab' || !drawerIsOpen()) return;
+  var ov=document.getElementById('modal-overlay'); if(ov && ov.classList.contains('open')) return; // modal wins
+  var d=document.getElementById('drawer');
+  var els=[].slice.call(d.querySelectorAll('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])')).filter(function(el){ return el.offsetParent!==null && !el.disabled; });
+  if(!els.length) return;
+  var first=els[0], last=els[els.length-1];
+  if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  else if(!d.contains(document.activeElement)){ e.preventDefault(); first.focus(); }
+});
+
 /* Toast / snackbar with an optional action (e.g. Undo). One at a time. */
 var _toastTimer=null;
 function showToast(message, actionLabel, actionFn, ms){
@@ -3910,7 +4045,10 @@ function showToast(message, actionLabel, actionFn, ms){
   var s=document.createElement('span'); s.className='toast-msg'; t.appendChild(s);
   if(actionLabel){ var b=document.createElement('button'); b.className='toast-action'; b.textContent=actionLabel; b.onclick=function(){ if(actionFn) actionFn(); dismissToast(); }; t.appendChild(b); }
   document.body.appendChild(t);
-  requestAnimationFrame(function(){ s.textContent=message; t.classList.add('show'); }); // text set after insert so the live region reliably announces
+  // Text set just after insert so the live region reliably announces it. Uses a timer, not
+  // requestAnimationFrame — rAF is paused while the window is hidden/occluded, which would
+  // leave a blank toast, and every form save now confirms through here.
+  setTimeout(function(){ s.textContent=message; t.classList.add('show'); }, 0);
   _toastTimer=setTimeout(function(){ dismissToast(); }, ms||6000);
 }
 function dismissToast(immediate){
@@ -3965,7 +4103,8 @@ function formEditState(sectionId, label, cancelFn){
     var b=document.createElement('div'); b.className='edit-banner';
     b.innerHTML=' Editing: <strong></strong>&nbsp;<a>Cancel</a>';
     b.querySelector('strong').textContent=label;
-    b.querySelector('a').onclick=function(){ if(cancelFn) cancelFn(); };
+    // In the drawer, cancelling an edit shuts the whole slide-over (drawerClose clears the form).
+    b.querySelector('a').onclick=function(){ if(drawerIsOpen()) drawerClose(); else if(cancelFn) cancelFn(); };
     var h=sec.querySelector('.script-label');
     if(h && h.nextSibling) sec.insertBefore(b, h.nextSibling); else sec.insertBefore(b, sec.firstChild);
   } else { sec.classList.remove('editing'); }
@@ -4003,7 +4142,7 @@ function buyerSave(){
   if(id){ var cur=arr.find(function(x){return x.id===id;}); rec.enquiries=(cur&&cur.enquiries)?cur.enquiries:[]; rec.archived=cur?!!cur.archived:false; arr=arr.map(function(x){ return x.id===id?rec:x; }); }
   else { rec.enquiries=[]; rec.archived=false; arr.push(rec); }
   buyersSaveCache(arr); buyerClearForm();
-  msg('b-msg','✓ Buyer '+(id?'updated':'saved')+': '+(first||last||mobile)+'.', false);
+  drawerSaved('✓ Buyer '+(id?'updated':'saved')+': '+(first||last||mobile)+'.');
   buyerRenderTable();
 }
 function buyerClearForm(){
@@ -4023,7 +4162,7 @@ function buyerEdit(id){
   document.querySelectorAll('.b-type-cb').forEach(function(cb){ cb.checked=(c.types||[]).indexOf(cb.value)>-1; });
   var sb=document.getElementById('buyer-save-btn'); if(sb) sb.textContent='✓ Update buyer';
   formEditState('buyer-form-section', ((c.first||'')+' '+(c.last||'')).trim()||c.mobile||'this buyer', buyerClearForm);
-  var panel=document.getElementById('buyers'); if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+  drawerOpen('buyer', true);
 }
 function buyerArchive(id){ var arr=buyersLoad(); var c=arr.find(function(x){return x.id===id;}); if(!c) return; c.archived=!c.archived; buyersSaveCache(arr); buyerRenderTable(); }
 function buyerDelete(id){ if(!confirm('Delete this buyer permanently?')) return; buyersSaveCache(buyersLoad().filter(function(x){return x.id!==id;})); buyerRenderTable(); }
@@ -4036,7 +4175,7 @@ function buyerRenderTable(){
   var arr=buyersLoad().slice();
   arr=arr.filter(function(b){ if(buyerFilter==='active') return !b.archived; if(buyerFilter==='archived') return b.archived; return true; });
   if(buyerSearch){ arr=arr.filter(function(b){ return (buyerName(b)+' '+(b.mobile||'')+' '+(b.email||'')+' '+(b.suburbs||[]).join(' ')+' '+(b.notes||'')).toLowerCase().indexOf(buyerSearch)>-1; }); }
-  if(!arr.length){ wrap.innerHTML='<div class="crm-empty">No buyers yet. Add one above to start matching them to properties.</div>'; return; }
+  if(!arr.length){ wrap.innerHTML='<div class="crm-empty">No buyers yet — hit “New buyer” to start matching them to properties.</div>'; return; }
   var rows=arr.map(function(b){
     var budget=(b.budgetMin!==''&&b.budgetMin!=null)||(b.budgetMax!==''&&b.budgetMax!=null) ? ((fmtMoney(b.budgetMin)||'$0')+' – '+(fmtMoney(b.budgetMax)||'any')) : '—';
     var types=(b.types||[]).map(function(t){return PROP_TYPE_LABEL[t]||t;}).join(', ')||'Any type';
@@ -4078,7 +4217,7 @@ function propSave(){
     arr=arr.map(function(x){ return x.id===id?rec:x; });
   } else { rec.listingMeta=''; arr.push(rec); }
   propsSaveCache(arr); propClearForm();
-  msg('p-msg','✓ Property '+(id?'updated':'saved')+': '+(address||rec.suburb)+'.', false);
+  drawerSaved('✓ Property '+(id?'updated':'saved')+': '+(address||rec.suburb)+'.');
   propStatusTab=rec.status; propSyncTabButtons(); propRenderTable();
   if(rec.listingUrl && !rec.listingMeta) propFetchPreview(rec.id, null, true);
 }
@@ -4127,7 +4266,7 @@ function propEdit(id){
   setv('p-salePrice',p.salePrice); setv('p-saleDate',p.saleDate); setv('p-listingUrl',p.listingUrl); setv('p-listedDate',p.listedDate); setv('p-notes',p.notes);
   var sb=document.getElementById('prop-save-btn'); if(sb) sb.textContent='✓ Update property';
   formEditState('prop-form-section', p.address||p.suburb||'this property', propClearForm); propFormSync();
-  var panel=document.getElementById('properties'); if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+  drawerOpen('property', true);
 }
 function propDelete(id){ if(!confirm('Delete this property permanently?')) return; propsSaveCache(propsLoadCache().filter(function(x){return x.id!==id;})); propRenderTable(); }
 function propSetStatus(id, status){ var arr=propsLoadCache(); var p=arr.find(function(x){return x.id===id;}); if(!p) return; p.status=status; propsSaveCache(arr); propRenderTable(); }
@@ -4382,7 +4521,7 @@ function dropSave(){
   var address=gv('d-address'); var type=gv('d-type')||'pocket';
   if(!address){ msg('d-msg','Add the address you dropped.', true); return; }
   var arr=dropsLoad(); var id=gv('drop-edit-id');
-  var interval=DROP_TYPES[type].days;
+  var interval=DROP_TYPES[type].days, ok='';
   if(id){
     var cur=arr.find(function(x){return x.id===id;}); if(!cur) return;
     var clash=dropFindSameAddrType(address, type, id);
@@ -4391,7 +4530,7 @@ function dropSave(){
     cur.type=type; cur.address=address; cur.lastDropped=gv('d-lastDropped')||todayISO();
     cur.intervalDays=interval; cur.notes=gv('d-notes');
     dropsSaveCache(arr);
-    msg('d-msg','✓ Drop updated: '+address+'.', false);
+    ok='✓ Drop updated: '+address+'.';
   } else {
     var dupe=dropFindSameAddrType(address, type, '');
     if(dupe){
@@ -4403,15 +4542,14 @@ function dropSave(){
       dupe.timesDropped=(parseInt(dupe.timesDropped,10)||0)+1; dupe.archived=false;
       var nn=gv('d-notes'); if(nn && String(dupe.notes||'').indexOf(nn)<0) dupe.notes=(dupe.notes?dupe.notes+' · ':'')+nn;
       dropsSaveCache(arr);
-      msg('d-msg','✓ Re-drop recorded at '+dupe.address+' ('+dupe.timesDropped+'× total).', false);
-      dropClearForm(); dropRenderAll(); return;
+      dropClearForm(); drawerSaved('✓ Re-drop recorded at '+dupe.address+' ('+dupe.timesDropped+'× total).'); dropRenderAll(); return;
     }
     arr.push({ id:duid(), type:type, address:address, lastDropped:gv('d-lastDropped')||todayISO(),
       intervalDays:interval, timesDropped:1, archived:false, notes:gv('d-notes'), lat:null, lng:null, geoAddr:'' });
     dropsSaveCache(arr);
-    msg('d-msg','✓ Drop logged: '+address+'.', false);
+    ok='✓ Drop logged: '+address+'.';
   }
-  dropClearForm(); dropRenderAll();
+  dropClearForm(); drawerSaved(ok); dropRenderAll();
 }
 function dropClearForm(){
   setv('drop-edit-id',''); setv('d-address',''); setv('d-notes','');
@@ -4427,7 +4565,7 @@ function dropEdit(id){
   dropTypeChanged();
   var sb=document.getElementById('drop-save-btn'); if(sb) sb.textContent='✓ Update drop';
   formEditState('drop-form-section', d.address||'this drop', dropClearForm);
-  var sec=document.getElementById('drop-form-section'); if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'});
+  drawerOpen('drop', true);
 }
 function dropAgain(id){
   var arr=dropsLoad(); var d=arr.find(function(x){return x.id===id;}); if(!d) return;
