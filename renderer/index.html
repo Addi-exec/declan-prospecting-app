@@ -1080,6 +1080,62 @@
     .dash-rail #tracker-sync-pill { margin: -8px 0 18px; }
   }
   @media (max-width: 640px) { .dash-rail .stat-row { grid-template-columns: repeat(2, 1fr); } }
+
+  /* --- MASTER–DETAIL (Buyers / Properties / Inspections): a compact list of records on the
+         left, the selected record's full detail + its sub-panel (enquiries / attendees) on the
+         right. Replaces the wide action-button tables and the inline row expansion — one record
+         is open at a time, so the sub-panels no longer stack down the page. Under 1100px the
+         detail pane drops underneath the list and selecting a row scrolls to it. --- */
+  .md { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 18px; align-items: start; }
+  .md-list { min-width: 0; }
+  .md-rows { display: flex; flex-direction: column; gap: 6px; }
+  .md-row { display: flex; align-items: flex-start; gap: 10px; width: 100%; min-height: 44px;
+    padding: 9px 12px; text-align: left; cursor: pointer; font-family: inherit; font-size: 14px;
+    color: var(--text); background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--r-sm); transition: background .14s ease, border-color .14s ease; }
+  .md-row:hover { background: var(--hover-ink); border-color: var(--border2); }
+  .md-row.active { background: var(--accent-tint); border-color: var(--accent);
+    box-shadow: inset 2px 0 0 var(--accent); }
+  .md-rt { flex: 1; min-width: 0; }
+  .md-rname { display: block; font-weight: 600; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .md-row.active .md-rname { font-weight: 700; }
+  .md-rsub { display: block; margin-top: 2px; font-size: 12.5px; color: var(--text3);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .md-rmeta { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
+    font-size: 12px; color: var(--text3); font-variant-numeric: tabular-nums; }
+
+  /* The detail pane. Sticky and self-scrolling, so a long attendee list never drags the
+     list column with it. */
+  .md-detail { min-width: 0; position: sticky; top: 18px; max-height: calc(100vh - 36px);
+    overflow-y: auto; overscroll-behavior: contain;
+    background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-sm);
+    padding: 16px 18px 18px; }
+  .md-dhead { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+  .md-dtitle { flex: 1; min-width: 0; font-size: 19px; font-weight: 650; color: var(--text);
+    letter-spacing: -0.2px; }
+  .md-dsub { font-size: 13px; color: var(--text3); margin-top: 2px; }
+  .md-dactions { display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 4px; }
+  .md-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px 16px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .md-fact-l { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--text3); }
+  .md-fact-v { font-size: 14px; color: var(--text); margin-top: 3px; }
+  .md-note { margin-top: 14px; font-size: 14px; color: var(--text2); line-height: 1.6;
+    white-space: pre-wrap; }
+  .md-sub { margin-top: 18px; padding-top: 4px; border-top: 1px solid var(--border); }
+  .md-sub .enq-panel { padding: 10px 0 0; }
+  .md-sub-hd { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--text3); padding-top: 14px; }
+  .md-line { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    padding: 9px 0; border-top: 1px solid var(--border); font-size: 13.5px; }
+  .md-line:first-of-type { border-top: none; }
+  .md-line-t { flex: 1; min-width: 140px; color: var(--text); }
+  @media (max-width: 1100px) {
+    .md { grid-template-columns: 1fr; gap: 14px; }
+    .md-detail { position: static; max-height: none; overflow: visible; }
+  }
+  @media (prefers-reduced-motion: reduce) { .md-row { transition: none; } }
 </style>
 </head>
 <body>
@@ -2404,7 +2460,11 @@
 <input id="buyer-search" oninput="buyerDoSearch(this.value)" placeholder="Search name, mobile, email, suburb or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:9px 32px 9px 11px;font-size:14px;color:var(--text);font-family:inherit;">
 <button type="button" class="search-clear" onclick="document.getElementById('buyer-search').value='';buyerDoSearch('');" aria-label="Clear search"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
 </div>
-<div id="buyer-table-wrap"></div>
+<!-- v6.0 master–detail: the list picks a buyer, the pane beside it holds their detail. -->
+<div class="md">
+<div class="md-list" id="buyer-table-wrap"></div>
+<div class="md-detail" id="buyer-detail" aria-live="polite"></div>
+</div>
 </div>
 </div>
 <!-- ===================== PROPERTIES INVENTORY ===================== -->
@@ -2412,7 +2472,7 @@
 <div class="panel-header">
 <div class="badge" style="background:var(--purple-bg);color:var(--purple)">Property inventory</div>
 <h2>Properties</h2>
-<p>Track everything you have available — on market, off market, and archived. Hit <strong>Match</strong> to rank buyers by fit, or expand <strong>Buyers</strong> on any property to see who's enquired, who's inspected, and who's in the offer running.</p>
+<p>Track everything you have available — on market, off market, and archived. Pick a property to see who's enquired, who's inspected and who's in the offer running, or hit <strong>Match</strong> to rank every buyer by fit.</p>
 </div>
 <div class="panel-cta">
 <button class="crm-btn crm-btn-primary" onclick="drawerOpen('property')"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> New property</button>
@@ -2485,7 +2545,10 @@
 <input id="prop-search" oninput="propDoSearch(this.value)" placeholder="Search address, suburb, postcode or notes…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xs);padding:9px 32px 9px 11px;font-size:14px;color:var(--text);font-family:inherit;">
 <button type="button" class="search-clear" onclick="document.getElementById('prop-search').value='';propDoSearch('');" aria-label="Clear search"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
 </div>
-<div id="prop-table-wrap"></div>
+<div class="md">
+<div class="md-list" id="prop-table-wrap"></div>
+<div class="md-detail" id="prop-detail" aria-live="polite"></div>
+</div>
 </div>
 </div>
 <!-- ===================== INSPECTIONS ===================== -->
@@ -2530,7 +2593,10 @@
 <div class="crm-field" style="gap:2px;"><label style="font-size:10px;">From</label><input type="date" id="insp-from" onchange="inspSetFrom(this.value)"></div>
 <div class="crm-field" style="gap:2px;"><label style="font-size:10px;">To</label><input type="date" id="insp-to" onchange="inspSetTo(this.value)"></div>
 </div>
-<div id="insp-table-wrap"></div>
+<div class="md">
+<div class="md-list" id="insp-table-wrap"></div>
+<div class="md-detail" id="insp-detail" aria-live="polite"></div>
+</div>
 </div>
 </div>
 <!-- ===================== LETTERBOX DROPS ===================== -->
@@ -3679,10 +3745,42 @@ var buyerFilter = 'active';      // active | archived | all
 var buyerSearch = '';
 var propStatusTab = 'onmarket';  // onmarket | offmarket | archived
 var propSearch = '';
+var BUYER_SEL = '';              // v6: the record open in each panel's detail pane
+var PROP_SEL = '';
 
 var PROP_TYPE_LABEL = { house:'House', townhouse:'Townhouse / Villa', unit:'Unit / Apartment', land:'Land / Acreage' };
 var BUYER_TYPE_LABEL = { '':'', fhb:'First-home buyer', upgrader:'Upgrader', downsizer:'Downsizer', investor:'Investor' };
 var PRICE_TYPE_LABEL = { fixed:'Fixed price', range:'Range', auction:'Auction', eoi:'EOI' };
+
+/* ===== v6 master–detail shell (Buyers / Properties / Inspections) =====
+   Each panel keeps ONE selected id. The list renders compact rows; the pane beside it renders
+   that record's detail plus its sub-panel (the same enqPanelHtml / inspAttendeePanel as before,
+   so nothing about enquiries or attendees changed — only where they appear). */
+function mdRowHtml(o){
+  return '<button type="button" class="md-row'+(o.active?' active':'')+'" aria-pressed="'+(o.active?'true':'false')+'" onclick="'+o.onclick+'">'+
+    '<span class="md-rt"><span class="md-rname">'+o.name+'</span>'+(o.sub?'<span class="md-rsub">'+o.sub+'</span>':'')+'</span>'+
+    (o.meta?'<span class="md-rmeta">'+o.meta+'</span>':'')+'</button>';
+}
+// pairs = [[label, alreadyEscapedValue], …]; blank values drop out.
+function mdFacts(pairs){
+  var items=pairs.filter(function(p){ return p[1]!==''&&p[1]!=null; }).map(function(p){
+    return '<div><div class="md-fact-l">'+esc(p[0])+'</div><div class="md-fact-v">'+p[1]+'</div></div>'; });
+  return items.length ? '<div class="md-facts">'+items.join('')+'</div>' : '';
+}
+// A selection only survives while its record is still in the filtered list; otherwise open the first.
+function mdResolveSel(cur, list){
+  for(var i=0;i<list.length;i++){ if(list[i].id===cur) return cur; }
+  return list.length?list[0].id:'';
+}
+// Narrow layout stacks the pane UNDER the list, so a pick has to scroll there to be seen.
+function mdReveal(hostId){
+  if(!(window.matchMedia&&window.matchMedia('(max-width: 1100px)').matches)) return;
+  var el=document.getElementById(hostId); if(!el||!el.scrollIntoView) return;
+  var calm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  el.scrollIntoView({behavior: calm?'auto':'smooth', block:'start'});
+}
+function mdEmpty(msg){ return '<div class="crm-empty">'+esc(msg)+'</div>'; }
+function mdByDateDesc(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); }
 var PROP_STATUS_LABEL = { onmarket:'On market', offmarket:'Off market', archived:'Archived' };
 
 function buid(){ return 'b' + Date.now() + Math.floor(Math.random()*1000); }
@@ -3702,7 +3800,7 @@ function buyersReload(){ if(window.api&&window.api.loadBuyers){ return window.ap
 function propsReload(){ if(window.api&&window.api.loadProperties){ return window.api.loadProperties().then(function(r){ PROPS_CACHE=r||[]; propRenderTable(); inspRefreshPropertyPickers(); }); } propRenderTable(); return Promise.resolve(); }
 
 /* ===== Inspections (open-home attendees) ===== */
-var INSPECTIONS_CACHE=[]; var INSP_EXPANDED={};
+var INSPECTIONS_CACHE=[]; var INSP_SEL='';   // v6: the inspection open in the detail pane
 var inspSearch='', inspPropFilter='', inspFrom='', inspTo='', inspBuyerFilter='', inspStatusFilter='active';
 function iuid(){ return 'i' + Date.now() + Math.floor(Math.random()*1000); }
 function inspectionsLoad(){ return INSPECTIONS_CACHE; }
@@ -3729,8 +3827,8 @@ function inspSave(){
   if(!pid){ msg('i-msg','Choose a property.', true); return; }
   if(!date){ msg('i-msg','Pick a date.', true); return; }
   var arr=inspectionsLoad(); var id=gv('insp-edit-id');
-  if(id){ var cur=arr.find(function(x){return x.id===id;}); if(cur){ cur.propertyId=pid; cur.date=date; cur.startTime=gv('i-startTime'); cur.notes=gv('i-notes'); } }
-  else { arr.push({ id:iuid(), propertyId:pid, date:date, startTime:gv('i-startTime'), notes:gv('i-notes'), attendees:[], createdAt:new Date().toISOString(), archived:false }); }
+  if(id){ var cur=arr.find(function(x){return x.id===id;}); if(cur){ cur.propertyId=pid; cur.date=date; cur.startTime=gv('i-startTime'); cur.notes=gv('i-notes'); } INSP_SEL=id; }
+  else { var nid=iuid(); arr.push({ id:nid, propertyId:pid, date:date, startTime:gv('i-startTime'), notes:gv('i-notes'), attendees:[], createdAt:new Date().toISOString(), archived:false }); INSP_SEL=nid; }
   inspectionsSaveCache(arr); inspClearForm();
   drawerSaved('✓ Inspection '+(id?'updated':'saved')+'.'); inspRenderTable();
 }
@@ -3764,27 +3862,37 @@ function inspRenderTable(){
   var wrap=document.getElementById('insp-table-wrap'); if(!wrap) return;
   var arr=inspectionsLoad().filter(inspMatchesFilter).slice().sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); });
   var chip = inspBuyerFilter ? '<div style="margin-bottom:10px;"><span class="pill pill-off">Showing inspections for '+esc(buyerName(buyerById(inspBuyerFilter)||{})||'this buyer')+'</span> <a href="#" onclick="inspClearBuyerFilter();return false;" style="color:var(--blue);font-size:12px;">clear</a></div>' : '';
-  if(!arr.length){ wrap.innerHTML=chip+'<div class="crm-empty">No inspections'+((inspSearch||inspPropFilter||inspFrom||inspTo||inspBuyerFilter||inspectionsLoad().length)?' match your filters.':' yet — hit “New inspection” to add one.')+'</div>'; return; }
-  var rows=arr.map(function(i){
-    var p=propById(i.propertyId); var n=(i.attendees||[]).length; var expanded=!!INSP_EXPANDED[i.id];
-    var main='<tr>'+
-      '<td><div style="font-weight:600;">'+esc(p?propLabel(p):'(property removed)')+'</div>'+(i.notes?'<div class="muted-sm">'+esc(i.notes)+'</div>':'')+(i.archived?'<div style="margin-top:3px;"><span class="pill pill-arch">Archived</span></div>':'')+'</td>'+
-      '<td>'+esc(inspDateLabel(i))+'</td>'+
-      '<td style="text-align:center;">'+n+'</td>'+
-      '<td><div class="due-actions">'+
-        '<button class="crm-btn '+(expanded?'crm-btn-primary':'crm-btn-ghost')+' crm-btn-sm" onclick="inspToggleAttendees(\''+i.id+'\')">'+'<svg class="ic ic-caret'+(expanded?'':' closed')+'" aria-hidden="true"><use href="#i-chevron"/></svg> Attendees ('+n+')</button>'+
-        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="inspCopyReport(\''+i.id+'\')"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg> Report</button>'+
-        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="inspEdit(\''+i.id+'\')">Edit</button>'+
-        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="inspArchive(\''+i.id+'\')">'+(i.archived?'Reopen':'Archive')+'</button>'+
-        '<button class="crm-btn crm-btn-danger crm-btn-sm" onclick="inspDelete(\''+i.id+'\')">Delete</button>'+
-      '</div></td></tr>';
-    return main + (expanded ? '<tr class="enq-detail"><td colspan="4">'+inspAttendeePanel(i)+'</td></tr>' : '');
-  }).join('');
-  wrap.innerHTML=chip+'<div class="crm-table-wrap"><table class="crm-table"><thead><tr><th>Property</th><th>Date &amp; time</th><th>Att.</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  INSP_SEL=mdResolveSel(INSP_SEL, arr);
+  if(!arr.length){ wrap.innerHTML=chip+'<div class="crm-empty">No inspections'+((inspSearch||inspPropFilter||inspFrom||inspTo||inspBuyerFilter||inspectionsLoad().length)?' match your filters.':' yet — hit “New inspection” to add one.')+'</div>'; inspRenderDetail(); return; }
+  wrap.innerHTML=chip+'<div class="md-rows">'+arr.map(function(i){
+    var p=propById(i.propertyId), n=(i.attendees||[]).length,
+        fu=(i.attendees||[]).filter(function(a){return a.followUp;}).length;
+    return mdRowHtml({ active:i.id===INSP_SEL, onclick:'inspSelect(\''+i.id+'\')',
+      name: esc(p?propLabel(p):'(property removed)')+(i.archived?' <span class="pill pill-arch">Archived</span>':''),
+      sub: esc(inspDateLabel(i)),
+      meta: '<span>'+n+' att</span>'+(fu?'<span>★ '+fu+'</span>':'') });
+  }).join('')+'</div>';
+  inspRenderDetail();
 }
-
-/* attendees */
-function inspToggleAttendees(id){ if(INSP_EXPANDED[id]) delete INSP_EXPANDED[id]; else INSP_EXPANDED[id]=true; inspRenderTable(); }
+function inspSelect(id){ INSP_SEL=id; inspRenderTable(); mdReveal('insp-detail'); }
+function inspRenderDetail(){
+  var host=document.getElementById('insp-detail'); if(!host) return;
+  var i=inspectionsLoad().filter(function(x){return x.id===INSP_SEL;})[0];
+  if(!i){ host.innerHTML=mdEmpty('Pick an inspection to see who came through and add their notes.'); return; }
+  var p=propById(i.propertyId);
+  host.innerHTML=
+    '<div class="md-dhead"><div class="md-dtitle">'+esc(p?propLabel(p):'(property removed)')+
+      '<div class="md-dsub">'+esc(inspDateLabel(i))+'</div></div>'+
+      (i.archived?'<span class="pill pill-arch">Archived</span>':'')+'</div>'+
+    '<div class="md-dactions">'+
+      '<button class="crm-btn crm-btn-primary crm-btn-sm" onclick="inspCopyReport(\''+i.id+'\')"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg> Report</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="inspEdit(\''+i.id+'\')">Edit</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="inspArchive(\''+i.id+'\')">'+(i.archived?'Reopen':'Archive')+'</button>'+
+      '<button class="crm-btn crm-btn-danger crm-btn-sm" onclick="inspDelete(\''+i.id+'\')">Delete</button>'+
+    '</div>'+
+    (i.notes?'<div class="md-note">'+esc(i.notes)+'</div>':'')+
+    '<div class="md-sub">'+inspAttendeePanel(i)+'</div>';
+}
 function attendeeFor(insp, buyerId){ return (insp.attendees||[]).filter(function(a){return a.buyerId===buyerId;})[0]||null; }
 function attendeeMutate(inspId, fn){ var arr=inspectionsLoad(); var i=arr.find(function(x){return x.id===inspId;}); if(!i) return; i.attendees=i.attendees||[]; fn(i); inspectionsSaveCache(arr); }
 function addAttendee(inspId, buyerId){ attendeeMutate(inspId, function(i){ if(!attendeeFor(i,buyerId)) i.attendees.push({buyerId:buyerId,notes:'',followUp:false,ts:new Date().toISOString()}); }); }
@@ -3964,14 +4072,13 @@ function jumpInspectionsForProp(pid){ inspPropFilter=pid; inspBuyerFilter=''; in
 /* ---- Enquiries are objects {id:propertyId, active:bool, notes:string}. Normalise legacy [propertyId] strings. ---- */
 function normEnq(enq){ return (enq||[]).map(function(e){ return (typeof e==='string')?{id:e,active:true,notes:'',offerCandidate:false}:{id:(e&&e.id)||'',active:e?e.active!==false:true,notes:(e&&e.notes)||'',offerCandidate:!!(e&&e.offerCandidate)}; }).filter(function(e){ return e.id; }); }
 function normalizeBuyers(arr){ (arr||[]).forEach(function(b){ b.enquiries=normEnq(b.enquiries); }); return arr||[]; }
-var PROP_EXPANDED={};
 function enqFor(b,propId){ return (b.enquiries||[]).filter(function(e){return e.id===propId;})[0]||null; }
 function buyersForProp(propId){ return buyersLoad().filter(function(b){ return !!enqFor(b,propId); }).map(function(b){ return {b:b, e:enqFor(b,propId)}; }); }
 function addEnquiry(buyerId, propId){ var arr=buyersLoad(); var b=arr.find(function(x){return x.id===buyerId;}); if(!b) return; b.enquiries=b.enquiries||[]; if(!enqFor(b,propId)) b.enquiries.push({id:propId,active:true,notes:'',offerCandidate:false}); buyersSaveCache(arr); }
 function removeEnquiry(buyerId, propId){ var arr=buyersLoad(); var b=arr.find(function(x){return x.id===buyerId;}); if(!b) return; b.enquiries=(b.enquiries||[]).filter(function(e){return e.id!==propId;}); buyersSaveCache(arr); }
 function toggleEnquiryActive(buyerId, propId){ var arr=buyersLoad(); var b=arr.find(function(x){return x.id===buyerId;}); if(!b) return; var e=enqFor(b,propId); if(e){ e.active=!e.active; buyersSaveCache(arr); } propRenderTable(); }
 function setEnquiryNote(buyerId, propId, txt){ var arr=buyersLoad(); var b=arr.find(function(x){return x.id===buyerId;}); if(!b) return; var e=enqFor(b,propId); if(e){ e.notes=txt; buyersSaveCache(arr); } }
-function propToggleEnq(propId){ if(PROP_EXPANDED[propId]) delete PROP_EXPANDED[propId]; else PROP_EXPANDED[propId]=true; propRenderTable(); }
+/* v6: the buyers/enquiries panel lives in the property detail pane — no per-row expansion. */
 function addEnqFromSelect(propId, buyerId){ if(buyerId){ addEnquiry(buyerId, propId); propRenderTable(); } }
 function propRemoveEnq(buyerId, propId){ removeEnquiry(buyerId, propId); propRenderTable(); }
 function buyerInspectedProp(buyerId, propId){ return inspForProp(propId).some(function(i){ return (i.attendees||[]).some(function(a){ return a.buyerId===buyerId; }); }); }
@@ -4174,6 +4281,7 @@ function buyerSave(){
   else { rec.enquiries=[]; rec.archived=false; arr.push(rec); }
   buyersSaveCache(arr); buyerClearForm();
   drawerSaved('✓ Buyer '+(id?'updated':'saved')+': '+(first||last||mobile)+'.');
+  BUYER_SEL=rec.id;   // open what was just saved in the detail pane
   buyerRenderTable();
 }
 function buyerClearForm(){
@@ -4199,6 +4307,16 @@ function buyerArchive(id){ var arr=buyersLoad(); var c=arr.find(function(x){retu
 function buyerDelete(id){ if(!confirm('Delete this buyer permanently?')) return; buyersSaveCache(buyersLoad().filter(function(x){return x.id!==id;})); buyerRenderTable(); }
 function buyerSetFilter(f){ buyerFilter=f; buyerRenderTable(); }
 function buyerDoSearch(v){ buyerSearch=String(v||'').toLowerCase(); buyerRenderTable(); }
+/* One place each for the labels the row AND the detail pane both show. */
+function buyerBudgetLabel(b){
+  return ((b.budgetMin!==''&&b.budgetMin!=null)||(b.budgetMax!==''&&b.budgetMax!=null))
+    ? ((fmtMoney(b.budgetMin)||'$0')+' – '+(fmtMoney(b.budgetMax)||'any')) : '—';
+}
+function buyerTypesLabel(b){ return (b.types||[]).map(function(t){return PROP_TYPE_LABEL[t]||t;}).join(', ')||'Any type'; }
+function buyerMinsLabel(b){ var p=[]; if(b.bedsMin) p.push(b.bedsMin+'+ bed'); if(b.bathsMin) p.push(b.bathsMin+'+ bath'); if(b.carMin) p.push(b.carMin+'+ car'); if(b.landMin) p.push(b.landMin+'m²'); return p.join(' · '); }
+function buyerAreasLabel(b){ return (b.suburbs||[]).join(', ')||'Any area'; }
+function buyerSelect(id){ BUYER_SEL=id; buyerRenderTable(); mdReveal('buyer-detail'); }
+
 function buyerRenderTable(){
   var wrap=document.getElementById('buyer-table-wrap'); if(!wrap) return;
   var fb=document.getElementById('buyer-filter-bar');
@@ -4206,29 +4324,52 @@ function buyerRenderTable(){
   var arr=buyersLoad().slice();
   arr=arr.filter(function(b){ if(buyerFilter==='active') return !b.archived; if(buyerFilter==='archived') return b.archived; return true; });
   if(buyerSearch){ arr=arr.filter(function(b){ return (buyerName(b)+' '+(b.mobile||'')+' '+(b.email||'')+' '+(b.suburbs||[]).join(' ')+' '+(b.notes||'')).toLowerCase().indexOf(buyerSearch)>-1; }); }
-  if(!arr.length){ wrap.innerHTML='<div class="crm-empty">No buyers yet — hit “New buyer” to start matching them to properties.</div>'; return; }
-  var rows=arr.map(function(b){
-    var budget=(b.budgetMin!==''&&b.budgetMin!=null)||(b.budgetMax!==''&&b.budgetMax!=null) ? ((fmtMoney(b.budgetMin)||'$0')+' – '+(fmtMoney(b.budgetMax)||'any')) : '—';
-    var types=(b.types||[]).map(function(t){return PROP_TYPE_LABEL[t]||t;}).join(', ')||'Any type';
-    var pref=[]; if(b.bedsMin) pref.push(b.bedsMin+'+ bed'); if(b.bathsMin) pref.push(b.bathsMin+'+ bath'); if(b.carMin) pref.push(b.carMin+'+ car'); if(b.landMin) pref.push(b.landMin+'m²');
-    var subs=(b.suburbs||[]).join(', ')||'Any area';
-    return '<tr>'+
-      '<td><div style="font-weight:600;">'+esc(buyerName(b)||'—')+'</div>'+(b.buyerType?'<div class="muted-sm">'+esc(BUYER_TYPE_LABEL[b.buyerType]||'')+'</div>':'')+(b.archived?'<div style="margin-top:3px;"><span class="pill pill-arch">Archived</span></div>':'')+'</td>'+
-      '<td>'+esc(b.mobile||'')+(b.email?'<div class="muted-sm">'+esc(b.email)+'</div>':'')+'</td>'+
-      '<td>'+esc(budget)+'</td>'+
-      '<td>'+esc(types)+(pref.length?'<div class="muted-sm">'+esc(pref.join(' · '))+'</div>':'')+'</td>'+
-      '<td>'+esc(subs)+'</td>'+
-      '<td style="text-align:center;">'+((b.enquiries||[]).length||'')+'</td>'+
-      '<td><div class="due-actions">'+
-        '<button class="crm-btn crm-btn-primary crm-btn-sm" onclick="buyerMatch(\''+b.id+'\')">Match</button>'+
-        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="buyerEnquiries(\''+b.id+'\')">Enquiries</button>'+
-        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="jumpInspectionsForBuyer(\''+b.id+'\')">Inspections ('+inspForBuyer(b.id).length+')</button>'+
-        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="buyerEdit(\''+b.id+'\')">Edit</button>'+
-        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="buyerArchive(\''+b.id+'\')">'+(b.archived?'Reopen':'Archive')+'</button>'+
-        '<button class="crm-btn crm-btn-danger crm-btn-sm" onclick="buyerDelete(\''+b.id+'\')">Delete</button>'+
-      '</div></td></tr>';
-  }).join('');
-  wrap.innerHTML='<div class="crm-table-wrap"><table class="crm-table"><thead><tr><th>Buyer</th><th>Contact</th><th>Budget</th><th>Wants</th><th>Areas</th><th>Enq.</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  BUYER_SEL=mdResolveSel(BUYER_SEL, arr);
+  if(!arr.length){ wrap.innerHTML='<div class="crm-empty">No buyers yet — hit “New buyer” to start matching them to properties.</div>'; buyerRenderDetail(); return; }
+  wrap.innerHTML='<div class="md-rows">'+arr.map(function(b){
+    var n=(b.enquiries||[]).length;
+    return mdRowHtml({ active:b.id===BUYER_SEL, onclick:'buyerSelect(\''+b.id+'\')',
+      name: esc(buyerName(b)||b.mobile||'—')+(b.archived?' <span class="pill pill-arch">Archived</span>':''),
+      sub: esc(buyerBudgetLabel(b)+' · '+buyerAreasLabel(b)),
+      meta: (n?'<span>'+n+' enq</span>':'') });
+  }).join('')+'</div>';
+  buyerRenderDetail();
+}
+function buyerRenderDetail(){
+  var host=document.getElementById('buyer-detail'); if(!host) return;
+  var b=buyerById(BUYER_SEL);
+  if(!b){ host.innerHTML=mdEmpty('Pick a buyer to see their budget, preferences, enquiries and inspection history.'); return; }
+  var insp=inspForBuyer(b.id).slice().sort(mdByDateDesc), enq=b.enquiries||[];
+  var enqHtml = enq.length ? enq.map(function(e){
+      var p=propById(e.id);
+      return '<div class="md-line"><div class="md-line-t">'+esc(p?propLabel(p):'(property removed)')+'</div>'+
+        (p?fitBadge(fitScore(b,p).score):'')+
+        (e.offerCandidate?'<span class="pill pill-on">Offer candidate</span>':'')+
+        '<span class="pill '+(e.active?'pill-on':'pill-arch')+'">'+(e.active?'Active':'Paused')+'</span></div>';
+    }).join('') : '<div class="muted-sm">No enquiries yet — use <strong>Enquiries</strong> to tick the properties they asked about.</div>';
+  var inspHtml = insp.length ? insp.map(function(i){
+      var p=propById(i.propertyId), a=attendeeFor(i,b.id)||{};
+      return '<div class="md-line"><div class="md-line-t">'+esc(inspDateLabel(i))+' · '+esc(p?propLabel(p):'(property removed)')+
+        (a.notes?'<div class="muted-sm">'+esc(a.notes)+'</div>':'')+'</div>'+
+        (a.followUp?'<span class="pill pill-off">★ Follow-up</span>':'')+'</div>';
+    }).join('') : '<div class="muted-sm">No inspections recorded for this buyer yet.</div>';
+  host.innerHTML=
+    '<div class="md-dhead"><div class="md-dtitle">'+esc(buyerName(b)||'—')+
+      '<div class="md-dsub">'+esc([BUYER_TYPE_LABEL[b.buyerType]||'', b.mobile||'', b.email||''].filter(Boolean).join(' · ')||'No contact details yet')+'</div></div>'+
+      (b.archived?'<span class="pill pill-arch">Archived</span>':'')+'</div>'+
+    '<div class="md-dactions">'+
+      '<button class="crm-btn crm-btn-primary crm-btn-sm" onclick="buyerMatch(\''+b.id+'\')">Match properties</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="buyerEnquiries(\''+b.id+'\')">Enquiries</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="jumpInspectionsForBuyer(\''+b.id+'\')">Inspections ('+insp.length+')</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="buyerEdit(\''+b.id+'\')">Edit</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="buyerArchive(\''+b.id+'\')">'+(b.archived?'Reopen':'Archive')+'</button>'+
+      '<button class="crm-btn crm-btn-danger crm-btn-sm" onclick="buyerDelete(\''+b.id+'\')">Delete</button>'+
+    '</div>'+
+    mdFacts([['Budget',esc(buyerBudgetLabel(b))],['Wants',esc(buyerTypesLabel(b))],
+             ['Minimums',esc(buyerMinsLabel(b)||'None set')],['Areas',esc(buyerAreasLabel(b))]])+
+    (b.notes?'<div class="md-note">'+esc(b.notes)+'</div>':'')+
+    '<div class="md-sub"><div class="md-sub-hd">Enquiries ('+enq.length+')</div>'+enqHtml+'</div>'+
+    '<div class="md-sub"><div class="md-sub-hd">Inspections ('+insp.length+')</div>'+inspHtml+'</div>';
 }
 
 /* ---- Properties ---- */
@@ -4249,7 +4390,7 @@ function propSave(){
   } else { rec.listingMeta=''; arr.push(rec); }
   propsSaveCache(arr); propClearForm();
   drawerSaved('✓ Property '+(id?'updated':'saved')+': '+(address||rec.suburb)+'.');
-  propStatusTab=rec.status; propSyncTabButtons(); propRenderTable();
+  propStatusTab=rec.status; PROP_SEL=rec.id; propSyncTabButtons(); propRenderTable();
   if(rec.listingUrl && !rec.listingMeta) propFetchPreview(rec.id, null, true);
 }
 /* ---- Listing preview: pull photo/title/description from the listing link (REA/Domain/etc) ---- */
@@ -4322,34 +4463,57 @@ function propStatusMenu(p){
   var opts=[['onmarket','On'],['offmarket','Off'],['archived','Arch']];
   return opts.filter(function(o){return o[0]!==p.status;}).map(function(o){ return '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="propSetStatus(\''+p.id+'\',\''+o[0]+'\')">→ '+o[1]+'</button>'; }).join('');
 }
+function propSpecsLabel(p){ var s=[]; if(p.beds) s.push(p.beds+' bed'); if(p.baths) s.push(p.baths+' bath'); if(p.car) s.push(p.car+' car'); if(p.land) s.push(p.land+'m²'); return s.join(' · '); }
+function propSelect(id){ PROP_SEL=id; propRenderTable(); mdReveal('prop-detail'); }
 function propRenderTable(){
   var wrap=document.getElementById('prop-table-wrap'); if(!wrap) return;
   var arr=propsLoadCache().filter(function(p){ return (p.status||'onmarket')===propStatusTab; });
   if(propSearch){ arr=arr.filter(function(p){ return ((p.address||'')+' '+(p.suburb||'')+' '+(p.postcode||'')+' '+(p.notes||'')).toLowerCase().indexOf(propSearch)>-1; }); }
-  if(!arr.length){ wrap.innerHTML='<div class="crm-empty">No '+PROP_STATUS_LABEL[propStatusTab].toLowerCase()+' properties yet.</div>'; return; }
-  var rows=arr.map(function(p){
-    var specs=[]; if(p.beds) specs.push(p.beds+' bed'); if(p.baths) specs.push(p.baths+' bath'); if(p.car) specs.push(p.car+' car'); if(p.land) specs.push(p.land+'m²');
-    var loc=esc([p.suburb,p.postcode].filter(Boolean).join(' '));
-    var link=p.listingUrl? '<a href="#" onclick="openExt(\''+encodeURIComponent(p.listingUrl)+'\');return false;" style="color:var(--blue);text-decoration:none;">View listing ↗</a>' : '';
-    if(p.listingUrl && !(p.listingMeta&&p.listingMeta.image)){ link+=(link?' ':'')+'<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="propFetchPreview(\''+p.id+'\',this)">↻ Preview</button>'; }
-    var thumb=(p.listingMeta&&p.listingMeta.image)?'<img class="listing-thumb" src="'+esc(p.listingMeta.image)+'" alt="" onclick="propOpenPreview(\''+p.id+'\')" title="'+esc(p.listingMeta.title||'Listing preview')+'">':'';
-    var bfp=buyersForProp(p.id); var n=bfp.length; var oc=bfp.filter(function(x){return !!(x.e.offerCandidate);}).length; var expanded=!!PROP_EXPANDED[p.id];
-    var mainRow='<tr>'+
-      '<td><div style="display:flex;gap:10px;align-items:flex-start;">'+thumb+'<div><div style="font-weight:600;">'+esc(p.address||'—')+'</div>'+(loc?'<div class="muted-sm">'+loc+'</div>':'')+(link?'<div class="muted-sm">'+link+'</div>':'')+'</div></div></td>'+
-      '<td>'+esc(PROP_TYPE_LABEL[p.type]||p.type||'')+'</td>'+
-      '<td>'+esc(propPriceLabel(p))+'</td>'+
-      '<td>'+esc(specs.join(' · ')||'—')+'</td>'+
-      '<td><div class="due-actions">'+
-        '<button class="crm-btn crm-btn-primary crm-btn-sm" onclick="propMatch(\''+p.id+'\')">Match</button>'+
-        '<button class="crm-btn '+(expanded?'crm-btn-primary':'crm-btn-ghost')+' crm-btn-sm" onclick="propToggleEnq(\''+p.id+'\')">'+(expanded?'▾':'▸')+' Buyers ('+n+')'+(oc?' · '+oc+' offering':'')+' </button>'+
-        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="jumpInspectionsForProp(\''+p.id+'\')">Inspections ('+inspForProp(p.id).length+')</button>'+
-        '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="propEdit(\''+p.id+'\')">Edit</button>'+
-        propStatusMenu(p)+
-        '<button class="crm-btn crm-btn-danger crm-btn-sm" onclick="propDelete(\''+p.id+'\')">Delete</button>'+
-      '</div></td></tr>';
-    return mainRow + (expanded ? '<tr class="enq-detail"><td colspan="5">'+enqPanelHtml(p)+'</td></tr>' : '');
-  }).join('');
-  wrap.innerHTML='<div class="crm-table-wrap"><table class="crm-table"><thead><tr><th>Property</th><th>Type</th><th>Price</th><th>Specs</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  PROP_SEL=mdResolveSel(PROP_SEL, arr);
+  if(!arr.length){ wrap.innerHTML='<div class="crm-empty">No '+PROP_STATUS_LABEL[propStatusTab].toLowerCase()+' properties yet.</div>'; propRenderDetail(); return; }
+  wrap.innerHTML='<div class="md-rows">'+arr.map(function(p){
+    var bfp=buyersForProp(p.id), oc=bfp.filter(function(x){return !!(x.e.offerCandidate);}).length;
+    return mdRowHtml({ active:p.id===PROP_SEL, onclick:'propSelect(\''+p.id+'\')',
+      name: esc(p.address||p.suburb||'—'),
+      sub: esc([PROP_TYPE_LABEL[p.type]||'', propPriceLabel(p), [p.suburb,p.postcode].filter(Boolean).join(' ')].filter(Boolean).join(' · ')),
+      meta: (bfp.length?'<span>'+bfp.length+' buyer'+(bfp.length>1?'s':'')+'</span>':'')+(oc?'<span>'+oc+' offering</span>':'') });
+  }).join('')+'</div>';
+  propRenderDetail();
+}
+function propRenderDetail(){
+  var host=document.getElementById('prop-detail'); if(!host) return;
+  var p=propById(PROP_SEL);
+  if(!p){ host.innerHTML=mdEmpty('Pick a property to see its details, enquiring buyers and inspections.'); return; }
+  var insp=inspForProp(p.id).slice().sort(mdByDateDesc);
+  var loc=[p.suburb,p.postcode].filter(Boolean).join(' ');
+  var thumb=(p.listingMeta&&p.listingMeta.image)?'<img class="listing-thumb" src="'+esc(p.listingMeta.image)+'" alt="" onclick="propOpenPreview(\''+p.id+'\')" title="'+esc(p.listingMeta.title||'Listing preview')+'">':'';
+  var link=p.listingUrl? '<a href="#" onclick="openExt(\''+encodeURIComponent(p.listingUrl)+'\');return false;" style="color:var(--blue);text-decoration:none;">View listing ↗</a>' : '';
+  if(p.listingUrl && !(p.listingMeta&&p.listingMeta.image)){ link+=(link?' ':'')+'<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="propFetchPreview(\''+p.id+'\',this)">↻ Preview</button>'; }
+  var inspHtml = insp.length ? insp.map(function(i){
+      var n=(i.attendees||[]).length;
+      return '<div class="md-line"><div class="md-line-t">'+esc(inspDateLabel(i))+'</div>'+
+        '<span class="muted-sm">'+n+' attendee'+(n===1?'':'s')+'</span>'+
+        (i.archived?'<span class="pill pill-arch">Archived</span>':'')+'</div>';
+    }).join('') : '<div class="muted-sm">No inspections booked for this property yet.</div>';
+  host.innerHTML=
+    '<div class="md-dhead">'+thumb+'<div class="md-dtitle">'+esc(p.address||p.suburb||'—')+
+      '<div class="md-dsub">'+esc([loc, PROP_TYPE_LABEL[p.type]||''].filter(Boolean).join(' · ')||'No location set')+'</div>'+
+      (link?'<div class="md-dsub">'+link+'</div>':'')+'</div>'+
+      '<span class="pill '+(p.status==='offmarket'?'pill-off':(p.status==='archived'?'pill-arch':'pill-on'))+'">'+esc(PROP_STATUS_LABEL[p.status||'onmarket'])+'</span></div>'+
+    '<div class="md-dactions">'+
+      '<button class="crm-btn crm-btn-primary crm-btn-sm" onclick="propMatch(\''+p.id+'\')">Match buyers</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="jumpInspectionsForProp(\''+p.id+'\')">Inspections ('+insp.length+')</button>'+
+      '<button class="crm-btn crm-btn-ghost crm-btn-sm" onclick="propEdit(\''+p.id+'\')">Edit</button>'+
+      propStatusMenu(p)+
+      '<button class="crm-btn crm-btn-danger crm-btn-sm" onclick="propDelete(\''+p.id+'\')">Delete</button>'+
+    '</div>'+
+    mdFacts([['Price',esc(propPriceLabel(p))],['Type',esc(PROP_TYPE_LABEL[p.type]||p.type||'—')],
+             ['Specs',esc(propSpecsLabel(p)||'—')],
+             ['Listed',p.listedDate?esc(fmtDate(parseDate(p.listedDate))||p.listedDate):''],
+             ['Sold',(p.salePrice||p.saleDate)?esc([fmtMoney(p.salePrice)||'', p.saleDate?(fmtDate(parseDate(p.saleDate))||p.saleDate):''].filter(Boolean).join(' · ')):'']])+
+    (p.notes?'<div class="md-note">'+esc(p.notes)+'</div>':'')+
+    '<div class="md-sub">'+enqPanelHtml(p)+'</div>'+
+    '<div class="md-sub"><div class="md-sub-hd">Inspections ('+insp.length+')</div>'+inspHtml+'</div>';
 }
 
 /* ---- Matching (pure best-fit ranking; no hard exclusions) ---- */
