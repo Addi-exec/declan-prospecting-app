@@ -30,5 +30,7 @@ contextBridge.exposeInMainWorld('api', {
   gsCreateSheet: (contacts) => ipcRenderer.invoke('gsheets:createSheet', contacts),
   gsLinkSheet: (url) => ipcRenderer.invoke('gsheets:linkSheet', url),
   gsDisconnect: () => ipcRenderer.invoke('gsheets:disconnect'),
-  gsOpenSheet: (url) => ipcRenderer.invoke('gsheets:openSheet', url)
+  gsOpenSheet: (url) => ipcRenderer.invoke('gsheets:openSheet', url),
+  gsSyncState: () => ipcRenderer.invoke('gsheets:syncState'),
+  gsSyncNow: () => ipcRenderer.invoke('gsheets:syncNow')
 });

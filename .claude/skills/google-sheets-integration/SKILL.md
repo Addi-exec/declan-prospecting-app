@@ -35,7 +35,9 @@ through `window.api` (see `electron/preload.js`).
   `gTokens` (access/refresh tokens; auto-refreshed via the OAuth client's `tokens` event),
   `gSheetId`, `gSheetName`. Read/written through `readConfig()` / `writeConfig()` /
   `updateConfig()`.
-- **The sheet**: one tab named `Contacts`, columns = `CONTACT_HEADERS`
+- **The sheet**: five tabs (`Contacts`/`Buyers`/`Properties`/`Inspections`/`Drops`) — the
+  Contacts description below is the original one-tab shape; see `CLAUDE.md` for the rest.
+  Columns = `CONTACT_HEADERS`
   (`id,method,outcome,first,last,address,mobile,email,callDate,stepsDone,branchDate,
   archived,notes`). `gsLoadFromSheet` reads `Contacts!A:N`; `gsSaveToSheet` clears and
   rewrites it. Requests use a 20s timeout (`GS_REQ_OPTS`).
@@ -43,6 +45,16 @@ through `window.api` (see `electron/preload.js`).
   local JSON file (so the app still works offline); `contacts:save` always writes local
   JSON first, THEN pushes to the sheet, returning `{ok:true, synced:false, syncError}` if
   the push fails — local data is never lost to a sync error.
+- **Sync state (v6.1)**: a failed push is recorded in `app-config.json` (`gsPending` per
+  collection, `gsLastError`, `gsNeedsReauth`, `gsLastOkAt`) by `gsMarkPending`/`gsClearPending`,
+  and `gsErrInfo(e)` turns the googleapis error into plain English + a `needsReauth` flag.
+  While a collection is pending, its `:load` does NOT mirror the sheet over local — it pushes
+  the newer LOCAL data up instead (so a sheet left stale by failed pushes can't overwrite recent
+  work, and the app catches up by itself next launch). `gsheets:syncState` reports it;
+  `gsheets:syncNow` re-pushes every collection from local. The renderer surfaces it through
+  `syncWatch` → the Tracker sync line, a toast, and the Settings → Data & sync card.
+  NB: this makes LOCAL the source of truth for a pending collection — everywhere else the sheet
+  still wins on load.
 - **Handlers**: `gsheets:getStatus`, `gsheets:setCredentials`, `gsheets:connect`,
   `gsheets:createSheet` (make a fresh sheet), `gsheets:linkSheet` (adopt an existing one by
   URL/ID), `gsheets:disconnect`, `gsheets:openSheet`. Helper `gsApi(auth)` builds the
@@ -85,6 +97,8 @@ sign in, and **Link** the same sheet (paste its URL).
 | `Not signed in to Google` | No `gTokens` in config | Run **Sign in with Google** first (`gsheets:connect`). |
 | Contacts not appearing on another device | Different sheet linked, or not signed in there | Confirm both devices are signed in and **Linked to the same sheet ID** (check `gsheets:getStatus`). |
 | `googleapis package not installed` | Dependency missing | `npm install` in the app folder. |
+| **Sheet silently stops updating after ~a week** (`invalid_grant` / "Token has been expired or revoked") | The Cloud app is in **Testing** publishing status, where refresh tokens expire after **7 days** | Set **Google Auth Platform → Audience → Publishing status = In production** (no verification needed for this scope), then **Sign in with Google again** in the app. Since v6.1 the app names this error and offers the re-sign-in + an automatic catch-up push. |
+| Sheet is behind but the app looked fine | Pre-v6.1: failed pushes were silent | Update to 6.1+: the Tracker says "Google Sheets is behind" with **Sync now**, and Settings → Data & sync shows the reason. |
 
 ## When editing this integration
 
@@ -92,6 +106,11 @@ sign in, and **Link** the same sheet (paste its URL).
   `userData/app-config.json`. Never log tokens.
 - Preserve the **local-first** contract: `contacts:save` must write local JSON before the
   sheet push and must not fail the save when the sheet push fails.
+- Preserve the **v6.1 sync-state contract**: a failed push calls `gsMarkPending(key, err)`, a good
+  one `gsClearPending(key)`, and `<key>:load` must NOT mirror the sheet over local while that key
+  is pending (it pushes local up instead). Any new synced collection must be added to
+  `GS_COLLECTIONS` so "Sync everything now" covers it. Surface failures through `syncWatch` in the
+  renderer — never drop a save's `{synced:false}` result.
 - If you change `CONTACT_HEADERS`, the sheet's column order changes — old sheets need a
   re-save. Keep it aligned with the contact record shape in `CLAUDE.md`.
 - After edits: `node --check electron/main.js`, and confirm every `gsheets:*` handler in

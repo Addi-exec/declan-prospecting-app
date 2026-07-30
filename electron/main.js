@@ -279,6 +279,59 @@ const GS_JSON_OBJ_FIELDS = { listingMeta: 1 }; // single objects → stored as J
 const GS_NUM_FIELDS = { stepsDone:1, budgetMin:1, budgetMax:1, bedsMin:1, bathsMin:1, carMin:1, landMin:1, price:1, priceMax:1, beds:1, baths:1, car:1, land:1, salePrice:1, intervalDays:1, timesDropped:1, lat:1, lng:1 };
 const GS_BOOL_FIELDS = { archived: 1 };
 
+/* Sync state (v6.1) — a failed sheet push used to be silent: the save returned
+   {synced:false} and every caller dropped it, so the app kept saying "Syncing to Google
+   Sheets" while nothing landed for days. We now remember, per collection, that the local
+   file holds changes the sheet never got (`gsPending`), plus the last error, so the UI can
+   say so, a retry can push them, and — importantly — a LOAD never mirrors a stale sheet
+   over newer local data. Never store tokens or secrets in these fields. */
+function gsMarkPending(key, err) {
+  const info = gsErrInfo(err);
+  updateConfig((c) => {
+    c.gsPending = Object.assign({}, c.gsPending); c.gsPending[key] = true;
+    c.gsLastError = info.message;
+    // Sticky while anything is still pending: one dead token breaks every collection, and a
+    // later network blip must not downgrade "sign in again" to a generic failure.
+    c.gsNeedsReauth = !!c.gsNeedsReauth || info.needsReauth;
+    c.gsLastErrorAt = Date.now();
+  });
+  return info;
+}
+function gsClearPending(key) {
+  updateConfig((c) => {
+    if (c.gsPending) delete c.gsPending[key];
+    c.gsLastOkAt = Date.now();
+    // Only declare all-clear once nothing is still waiting to go up.
+    if (!c.gsPending || !Object.keys(c.gsPending).length) { c.gsLastError = ''; c.gsNeedsReauth = false; c.gsLastErrorAt = 0; }
+  });
+}
+function gsPendingKeys() { const c = readConfig(); return Object.keys(c.gsPending || {}); }
+
+/* Turn a googleapis error into something Declan can act on (and a needsReauth flag). */
+function gsErrInfo(e) {
+  const d = (e && e.response && e.response.data) || {};
+  // Match on EVERY part Google might use — an expired refresh token arrives as
+  // {error:'invalid_grant', error_description:'Token has been expired or revoked.'},
+  // so reading error_description alone would miss the invalid_grant marker entirely.
+  const errField = d.error && (typeof d.error === 'string' ? d.error : (d.error.message || d.error.status || ''));
+  const parts = [d.error_description, errField, e && e.message, e && (e.code || e.status)].filter(Boolean).map(String);
+  const s = String(d.error_description || errField || (e && e.message) || e);
+  const low = parts.join(' | ').toLowerCase(), code = (e && (e.code || e.status)) || 0;
+  if (low.indexOf('invalid_grant') > -1 || low.indexOf('invalid credentials') > -1 || low.indexOf('invalid_token') > -1 ||
+      low.indexOf('expired or revoked') > -1 || low.indexOf('token has been expired') > -1 ||
+      low.indexOf('unauthenticated') > -1 || code === 401)
+    return { needsReauth: true, message: 'Google signed the app out — the sign-in expired or was revoked. Hit “Sign in with Google” again and your data will go straight up.' };
+  if (low.indexOf('has not been used') > -1 || low.indexOf('is disabled') > -1)
+    return { needsReauth: false, message: 'The Google Sheets API is switched off for this Google Cloud project. Enable it, wait a minute, then retry.' };
+  if (low.indexOf('permission') > -1 || code === 403)
+    return { needsReauth: false, message: 'This Google account isn’t allowed to edit that sheet (permission denied).' };
+  if (low.indexOf('not found') > -1 || low.indexOf('unable to parse range') > -1 || code === 404)
+    return { needsReauth: false, message: 'The linked sheet (or one of its tabs) can’t be found — it may have been deleted, renamed, or moved to another account.' };
+  if (low.indexOf('timeout') > -1 || low.indexOf('etimedout') > -1 || low.indexOf('enotfound') > -1 || low.indexOf('econnreset') > -1 || low.indexOf('network') > -1)
+    return { needsReauth: false, message: 'Couldn’t reach Google — no internet, or the request timed out.' };
+  return { needsReauth: false, message: s };
+}
+
 async function gsLoadTab(auth, sheetId, tab) {
   const api = gsApi(auth);
   const res = await api.spreadsheets.values.get({ spreadsheetId: sheetId, range: tab + '!A:ZZ' }, GS_REQ_OPTS);
@@ -354,6 +407,18 @@ function makeCollectionHandlers(key, tab, headers) {
       if (cfg.gTokens && cfg.gSheetId) {
         const auth = getAuthClient();
         if (auth) {
+          // Changes that never reached the sheet must WIN. Without this, a sheet left
+          // stale by days of failed pushes would be mirrored over the newer local file
+          // the moment syncing started working again — silently losing that work.
+          if (gsPendingKeys().indexOf(key) > -1) {
+            const local = readData()[key] || [];
+            try {
+              await ensureTabs(auth, cfg.gSheetId);
+              await gsSaveTab(auth, cfg.gSheetId, tab, headers, local);
+              gsClearPending(key);            // caught up — the sheet now matches local
+            } catch(e) { gsMarkPending(key, e); }
+            return local;
+          }
           try {
             const rows = await gsLoadTab(auth, cfg.gSheetId, tab);
             // Mirror to the local file so the app still works offline.
@@ -377,8 +442,12 @@ function makeCollectionHandlers(key, tab, headers) {
           try {
             await ensureTabs(auth, cfg.gSheetId);
             await gsSaveTab(auth, cfg.gSheetId, tab, headers, arr || []);
+            gsClearPending(key);
             return { ok: true, synced: true };
-          } catch(e) { return { ok: true, synced: false, syncError: String(e) }; }
+          } catch(e) {
+            const info = gsMarkPending(key, e);
+            return { ok: true, synced: false, syncError: info.message, needsReauth: info.needsReauth };
+          }
         }
       }
       return { ok: true };
@@ -391,6 +460,60 @@ makeCollectionHandlers('buyers', 'Buyers', BUYER_HEADERS);
 makeCollectionHandlers('properties', 'Properties', PROPERTY_HEADERS);
 makeCollectionHandlers('inspections', 'Inspections', INSPECTION_HEADERS);
 makeCollectionHandlers('drops', 'Drops', DROP_HEADERS);
+
+/* The five synced collections, in one place, so syncNow can walk them. */
+const GS_COLLECTIONS = [
+  { key: 'contacts',    tab: 'Contacts',    headers: CONTACT_HEADERS },
+  { key: 'buyers',      tab: 'Buyers',      headers: BUYER_HEADERS },
+  { key: 'properties',  tab: 'Properties',  headers: PROPERTY_HEADERS },
+  { key: 'inspections', tab: 'Inspections', headers: INSPECTION_HEADERS },
+  { key: 'drops',       tab: 'Drops',       headers: DROP_HEADERS }
+];
+
+/* What the UI needs to tell the truth about syncing (v6.1). */
+ipcMain.handle('gsheets:syncState', async () => {
+  const c = readConfig();
+  return {
+    connected: !!(c.gTokens && c.gSheetId),
+    pending: Object.keys(c.gsPending || {}),
+    lastError: c.gsLastError || '',
+    needsReauth: !!c.gsNeedsReauth,
+    lastErrorAt: c.gsLastErrorAt || 0,
+    lastOkAt: c.gsLastOkAt || 0
+  };
+});
+
+/* Push every collection from the LOCAL file up to the sheet (local is the newer copy
+   whenever a push has been failing). Used by the "Sync everything now" retry. */
+ipcMain.handle('gsheets:syncNow', async () => {
+  const cfg = readConfig();
+  if (!(cfg.gTokens && cfg.gSheetId)) return { ok: false, error: 'Not connected to a Google Sheet.' };
+  const auth = getAuthClient();
+  if (!auth) return { ok: false, error: 'Not signed in to Google.' };
+  const d = readData();
+  const results = [];
+  try { await ensureTabs(auth, cfg.gSheetId); }
+  catch (e) {
+    const info = gsErrInfo(e);
+    return { ok: false, error: info.message, needsReauth: info.needsReauth };
+  }
+  for (const col of GS_COLLECTIONS) {
+    try {
+      await gsSaveTab(auth, cfg.gSheetId, col.tab, col.headers, d[col.key] || []);
+      gsClearPending(col.key);
+      results.push({ key: col.key, tab: col.tab, ok: true, rows: (d[col.key] || []).length });
+    } catch (e) {
+      const info = gsMarkPending(col.key, e);
+      results.push({ key: col.key, tab: col.tab, ok: false, error: info.message, needsReauth: info.needsReauth });
+    }
+  }
+  const failed = results.filter((r) => !r.ok);
+  return {
+    ok: !failed.length, results: results,
+    error: failed.length ? failed[0].error : '',
+    needsReauth: failed.some((r) => r.needsReauth)
+  };
+});
 
 /* Activity log — LOCAL ONLY (never synced to Google Sheets; per-machine call/SMS
    counters that power the Tracker's "This week" stats). */
@@ -721,7 +844,12 @@ ipcMain.handle('gsheets:createSheet', async (_e, contacts) => {
     await gsSaveTab(auth, sheetId, 'Buyers', BUYER_HEADERS, d.buyers);
     await gsSaveTab(auth, sheetId, 'Properties', PROPERTY_HEADERS, d.properties);
     await gsSaveTab(auth, sheetId, 'Inspections', INSPECTION_HEADERS, d.inspections);
-    updateConfig((cfg) => { cfg.gSheetId = sheetId; cfg.gSheetName = 'Declan Prospecting Contacts'; });
+    await gsSaveTab(auth, sheetId, 'Drops', DROP_HEADERS, d.drops);   // was missed — a new sheet got an empty Drops tab
+    updateConfig((cfg) => {
+      cfg.gSheetId = sheetId; cfg.gSheetName = 'Declan Prospecting Contacts';
+      // Everything local just went up, so nothing is waiting any more.
+      cfg.gsPending = {}; cfg.gsLastError = ''; cfg.gsNeedsReauth = false; cfg.gsLastErrorAt = 0; cfg.gsLastOkAt = Date.now();
+    });
     return { ok: true, sheetId, sheetName: 'Declan Prospecting Contacts', sheetUrl: 'https://docs.google.com/spreadsheets/d/' + sheetId };
   } catch(e) { return { ok: false, error: String(e) }; }
 });
@@ -737,13 +865,22 @@ ipcMain.handle('gsheets:linkSheet', async (_e, urlOrId) => {
     const meta = await api.spreadsheets.get({ spreadsheetId: sheetId }, GS_REQ_OPTS);
     const sheetName = meta.data.properties.title;
     await ensureTabs(auth, sheetId);
-    updateConfig((cfg) => { cfg.gSheetId = sheetId; cfg.gSheetName = sheetName; });
+    updateConfig((cfg) => {
+      cfg.gSheetId = sheetId; cfg.gSheetName = sheetName;
+      // Linking is a deliberate "adopt THIS sheet", so drop any pending-push state from a
+      // previous sheet — otherwise the next load would push local data over the one just linked.
+      cfg.gsPending = {}; cfg.gsLastError = ''; cfg.gsNeedsReauth = false; cfg.gsLastErrorAt = 0;
+    });
     return { ok: true, sheetId, sheetName };
   } catch(e) { return { ok: false, error: String(e) }; }
 });
 
 ipcMain.handle('gsheets:disconnect', () => {
-  updateConfig((cfg) => { delete cfg.gTokens; delete cfg.gSheetId; delete cfg.gSheetName; });
+  updateConfig((cfg) => {
+    delete cfg.gTokens; delete cfg.gSheetId; delete cfg.gSheetName;
+    // No sheet to be behind any more — don't leave a stale warning in the UI.
+    delete cfg.gsPending; cfg.gsLastError = ''; cfg.gsNeedsReauth = false; cfg.gsLastErrorAt = 0;
+  });
   return { ok: true };
 });
 

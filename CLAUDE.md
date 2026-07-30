@@ -160,6 +160,8 @@ The renderer NEVER touches Node/fs directly. Everything goes through:
   - `gsConnect()` -> runs the browser OAuth flow (localhost:42813 redirect)
   - `gsCreateSheet(contacts)` / `gsLinkSheet(url)` — make or adopt a sheet
   - `gsDisconnect()` / `gsOpenSheet(url)`
+  - `gsSyncState()` -> { connected, pending[], lastError, needsReauth, lastErrorAt, lastOkAt }
+  - `gsSyncNow()` -> re-pushes every collection from the local file; { ok, results[], error, needsReauth }
   When connected, `loadContacts`/`saveContacts` read/write the sheet (mirrored to
   the local JSON file); a sync failure never loses local data.
 
@@ -194,6 +196,31 @@ The renderer NEVER touches Node/fs directly. Everything goes through:
 - When connected, `<key>:load` reads the tab (mirrors to local JSON), `<key>:save` writes local
   JSON first then pushes to the tab — a sync failure returns `{ok:true, synced:false, syncError}`
   and never loses local data. `gsLoadTab` throws on a missing tab so the caller falls back to local.
+- **Sync state + local-wins (v6.1)** — a failed push used to be invisible (every renderer save
+  dropped the IPC result, so the Tracker still claimed "Syncing to Google Sheets" while the sheet
+  went stale for days). Now:
+  - `main.js` records it in `app-config.json`: `gsPending` (map of collection keys whose local
+    changes never reached the sheet), `gsLastError`, `gsNeedsReauth`, `gsLastErrorAt`, `gsLastOkAt`
+    — via `gsMarkPending(key, err)` / `gsClearPending(key)` / `gsPendingKeys()`. `gsErrInfo(e)`
+    maps a googleapis error to plain English + a `needsReauth` flag (matches `invalid_grant`,
+    "Token has been expired or revoked", 401 → re-auth; 403, 404/missing tab, API-disabled,
+    network get their own wording). NEVER put tokens/secrets in these fields.
+  - **`<key>:load` will not mirror a stale sheet over newer local data**: if that key is pending it
+    pushes LOCAL up instead and returns local. So the app self-heals on the next launch once auth
+    is fixed. (Trade-off: with two machines, a pending push wins over the other machine's newer
+    sheet rows — the store has always been last-writer-wins per tab; losing the user's own
+    unsynced work silently was the worse failure.)
+  - `gsheets:syncState` → `{connected, pending[], lastError, needsReauth, lastErrorAt, lastOkAt}`;
+    `gsheets:syncNow` re-pushes all five collections from the LOCAL file (`GS_COLLECTIONS`) and
+    reports per-tab results. `createSheet` (now including Drops) / `linkSheet` / `disconnect` all
+    reset the pending state — linking means "adopt THIS sheet", so a stale pending push can't
+    overwrite it.
+  - Renderer: `syncWatch(promise)` wraps all five `*SaveCache` calls; `syncFailed`/`syncOk` drive
+    `SYNC_ERR`/`SYNC_PENDING`, the `#tracker-sync-pill` warning ("Google Sheets is behind — Sync
+    now"), a throttled toast (max 1/30s), and `gsRenderSyncCard` in Settings → Data & sync
+    (reason + "Sync everything now" + "Sign in with Google again" via `gsReconnectAndSync`).
+    `syncRefreshState()` runs ~2.5s after launch (so the loads' auto-retry settles first) and on
+    entering Settings.
 - Full setup + every Google Cloud error fix: the `google-sheets-integration` skill.
 
 ### Contact record shape
@@ -423,7 +450,7 @@ topbar CSS is left in place as a historical layer.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **6.0.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **6.1.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
