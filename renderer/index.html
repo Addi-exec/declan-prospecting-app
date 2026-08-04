@@ -1549,7 +1549,7 @@
 </div>
 <!-- JS NURTURE -->
 <div id="js-nurture" class="js-track" style="display:none;">
-<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">For anyone who didn't convert in the 12-day sequence. No pressure, no agenda — just staying warm so you're the first name they think of when the time comes. Pick the track that matches their temperature.</div>
+<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">For anyone who didn't convert in the follow-up sequence. No pressure, no agenda — just staying warm so you're the first name they think of when the time comes. Pick the track that matches their temperature.</div>
 <div class="btn-bar">
 <button class="jsn-tab branch-tab active" onclick="showJsnTab('jsn-hot',this)" style="border:none;font-weight:600;background:var(--danger-bg);color:var(--danger);"> HOT</button>
 <button class="jsn-tab branch-tab" onclick="showJsnTab('jsn-warm',this)"> WARM</button>
@@ -1562,7 +1562,10 @@
 <div class="sms-label" style="margin-top:12px;">SMS 2 — 24hrs no reply</div>
 <div class="sms-bubble">Hi [Name], Declan here — just following up 😊 Happy to work around you completely — even a quick call over lunch works. Let me know what suits!</div>
 <div class="sms-label" style="margin-top:12px;">SMS 3 — Day 3, add urgency</div>
-<div class="sms-bubble">Hey [Name], one of the buyers from [suburb] is still looking and hasn't found anything yet. If the timing worked for you it could be a really smooth process. Worth a quick 10 min call? 🙏</div>
+<div class="sms-bubble">Hey [Name], one of the buyers from [suburb] is still looking and hasn't found anything yet. If the timing ever worked for you it could be a really smooth process — thought it was worth mentioning.</div>
+<div class="sms-label" style="margin-top:12px;">Day 5 — one call, then let it cool</div>
+<div class="script-block" style="font-size:13px;">"Hi [Name], Declan here — I sent you a couple of texts, so I won't keep chasing. I just didn't want to let it go without actually speaking to you. Is the appraisal something you'd still want done, or is it more a down-the-track thing?"</div>
+<div class="tip-box" style="margin-top:12px;"><strong>No reply to any of it?</strong> Move them to the WARM track — change their outcome in the tracker and they pick up the monthly touches instead.</div>
 <div class="tip-box"><strong>HOT tip:</strong> Speed is everything. A hot lead that doesn't hear back within hours cools fast. Send SMS 1 within the hour.</div>
 </div>
 <div id="jsn-warm" class="jsn-track" style="display:none;">
@@ -1575,6 +1578,10 @@
 <div class="sms-bubble">Hi [Name], Declan. Has anything changed, or are you still thinking more towards [timeframe]? Either way totally fine — just like to stay in touch 😊</div>
 <div class="sms-label" style="margin-top:12px;">Month 6 — seasonal touch</div>
 <div class="sms-bubble">Hey [Name]! Hope you've had a great [season]. [suburb] market is looking really interesting heading into [upcoming season] — if you want the latest numbers just say the word. Hope everything's going well!</div>
+<div class="sms-label" style="margin-top:12px;">Month 9 — the year in one line</div>
+<div class="sms-bubble">Hi [Name], Declan here. [suburb] has moved a fair bit this year — [one line stat]. If you're still thinking [timeframe], now's a good moment to get a current number so you're not guessing when it comes time.</div>
+<div class="sms-label" style="margin-top:12px;">Month 12 — the anniversary check</div>
+<div class="sms-bubble">Hi [Name], Declan here — it's been about a year since we first spoke about [street]. Has anything changed on your end? Happy to swing past and give you an updated figure whenever it's useful.</div>
 <div class="tip-box"><strong>WARM tip:</strong> Stay present with something useful every 3–4 weeks. Going quiet then reappearing with a pitch is the biggest mistake agents make.</div>
 </div>
 <div id="jsn-cold" class="jsn-track" style="display:none;">
@@ -1582,11 +1589,13 @@
 <div class="sms-label">Month 1 — friendly re-intro</div>
 <div class="sms-bubble">Hi [Name], Declan here — tried to reach you a while back about a sale in your street. No stress at all. I keep an eye on [suburb] and I'm always happy to chat if you want the latest. Hope you're well! 😊</div>
 <div class="sms-label" style="margin-top:12px;">Month 2 — pure value, no ask</div>
-<div class="sms-bubble">Hey [Name], Declan here. [address nearby] just sold for [result] — a really strong result for your street. No reply needed, just keeping you in the loop 👋</div>
+<div class="sms-bubble">Hey [Name], Declan here. [address nearby] just sold for [result] — a really strong result for your street. No reply needed, just keeping you in the loop.</div>
 <div class="sms-label" style="margin-top:12px;">Month 4 — ultra short check-in</div>
-<div class="sms-bubble">Hey [Name]! Declan here — just a quick hi. Still keeping an eye on [suburb] for you. Here if you ever need anything 👍</div>
+<div class="sms-bubble">Hey [Name]! Declan here — just a quick hi. Still keeping an eye on [suburb] for you. Here if you ever need anything 😊</div>
 <div class="sms-label" style="margin-top:12px;">Month 9+ — quarterly keepalive</div>
-<div class="sms-bubble">Hey [Name]! Declan here — quick quarterly hello 😄 [suburb] update: [one line stat]. Still here if you ever want a chat. Hope all's well!</div>
+<div class="sms-bubble">Hey [Name]! Declan here — quick quarterly hello. [suburb] update: [one line stat]. Still here if you ever want a chat. Hope all's well!</div>
+<div class="sms-label" style="margin-top:12px;">Month 12 — the year mark</div>
+<div class="sms-bubble">Hi [Name], Declan here. A year on from that [street] sale — the street's now doing [one line stat]. Worth knowing even if you're not going anywhere. Always here if you want the current number on your place.</div>
 <div class="tip-box"><strong>COLD tip:</strong> Cold contacts often convert months or years later. You just need to be the agent who never disappeared.</div>
 </div>
 </div>
@@ -3070,9 +3079,9 @@ document.addEventListener('DOMContentLoaded', objInit);
 /* ===== Contact tracker engine ===== */
 var METHODS = {
   justsold:{ label:'Just sold street', sheet:'Just Sold Street', chipBg:'var(--blue-bg)', chipFg:'var(--blue)', ms:{
-    noanswer:[{d:1,t:'Voicemail + SMS'},{d:7,t:'Final SMS → nurture'},{d:60,t:'Nurture touch'},{d:120,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
+    noanswer:[{d:1,t:'Voicemail + SMS'},{d:7,t:'Final SMS → nurture'},{d:60,t:'Nurture touch'},{d:120,t:'Nurture touch'},{d:180,t:'Nurture touch'},{d:270,t:'Nurture touch'},{d:365,t:'Nurture touch'}],
     interested:[{d:0,t:'Recap SMS'},{d:1,t:'Deliver data SMS'},{d:3,t:'Call — lock in appraisal'},{d:6,t:'Confirm appointment SMS'},{d:8,t:'Post-appraisal thank-you SMS'}],
-    notinterested:[{d:0,t:'Gracious SMS + data'},{d:7,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:90,t:'Nurture touch'},{d:180,t:'Nurture touch'}]
+    notinterested:[{d:0,t:'Gracious SMS + data'},{d:7,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:90,t:'Nurture touch'},{d:180,t:'Nurture touch'},{d:270,t:'Nurture touch'},{d:365,t:'Nurture touch'}]
   }},
   listed:{ label:'Just listed', sheet:'Just Listed', chipBg:'var(--green-bg)', chipFg:'var(--green)', ms:{
     noanswer:[{d:1,t:'Voicemail + SMS'},{d:2,t:'Preview invite SMS'},{d:5,t:'SMS — value'},{d:9,t:'SMS — check in'},{d:12,t:'Final SMS → nurture'},{d:60,t:'Nurture touch'},{d:120,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
