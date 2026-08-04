@@ -437,6 +437,16 @@ topbar CSS is left in place as a historical layer.
 - **Tracker dashboard** (`.dash` / `.dash-main` / `.dash-rail`): due queue + call session on the
   left, a sticky rail (stats, "This week", `#tracker-sync-pill`, "+ Log contact") on the right,
   "All contacts" full-width below. ≤1100px it stacks back into the old order.
+### Buyers list filters (v7.4.0)
+Three stacked filters, all AND-ed with the search box: the existing `#buyer-filter-bar`
+(Active/Archived/All, `buyerFilter`) stays full-width above the search, while
+`#buyer-type-bar` (`buyerTypeFilter` = `all|fhb|upgrader|downsizer|investor`) and
+`#buyer-budget-bar` (`buyerBudgetFilter` = `all` or a `BUYER_BANDS` id) sit INSIDE the list
+column, above the rows, rendered by `buyerRenderTable` itself. `BUYER_BANDS` is an OVERLAP
+test via `buyerInBand` — blank `budgetMin`→0, blank `budgetMax`→Infinity — so a buyer spanning
+two bands shows in both and a buyer with no budget shows in all. `buyerCapList()` caps the list
+at ten rows exactly like `propCapList()` (same measure-the-tenth-row trick, same `showPanel` re-run).
+
 - **Master–detail** (Buyers / Properties / Inspections): `.md` grid = `.md-list` of compact
   `.md-row` buttons + a sticky `.md-detail` pane. One selection id per panel (`BUYER_SEL`,
   `PROP_SEL`, `INSP_SEL`), resolved by `mdResolveSel(cur, filteredList)` (a selection survives
@@ -510,7 +520,7 @@ topbar CSS is left in place as a historical layer.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **7.3.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **7.4.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
