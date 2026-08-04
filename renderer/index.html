@@ -1189,6 +1189,8 @@
   .obj-pill:hover { background: var(--hover-ink); color: var(--text); }
   .obj-pill.active { background: var(--danger-bg); border-color: var(--danger-border);
     color: var(--danger); font-weight: 600; }
+  .obj-pill.br-pill.active { background: var(--green-bg); border-color: var(--green);
+    color: var(--green); }
   .obj-panel .obj-q { font-size: 13.5px; font-style: italic; color: var(--text2);
     margin-bottom: 8px; }
   .obj-panel .script-block { font-size: 15px; }
@@ -1866,86 +1868,51 @@
 </div>
 <div class="method-tabs">
 <button class="bd-tab method-tab active" onclick="showBdTab('bd-openers',this)" style="border:none;font-weight:600;background:var(--teal-bg);color:var(--teal);">Openers</button>
-<button class="bd-tab method-tab" onclick="showBdTab('bd-objections',this)">Objections</button>
-<button class="bd-tab method-tab" onclick="showBdTab('bd-closes',this)">Closes</button>
 <button class="bd-tab method-tab" onclick="showBdTab('bd-followup',this)">Follow-up</button>
 <button class="bd-tab method-tab" onclick="showBdTab('bd-nurture',this)">Nurture</button>
 </div>
-<!-- BD OPENERS -->
+<!-- BD OPENERS — diagnostic opener + branch picker -->
 <div id="bd-openers" class="bd-track">
-<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:14px 18px;margin-bottom:20px;">
-<div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Diagnose before you pitch</div>
-<p class="muted-sm">You have zero context. Their answer to the first question tells you everything. Branch to the right script from there.</p>
+<div class="script-label" style="margin-top:0;">The diagnostic opener — use every time</div>
+<div class="opener-lead">
+<div class="script-block">"Hi [Name], it's Declan here — I know this might be a little out of the blue. You came through one of my open homes in [suburb] a while back, and I just wanted to touch base and see how things ended up for you. Did you manage to find something?"</div>
 </div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--text);">The diagnostic opener — use every time</div>
-<span style="font-size:11px;background:var(--green-bg);color:var(--green);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;">Start here</span>
+<div class="fork-arrow">Their answer tells you which call you're on</div>
+<div class="br-picker" data-br="bd"></div>
+<div class="tip-box" style="margin-top:18px;"><strong>"I don't remember coming to your open."</strong> — "No worries at all, it was a while back. I keep my open home registrations so I can stay in touch with people who were interested in the area. You had a look around [suburb] — I just wanted to see if anything had changed for you." Then carry on with the diagnostic question.</div>
+
+<div class="fork" style="margin-top:22px;">
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Someone else answers</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Wrong person / partner picks up</div>
+<div class="script-block">"Oh sorry — I was after [Name]. It's Declan, one of the local agents in [suburb]. Nothing urgent: they came through one of my open homes a while back and I'm just checking in to see how they went. Did you two end up finding something?"</div>
 </div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Hi [Name], it's Declan here — I know this might be a little out of the blue. You came through one of my open homes in [suburb] a while back, and I just wanted to touch base and see how things ended up for you. Did you manage to find something in the area, or is the search still ongoing?"</div>
-<div style="background:var(--blue-bg);border-radius:var(--r-xs);padding:10px 14px;margin-top:12px;">
-<div style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--blue);margin-bottom:6px;">Branch guide</div>
-<div style="font-size:13px;color:var(--text2);margin-bottom:6px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">"Yes, we bought"</span> → Branch A below</div>
-<div style="font-size:13px;color:var(--text2);margin-bottom:6px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">"Still looking"</span> → Branch B below</div>
-<div class="muted-sm"><span style="font-weight:600;color:var(--text);">"Gave up / staying put"</span> → Branch C below</div>
-</div>
-</div>
-</div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;"><div style="font-size:13px;font-weight:600;color:var(--text);">Branch A — "Yes we bought" → Seller pivot</div></div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Oh that's great — whereabouts did you end up? ... Nice. How have you found it? ... That's really good to hear. I ask because the market around there has been moving really well lately. Sometimes once people settle in and life moves on, the idea of upsizing or moving on comes up again. Is that something that's crossed your mind at all, even down the track?"</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Cialdini — liking</span><span class="tag">Soft pivot</span><span class="tag">Open question</span></div>
+<div>
+<div class="fork-step">Number's been reassigned</div>
+<div class="script-block">"Ah, my apologies — I've got an old number then. Sorry to trouble you, I'll take it off my list. Have a good one."</div>
 </div>
 </div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;"><div style="font-size:13px;font-weight:600;color:var(--text);">Branch B — "Still looking" → Re-engage buyer</div></div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Oh really — still on the hunt? That's actually why I'm calling. The [suburb] market has shifted quite a bit and I've had a couple of properties come through recently that didn't even make it to realestate.com.au. What's changed for you in terms of what you're looking for?"</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Exclusivity — off-market</span><span class="tag">Re-qualify</span><span class="tag">Reciprocity</span></div>
+</div>
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Nobody picks up</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Voicemail — keep it under 20 seconds</div>
+<div class="script-block">"Hi [Name], it's Declan, one of the local agents around [suburb]. You came through one of my open homes a while back — I'm just checking in to see how you went and whether you found something. Give me a call back on [number] whenever suits. Cheers [Name]."</div>
+</div>
+<div>
+<div class="fork-step">Text straight after</div>
+<div class="sms-bubble">Hi [Name], Declan here — local agent, just left you a voicemail. You came through one of my [suburb] opens a while back; just checking in to see how you ended up going. Did you find something in the end?</div>
 </div>
 </div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;"><div style="font-size:13px;font-weight:600;color:var(--text);">Branch C — "Gave up / staying put" → Life events re-open</div></div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Oh totally understandable — the market's been a lot. I just wanted to check in because things have actually changed quite a bit since [year]. Has anything shifted for you since then — family, work, space? Sometimes the reason people were looking comes back around in a different way."</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Empathy first</span><span class="tag">Life events trigger</span><span class="tag">No pressure re-open</span></div>
 </div>
+
 </div>
-<div class="tip-box"><strong>Data point:</strong> 68% of real estate agents report receiving successful follow-up after cold calling past open home attendees. The diagnostic first question is what most agents skip.</div>
-</div>
-<!-- BD OBJECTIONS -->
-<div id="bd-objections" class="bd-track" style="display:none;">
-<div class="objection-item" style="padding-top:0;border-top:none;">
-<div class="objection-q">"I don't remember coming to your open."</div>
-<div class="objection-a">"No worries at all — it was a while back. I keep all my open home registrations so I can stay in touch with people who were interested in the area. You had a look at [suburb] — I just wanted to check in and see if your situation had changed."</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"We're happy where we are."</div>
-<div class="objection-a">"That's great to hear — honestly that's the best outcome. I just like to check in with people I've met, especially when the market in your area is doing something interesting. Would it be alright if I sent through a quick market update every now and then? Completely no-obligation."</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"We're working with another agent."</div>
-<div class="objection-a">"Absolutely, I wouldn't dream of stepping on that. I just wanted to reconnect and say hi. If anything ever changes or you want a second opinion on the market, I'm always happy to help."</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"We bought years ago, why are you calling now?"</div>
-<div class="objection-a">"Fair question — I keep in touch with people I've met in the market because sometimes the next chapter comes around sooner than expected. Just wanted to check in and see how things were going. No agenda at all."</div>
-</div>
-<div class="tip-box"><strong>Tone tip:</strong> These calls feel more like a genuine check-in than a cold pitch — because they are. Lead with warmth and you'll disarm 80% of resistance before it starts.</div>
-</div>
-<!-- BD CLOSES -->
-<div id="bd-closes" class="bd-track" style="display:none;">
-<div class="script-label">Close 1 — appraisal for the buyer who bought</div>
-<div class="script-block">"You've been in the property a couple of years now — it'd be interesting to know what it's worth today compared to what you paid. I can give you a rough number in 20 minutes, no cost, no obligation. Would that be useful? I'm in [suburb] this week."</div>
-<div class="script-label">Close 2 — off-market match for the buyer still looking</div>
-<div class="script-block">"I've got a couple of properties that haven't gone to market yet and won't for a few weeks. If they're in the right range for you, I'd rather call you first than put them online. Can I send you through the details?"</div>
-<div class="script-label">Close 3 — market update for long-term nurture</div>
-<div class="script-block">"Can I drop you a market update for [suburb] every quarter by text? It's just a quick summary of what's sold and what things are worth. That way if the idea ever comes up again, you've already got the data. What's the best mobile?"</div>
-<div class="script-label">Close 4 — straight appraisal ask</div>
-<div class="script-block">"Would it be worth 20 minutes for me to come through and give you an accurate figure on what your place would sell for today? No pitch, no pressure. I'd just like to put a number in front of you and let you decide what to do with it."</div>
-<div class="tags"><span class="tag">Assumptive but low pressure</span><span class="tag">Off-market exclusivity</span><span class="tag">Text close — long game</span></div>
+<div class="tip-box"><strong>Diagnose before you pitch:</strong> you have zero context on these people. The first question does all the work — most agents skip it and pitch into the dark.</div>
 </div>
 <!-- BD FOLLOW-UP -->
 <div id="bd-followup" class="bd-track" style="display:none;">
@@ -3053,6 +3020,106 @@ var OBJECTIONS = {
       f:'"While I’ve got you — it’s [address], going to market at [price guide]. Worth knowing what’s happening in your own street."' }
   ]
 };
+/* Branch picker — same interaction as the objection pills, but each choice holds a
+   multi-step path rather than one answer. Used where the call forks on their reply
+   instead of on a pushback: <div class="br-picker" data-br="bd"></div>. */
+var BRANCHES = {
+  bd: [
+    { pill:'"Yes, we bought"',
+      sub:'Seller pivot — they own something now',
+      steps:[
+        { s:'1 — Be pleased for them, and get them talking',
+          t:'"Oh that\'s great — whereabouts did you end up? … Nice one. How have you found it?"' },
+        { s:'2 — The pivot',
+          t:'"I ask because the market around there has been moving really well lately. Sometimes once people settle in and life moves on a bit, the place stops fitting the way it used to."' },
+        { s:'3 — The ask',
+          t:'"You\'ve been in it a couple of years now — it\'d be interesting to know what it\'s worth today compared to what you paid. I could give you a real number in 20 minutes. Is that something you\'d want me to do for you?"' },
+        { s:'4 — Lock it in and get the details',
+          t:'"Perfect. What does your week look like? … Let\'s say [day] at [time], I\'ll put it in the diary. Best mobile? … And anything you\'ve done to the place I should know about?"' },
+        { s:'If they ask why you\'re calling after all this time',
+          t:'"Fair question — I keep in touch with people I\'ve met in the market, because sometimes the next chapter comes around sooner than expected. No agenda at all, just wanted to see how it worked out for you."' },
+        { s:'If they\'re happy where they are',
+          t:'"That\'s the best outcome, honestly. Would it be alright if I sent you a quick market update for the area now and then? That way if it ever does come up, you\'ve already got the numbers."' }
+      ] },
+    { pill:'"Still looking"',
+      sub:'Re-engage them as a buyer',
+      steps:[
+        { s:'1 — Re-qualify',
+          t:'"Oh really — still on the hunt? That\'s actually why I\'m calling. What\'s changed for you since then? Same areas, or has the search moved?"' },
+        { s:'2 — The off-market hook',
+          t:'"The [suburb] market has shifted a fair bit, and I\'ve had a couple come through recently that never made it to realestate.com.au. If they\'re in the right range for you, I\'d rather call you first than put them online."' },
+        { s:'3 — Get their brief properly',
+          t:'"So I\'m not wasting your time — what\'s the budget looking like now, and how many bedrooms do you need? … And are you in a position to move quickly if the right one came up?"' },
+        { s:'4 — Confirm by text',
+          t:'SMS: Hi [Name], Declan here — great to catch up. I\'ve got you down for [beds] in [suburbs] around [budget]. I\'ll call you first when something fits, before it goes online.' },
+        { s:'If they\'re working with another agent',
+          t:'"Absolutely, I wouldn\'t dream of stepping on that. Doesn\'t stop me letting you know if something comes up off-market though — worst case you\'ve seen it before anyone else."' }
+      ] },
+    { pill:'"We gave up"',
+      sub:'Staying put — re-open it gently',
+      steps:[
+        { s:'1 — Empathy first, no pitch',
+          t:'"Oh totally understandable — the market\'s been a lot. I just wanted to check in, because things have actually changed quite a bit since [year]."' },
+        { s:'2 — The life-events question',
+          t:'"Has anything shifted for you since then — family, work, space? Sometimes the reason people stopped looking is the same reason they start again."' },
+        { s:'3 — If nothing has changed, get permission',
+          t:'"No dramas at all. Can I drop you a [suburb] update every few months by text? Just what\'s sold and what things are worth, so if it ever comes up again you\'ve already got the picture. What\'s the best mobile?"' },
+        { s:'If something HAS changed',
+          t:'"That does change things. Would it be worth me giving you an honest read on what you could buy — and what your place is worth — so you know where you actually stand? No pitch, just the numbers."' }
+      ] }
+  ]
+};
+var BR_SEL = {};
+function brPick(set, i, btn){
+  BR_SEL[set] = i;
+  var host = document.querySelector('.br-picker[data-br="' + set + '"]');
+  if (!host) return;
+  var pills = host.querySelectorAll('.obj-pill');
+  for (var p = 0; p < pills.length; p++){
+    var on = p === i;
+    pills[p].classList.toggle('active', on);
+    pills[p].setAttribute('aria-selected', on ? 'true' : 'false');
+    pills[p].tabIndex = on ? 0 : -1;
+  }
+  var b = BRANCHES[set][i], html = '<div class="obj-q">' + b.sub + '</div>';
+  for (var s = 0; s < b.steps.length; s++){
+    html += '<div class="fork-step" style="margin:' + (s ? '14px' : '0') + ' 0 5px;">' + b.steps[s].s + '</div>';
+    html += (b.steps[s].t.indexOf('SMS: ') === 0)
+      ? '<div class="sms-bubble">' + b.steps[s].t.slice(5) + '</div>'
+      : '<div class="script-block" style="margin:0;">' + b.steps[s].t + '</div>';
+  }
+  host.querySelector('.obj-panel').innerHTML = html;
+  if (btn && btn.focus) btn.focus();
+}
+function brKeys(e, set, i){
+  var n = BRANCHES[set].length, j = -1;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') j = (i + 1) % n;
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') j = (i - 1 + n) % n;
+  else if (e.key === 'Home') j = 0;
+  else if (e.key === 'End') j = n - 1;
+  if (j < 0) return;
+  e.preventDefault();
+  var host = document.querySelector('.br-picker[data-br="' + set + '"]');
+  brPick(set, j, host && host.querySelectorAll('.obj-pill')[j]);
+}
+function brInit(){
+  var hosts = document.querySelectorAll('.br-picker');
+  for (var h = 0; h < hosts.length; h++){
+    var set = hosts[h].getAttribute('data-br'), list = BRANCHES[set];
+    if (!list) continue;
+    var row = '<div class="obj-pills" role="tablist" aria-label="How they answered">';
+    for (var i = 0; i < list.length; i++){
+      row += '<button type="button" class="obj-pill br-pill' + (i === 0 ? ' active' : '') + '" role="tab"' +
+        ' aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '"' +
+        ' onclick="brPick(\'' + set + '\',' + i + ',this)"' +
+        ' onkeydown="brKeys(event,\'' + set + '\',' + i + ')">' + list[i].pill + '</button>';
+    }
+    hosts[h].innerHTML = row + '</div><div class="obj-panel" role="tabpanel"></div>';
+    brPick(set, BR_SEL[set] || 0);
+  }
+}
+document.addEventListener('DOMContentLoaded', brInit);
+
 var OBJ_SEL = {};
 function objPick(set, i, btn){
   OBJ_SEL[set] = i;
