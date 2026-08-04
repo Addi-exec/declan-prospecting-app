@@ -337,8 +337,9 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
   like listingMeta, and the import skip-list `NON_CONTACT_SHEETS` covers the Drops sheet).
 
 ## The four prospect methods
-Each is a top-level `.panel` with **3 sub-tabs: Openers, Follow-up, Nurture** (v7.0.0 —
-Objections and Closes were folded into the Openers page; don't re-add them).
+Each is a top-level `.panel` holding **the openers ONLY** — no sub-tabs at all (v7.1.0).
+Objections/Closes were folded into the Openers page in v7.0.0; Follow-up and Nurture MOVED
+into the separate `followups` panel in v7.1.0. Don't re-add sub-tabs to a method panel.
 | id          | label             | accent var   |
 |-------------|-------------------|--------------|
 | justsold    | Just sold street  | --blue       |
@@ -362,6 +363,16 @@ Objections and Closes were folded into the Openers page; don't re-add them).
     roving tabindex and arrow/Home/End keys. `.br-pill.active` is green, `.obj-pill.active` red.
   - NO research furniture on these pages — no success-rate badges, no "Why it works", no `.tags`.
     Emoji: at most one per SMS, none in the call scripts.
+- **`followups` panel (v7.1.0)** — "Follow-ups", reached from the sidebar's Prospecting group.
+  Holds the Tracker's old due queue (`#due-stats` + `#due-list`, ids unchanged so `crmRenderDue`
+  and `csQueue` still find them) and, below it, the follow-up + nurture scripts for ONE method at
+  a time: `.fu-pill` buttons swap the `#fu-js` / `#fu-jl` / `#fu-bd` / `#fu-sl` blocks via
+  `fuPick`/`fuKeys`. Each block holds that method's `#<pre>-followup` and `#<pre>-nurture` divs,
+  moved verbatim out of the method panel — so `scriptForDue` keeps resolving by id exactly as before.
+- **The Tracker (`contacts`) is now the RECORDS panel** — all contacts, search, "This week", the
+  sync pill, the log/edit form, import/export, and the Start call session button. No due queue.
+- Sidebar: `PROSPECTING_PANELS` (methods + `contacts` + `followups`) is what keeps the Prospecting
+  group open and highlighted; `METHOD_PANELS` still gates the method colour label only.
 - **Follow-up** sub-tab = three branches: **No answer** (voicemail + SMS),
   **Answered – interested** (call + SMS), **Answered – not interested** (call + SMS).
   Every call is paired with an "SMS if no answer".
@@ -476,7 +487,7 @@ topbar CSS is left in place as a historical layer.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **7.0.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **7.1.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.

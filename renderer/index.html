@@ -1180,6 +1180,12 @@
     text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
   @media (max-width: 1100px) { .fork { grid-template-columns: 1fr; } }
 
+  /* Follow-ups panel: the due queue on top, then one method's scripts at a time. */
+  .obj-pill.fu-pill.active { background: var(--accent-tint); border-color: var(--accent);
+    color: var(--text); }
+  .fu-method .branch-tab { margin-bottom: 0; }
+
+
   /* Objection picker: pick the pushback, read one answer. Nothing else on screen. */
   .obj-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
   .obj-pill { font: inherit; font-size: 12.5px; line-height: 1.2; cursor: pointer;
@@ -1237,10 +1243,11 @@
 <button class="icon-btn sb-collapse" onclick="sidebarToggle()" title="Collapse / expand the sidebar" aria-label="Collapse or expand the sidebar" aria-expanded="true" id="sb-collapse-btn"><svg class="ic" aria-hidden="true"><use href="#i-panel"/></svg></button>
 </div>
 <nav class="sb-nav" aria-label="Main">
-<button class="nav-item active" onclick="showPanel('contacts',this)" title="Tracker"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg><span class="sb-label">Tracker</span></button>
 <div class="sb-group" id="sb-prospecting-group">
 <button class="nav-item sb-group-head" id="nav-prospecting" onclick="prospectingClick()" title="Prospecting scripts" aria-expanded="false" aria-controls="sb-prospecting-list"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg><span class="sb-label">Prospecting</span><span class="sb-meth" id="sb-prosp-current"></span><svg class="ic ic-sm sb-caret" aria-hidden="true"><use href="#i-chevron"/></svg></button>
-<div class="sb-sub" id="sb-prospecting-list">
+<div class="sb-sub" id="sb-prospecting-list"><!-- v7.1: Follow-ups + Tracker live here too -->
+<button class="nav-item" onclick="showPanel('followups',this)" title="Reminders and follow-up scripts"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-clock"/></svg><span class="sb-label">Follow-ups</span></button>
+<button class="nav-item" onclick="showPanel('contacts',this)" title="Contact tracker"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-phone"/></svg><span class="sb-label">Tracker</span></button>
 <button class="nav-item" onclick="pickMethod('justsold')" title="Just sold street"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-home"/></svg><span class="sb-label">Just sold street</span></button>
 <button class="nav-item" onclick="pickMethod('listed')" title="Just listed"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-list"/></svg><span class="sb-label">Just listed</span></button>
 <button class="nav-item" onclick="pickMethod('buyerdb')" title="Buyer database scripts"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-users"/></svg><span class="sb-label">Buyer database</span></button>
@@ -1259,7 +1266,7 @@
 <div class="sb-mini-row">
 <button class="icon-btn" id="theme-toggle" onclick="toggleTheme()" title="Light / dark" aria-label="Switch light or dark mode"><svg class="ic" aria-hidden="true"><use href="#i-moon"/></svg></button>
 <button class="icon-btn" id="calm-btn" onclick="calmToggleBtn()" title="Calm mode — switch off the moving background" aria-label="Calm mode" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-calm"/></svg></button>
-<button id="app-version" onclick="showPanel('about')" title="What&#39;s new">v7.0.0</button>
+<button id="app-version" onclick="showPanel('about')" title="What&#39;s new">v7.1.0</button>
 </div>
 </div>
 </aside>
@@ -1270,32 +1277,17 @@
 <div class="panel-header">
 <div class="badge" style="background:var(--amber-bg);color:var(--amber)">Contact tracker</div>
 <h2>Tracker</h2>
-<p>Everyone due for a touch — with exactly what to send or say for each person's next step. Log a call anytime; export whenever you need it.</p>
+<p>Every contact you've logged, searchable, with this week's activity. The reminders themselves live in Follow-ups.</p>
 </div>
 <div class="panel-cta">
 <button class="crm-btn crm-btn-tint" onclick="drawerOpen('contact')"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> Log contact</button>
-</div>
-<div id="due-stats" class="stat-row"></div>
-<!-- v6.0 dashboard: the day's queue owns the wide column; "This week" and the sync
-     line sit in a sticky rail instead of pushing "All contacts" down the page. -->
-<div class="dash">
-<div class="dash-main">
-<div class="crm-section">
-<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-<div class="script-label sec-hd">Due now &amp; overdue</div>
 <button id="cs-start-btn" class="crm-btn crm-btn-primary" onclick="startCallSession()"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg> Start call session</button>
 </div>
-<div id="due-list"></div>
-</div>
-</div>
-<aside class="dash-rail" aria-label="Tracker summary">
-<div class="crm-section">
+<div class="crm-section" style="margin-bottom:14px;">
 <div class="script-label">This week</div>
 <div id="week-stats" class="stat-row"></div>
 </div>
 <div id="tracker-sync-pill"></div>
-</aside>
-</div>
 <!-- The add/edit form is PARKED here (hidden) and MOVED into the right-side drawer when
      opened — same DOM nodes, so every id and every existing handler keeps working. -->
 <div class="form-home" id="crm-form-home">
@@ -1348,110 +1340,32 @@
 <div id="table-wrap"></div>
 </div>
 </div>
-<!-- ===================== JUST SOLD STREET ===================== -->
-<div id="justsold" class="panel">
+<!-- ===================== FOLLOW-UPS ===================== -->
+<div id="followups" class="panel">
 <div class="panel-header">
-<div class="badge" style="background:var(--blue-bg);color:var(--blue)">Prospect method</div>
-<h2>Just sold street</h2>
-<p>You've just sold a property on their street. That result is your reason to call every neighbour. Full call flow from opener to close, plus follow-up for every scenario.</p>
+<div class="badge" style="background:var(--amber-bg);color:var(--amber)">Prospecting</div>
+<h2>Follow-ups</h2>
+<p>Everyone due for a touch, with exactly what to send or say for each person's next step — and the full follow-up and nurture scripts underneath.</p>
 </div>
-<div class="method-tabs">
-<button class="js-tab method-tab active" onclick="showJsTab('js-openers',this)" style="border:none;font-weight:600;background:var(--blue-bg);color:var(--blue);">Openers</button>
-<button class="js-tab method-tab" onclick="showJsTab('js-followup',this)">Follow-up</button>
-<button class="js-tab method-tab" onclick="showJsTab('js-nurture',this)">Nurture</button>
-</div>
-<!-- JS OPENERS -->
-<div id="js-openers" class="js-track">
-<div class="script-label" style="margin-top:0;">The opener</div>
-<div class="opener-lead">
-<div class="script-block">"Hi [Name], it's Declan here — I'm one of the local agents around [suburb]. We haven't met, so I'll keep this genuine and quick. I just helped some of your neighbours sell their place on [street], and I'm letting a few people nearby know how it went before word gets around. Is now an okay moment for a quick one?"</div>
-</div>
-<div class="fork-arrow">Then it goes one of two ways</div>
-<div class="fork">
-
-<div class="fork-col fork-yes">
-<div class="fork-head">They're happy to talk</div>
-<div class="fork-body">
+<div id="due-stats" class="stat-row"></div>
+<!-- v6.0 dashboard: the day's queue owns the wide column; "This week" and the sync
+     line sit in a sticky rail instead of pushing "All contacts" down the page. -->
 <div>
-<div class="fork-step">1 — Give them the result</div>
-<div class="script-block">"So [address] just sold — [X days on market, $X]. That's well above what most people in the street would have guessed, and it does move the number on your place too."</div>
-</div>
 <div>
-<div class="fork-step">2 — Make it about them</div>
-<div class="script-block">"How long have you been in the street yourself? … And has selling ever crossed your mind, even down the track?"</div>
+<div class="crm-section">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+<div class="script-label sec-hd">Due now &amp; overdue</div>
 </div>
-<div>
-<div class="fork-step">3 — The ask</div>
-<div class="script-block">"I'm in [suburb] this week anyway — it'd take me 20 minutes to walk through and give you a real number rather than a guess. Is that something you'd want me to do for you?"</div>
-</div>
-<div>
-<div class="fork-step">4 — They say yes: lock it in</div>
-<div class="script-block">"Perfect. What does your week look like? … [their answer] — that works for me. Let's say [day] at [time], I'll put it in the diary now."</div>
-</div>
-<div>
-<div class="fork-step">5 — Get the details before you hang up</div>
-<div class="script-block">"Best mobile to reach you on? … And it's [address], isn't it? Last thing — is there anything you've done to the place I should know about before I come through?"</div>
-</div>
-<div>
-<div class="fork-step">6 — Confirm by text straight after</div>
-<div class="sms-bubble">Hi [Name], Declan here — great chatting. Locked in for [day] [time] at [address]. I'll bring the recent [street] sales with me so you can see exactly where you sit. Any dramas, just text me back.</div>
-</div>
-<div>
-<div class="fork-step">If they're not ready for that</div>
-<div class="script-block">"No worries at all — can I text you the sold data for your street so you've got it? What's the best mobile?"</div>
-</div>
-</div>
-</div>
-
-<div class="fork-col fork-no">
-<div class="fork-head">They push back</div>
-<div class="fork-body">
-<div class="obj-picker" data-obj="js"></div>
+<div id="due-list"></div>
 </div>
 </div>
 
 </div>
-
-<div class="fork">
-
-<div class="fork-col">
-<div class="fork-head" style="background:var(--surface2);color:var(--text);">Someone else answers</div>
-<div class="fork-body">
-<div>
-<div class="fork-step">Wrong person / partner picks up</div>
-<div class="script-block">"Oh sorry — I was after [Name]. It's Declan, one of the local agents. Nothing urgent at all: I sold [address] on your street and I've been letting the neighbours know how it went. Are you at that address as well? … Then honestly you'd want to hear it too."</div>
-</div>
-<div>
-<div class="fork-step">If they'd rather you call back</div>
-<div class="script-block">"No problem — when's usually a better time to catch you both? I'll make a note and try then."</div>
-</div>
-<div>
-<div class="fork-step">Renting, not the owner</div>
-<div class="script-block">"Ah, you're renting — thanks for letting me know, I'll leave you be. Sorry to bother you."</div>
-</div>
-</div>
-</div>
-
-<div class="fork-col">
-<div class="fork-head" style="background:var(--surface2);color:var(--text);">Nobody picks up</div>
-<div class="fork-body">
-<div>
-<div class="fork-step">Voicemail — keep it under 20 seconds</div>
-<div class="script-block">"Hi [Name], it's Declan, one of the local agents around [suburb] — we haven't met. I just sold [address] on your street and I'm ringing the neighbours to let them know how it went before word gets around. Give me a call back on [number] and I'll run you through it — I'll have the numbers in front of me. Otherwise I'll try you again shortly. Cheers [Name]."</div>
-</div>
-<div>
-<div class="fork-step">Text straight after</div>
-<div class="sms-bubble">Hi [Name], Declan here — local agent. Just left you a voicemail. We sold [address] on your street for [$X] in [X days]. Give me a call when you get a chance and I'll tell you what it means for your place.</div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="tip-box"><strong>Mirroring:</strong> Repeat their last 2–3 words back as a question — "Not interested?" — then stop talking. Gets them explaining instead of hanging up.</div>
-<div class="tip-box"><strong>Timing:</strong> Wed &amp; Thu outperform all other days. Best windows 8–9 AM and 4–5 PM.</div>
-</div>
-<!-- JS FOLLOW-UP -->
-<div id="js-followup" class="js-track" style="display:none;">
+<div class="script-label" style="margin-top:30px;">The scripts</div>
+<div class="obj-pills" role="tablist" aria-label="Prospect method"><button type="button" class="obj-pill fu-pill active" role="tab" aria-selected="true" tabindex="0" onclick="fuPick('js',this)" onkeydown="fuKeys(event,'js')">Just sold street</button><button type="button" class="obj-pill fu-pill" role="tab" aria-selected="false" tabindex="-1" onclick="fuPick('jl',this)" onkeydown="fuKeys(event,'jl')">Just listed</button><button type="button" class="obj-pill fu-pill" role="tab" aria-selected="false" tabindex="-1" onclick="fuPick('bd',this)" onkeydown="fuKeys(event,'bd')">Buyer database</button><button type="button" class="obj-pill fu-pill" role="tab" aria-selected="false" tabindex="-1" onclick="fuPick('sl',this)" onkeydown="fuKeys(event,'sl')">Steal listings</button></div>
+<div class="fu-method" id="fu-js">
+<div class="script-label" style="margin-top:0;">Follow-up — pick the branch that matches the call</div>
+<div id="js-followup" class="fu-block">
 <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches what happened on the call. Each one is a ready-made sequence of calls and texts.</div>
 <div class="btn-bar">
 <button class="jsf-tab branch-tab active" onclick="showJsfTab('jsf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">No answer</button>
@@ -1549,8 +1463,8 @@
 <div class="tip-box"><strong>Tip:</strong> A "no" today is rarely a "no" forever. The agent who stays warm and useful without pushing is the one they call when life changes. From here, move them into the WARM or COLD nurture track.</div>
 </div>
 </div>
-<!-- JS NURTURE -->
-<div id="js-nurture" class="js-track" style="display:none;">
+<div class="script-label" style="margin-top:26px;">Nurture — for anyone who didn't convert</div>
+<div id="js-nurture" class="fu-block">
 <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">For anyone who didn't convert in the follow-up sequence. No pressure, no agenda — just staying warm so you're the first name they think of when the time comes. Pick the track that matches their temperature.</div>
 <div class="btn-bar">
 <button class="jsn-tab branch-tab active" onclick="showJsnTab('jsn-hot',this)" style="border:none;font-weight:600;background:var(--danger-bg);color:var(--danger);"> HOT</button>
@@ -1602,109 +1516,9 @@
 </div>
 </div>
 </div>
-<!-- ===================== JUST LISTED ===================== -->
-<div id="listed" class="panel">
-<div class="panel-header">
-<div class="badge" style="background:var(--green-bg);color:var(--green)">Prospect method</div>
-<h2>Just listed</h2>
-<p>Call the 20–30 closest homes before the listing hits the portals. Neighbours often know a buyer — or become one. One of the easiest ways to generate your next appraisal for free.</p>
-</div>
-<div class="method-tabs">
-<button class="jl-tab method-tab active" onclick="showJlTab('jl-openers',this)" style="border:none;font-weight:600;background:var(--green-bg);color:var(--green);">Openers</button>
-<button class="jl-tab method-tab" onclick="showJlTab('jl-followup',this)">Follow-up</button>
-<button class="jl-tab method-tab" onclick="showJlTab('jl-nurture',this)">Nurture</button>
-</div>
-<!-- JL OPENERS (opener + fork) -->
-<div id="jl-openers" class="jl-track">
-<div class="script-label" style="margin-top:0;">The opener</div>
-<div class="opener-lead">
-<div class="script-block">"Hi [Name], it's Declan here — I'm one of the local agents around [suburb]. I'm calling before this hits realestate.com.au: I've just listed [address] on your street, and I always give the neighbours the heads up first. Sometimes the best buyer for a home in a street is someone who already loves the area. Do you know anyone who's been trying to get into [suburb]?"</div>
-</div>
-<div class="fork-arrow">Then it goes one of two ways</div>
-<div class="fork">
-
-<div class="fork-col fork-yes">
-<div class="fork-head">They're happy to talk</div>
-<div class="fork-body">
-<div>
-<div class="fork-step">1 — Get them through the door</div>
-<div class="script-block">"I'm doing a neighbours-only walk-through the morning before the first open — just the street, before the public comes through. It's [day] at [time]. Would you like to come along?"</div>
-</div>
-<div>
-<div class="fork-step">2 — The referral ask</div>
-<div class="script-block">"And if anyone does come to mind — family, friends, someone who's been priced out elsewhere — I'd much rather it went to someone from around here than a stranger off the portal. What's the best way to send you the details so you can pass them on?"</div>
-</div>
-<div>
-<div class="fork-step">3 — The pivot to them</div>
-<div class="script-block">"While I've got you — on your own end, have you ever thought about upsizing, downsizing, or a change of scenery? Even down the track?"</div>
-</div>
-<div>
-<div class="fork-step">4 — If the pivot lands: the ask</div>
-<div class="script-block">"I'm in the street this week anyway — it'd take me 20 minutes to walk through and give you a real number rather than a guess. Is that something you'd want me to do for you?"</div>
-</div>
-<div>
-<div class="fork-step">5 — Lock it in and get the details</div>
-<div class="script-block">"Perfect. What does your week look like? … Let's say [day] at [time], I'll put it in the diary now. Best mobile to reach you on? … And is there anything you've done to the place I should know about before I come through?"</div>
-</div>
-<div>
-<div class="fork-step">6 — Confirm by text straight after</div>
-<div class="sms-bubble">Hi [Name], Declan here — great chatting. Locked in for [day] [time] at [address]. I'll bring the recent [street] sales with me so you can see exactly where you sit. Any dramas, just text me back.</div>
-</div>
-<div>
-<div class="fork-step">If they only want the listing</div>
-<div class="sms-bubble">Hi [Name], Declan here — as promised, here's [address] before it goes public: [price guide], [brief description]. Neighbours preview is [day] [time] if you'd like a look. Feel free to forward it to anyone who'd suit it.</div>
-</div>
-</div>
-</div>
-
-<div class="fork-col fork-no">
-<div class="fork-head">They push back</div>
-<div class="fork-body">
-<div class="obj-picker" data-obj="jl"></div>
-</div>
-</div>
-
-</div>
-
-<div class="fork">
-
-<div class="fork-col">
-<div class="fork-head" style="background:var(--surface2);color:var(--text);">Someone else answers</div>
-<div class="fork-body">
-<div>
-<div class="fork-step">Wrong person / partner picks up</div>
-<div class="script-block">"Oh sorry — I was after [Name]. It's Declan, one of the local agents. Nothing urgent: I've just listed [address] on your street and I'm giving the neighbours first look before it goes public. Are you at that address too? … Then you'd want to know as well."</div>
-</div>
-<div>
-<div class="fork-step">If they'd rather you call back</div>
-<div class="script-block">"No problem — when's usually a better time to catch you both? The preview's [day] so I'd like to get you in before that if you're keen."</div>
-</div>
-<div>
-<div class="fork-step">Renting, not the owner</div>
-<div class="script-block">"Ah, you're renting — no dramas. Actually, if you're ever looking to buy in the area, this one might be worth a look. Otherwise I'll leave you be."</div>
-</div>
-</div>
-</div>
-
-<div class="fork-col">
-<div class="fork-head" style="background:var(--surface2);color:var(--text);">Nobody picks up</div>
-<div class="fork-body">
-<div>
-<div class="fork-step">Voicemail — keep it under 20 seconds</div>
-<div class="script-block">"Hi [Name], it's Declan, one of the local agents around [suburb]. I've just listed [address] on your street and I always give the neighbours first look before it goes public. Give me a call back on [number] and I'll run you through it — there's a neighbours-only preview on [day] I can get you into. Cheers [Name]."</div>
-</div>
-<div>
-<div class="fork-step">Text straight after</div>
-<div class="sms-bubble">Hi [Name], Declan here — local agent, just left you a voicemail. Just listed [address] on your street, going public in a few days. Neighbours-only preview is [day] [time] — give me a call if you'd like to come through, or pass it on to anyone who'd suit it.</div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="tip-box"><strong>Pro move:</strong> Call the morning before the first open, not a week out — recency creates urgency. Have a market update for their street ready: anyone who comes through out of curiosity will ask what their own place is worth on the way out.</div>
-</div>
-<!-- JL FOLLOW-UP -->
-<div id="jl-followup" class="jl-track" style="display:none;">
+<div class="fu-method" id="fu-jl" style="display:none;">
+<div class="script-label" style="margin-top:0;">Follow-up — pick the branch that matches the call</div>
+<div id="jl-followup" class="fu-block">
 <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches the call. The just-listed window is short — move fast.</div>
 <div class="btn-bar">
 <button class="jlf-tab branch-tab active" onclick="showJsfTab('jlf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">No answer</button>
@@ -1806,8 +1620,8 @@
 <div class="tip-box"><strong>Tip:</strong> A neighbour who said no today is still your warmest future listing on that street. From here, move them into the WARM or COLD nurture track.</div>
 </div>
 </div>
-<!-- JL NURTURE -->
-<div id="jl-nurture" class="jl-track" style="display:none;">
+<div class="script-label" style="margin-top:26px;">Nurture — for anyone who didn't convert</div>
+<div id="jl-nurture" class="fu-block">
 <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">For neighbours who didn't convert. They've seen your signs and know your name — keep them warm and you're the obvious call when the time comes. Pick the track that matches their temperature.</div>
 <div class="btn-bar">
 <button class="jln-tab branch-tab active" onclick="showJsnTab('jln-hot',this)" style="border:none;font-weight:600;background:var(--danger-bg);color:var(--danger);"> HOT</button>
@@ -1859,63 +1673,9 @@
 </div>
 </div>
 </div>
-<!-- ===================== BUYER DATABASE ===================== -->
-<div id="buyerdb" class="panel">
-<div class="panel-header">
-<div class="badge" style="background:var(--teal-bg);color:var(--teal)">Prospect method</div>
-<h2>Buyer database</h2>
-<p>People who registered at your opens 1–5+ years ago. You have no idea if they bought, rented, or are still looking. Diagnose first, pitch second.</p>
-</div>
-<div class="method-tabs">
-<button class="bd-tab method-tab active" onclick="showBdTab('bd-openers',this)" style="border:none;font-weight:600;background:var(--teal-bg);color:var(--teal);">Openers</button>
-<button class="bd-tab method-tab" onclick="showBdTab('bd-followup',this)">Follow-up</button>
-<button class="bd-tab method-tab" onclick="showBdTab('bd-nurture',this)">Nurture</button>
-</div>
-<!-- BD OPENERS — diagnostic opener + branch picker -->
-<div id="bd-openers" class="bd-track">
-<div class="script-label" style="margin-top:0;">The diagnostic opener — use every time</div>
-<div class="opener-lead">
-<div class="script-block">"Hi [Name], it's Declan here — I know this might be a little out of the blue. You came through one of my open homes in [suburb] a while back, and I just wanted to touch base and see how things ended up for you. Did you manage to find something?"</div>
-</div>
-<div class="fork-arrow">Their answer tells you which call you're on</div>
-<div class="br-picker" data-br="bd"></div>
-<div class="tip-box" style="margin-top:18px;"><strong>"I don't remember coming to your open."</strong> — "No worries at all, it was a while back. I keep my open home registrations so I can stay in touch with people who were interested in the area. You had a look around [suburb] — I just wanted to see if anything had changed for you." Then carry on with the diagnostic question.</div>
-
-<div class="fork" style="margin-top:22px;">
-
-<div class="fork-col">
-<div class="fork-head" style="background:var(--surface2);color:var(--text);">Someone else answers</div>
-<div class="fork-body">
-<div>
-<div class="fork-step">Wrong person / partner picks up</div>
-<div class="script-block">"Oh sorry — I was after [Name]. It's Declan, one of the local agents in [suburb]. Nothing urgent: they came through one of my open homes a while back and I'm just checking in to see how they went. Did you two end up finding something?"</div>
-</div>
-<div>
-<div class="fork-step">Number's been reassigned</div>
-<div class="script-block">"Ah, my apologies — I've got an old number then. Sorry to trouble you, I'll take it off my list. Have a good one."</div>
-</div>
-</div>
-</div>
-
-<div class="fork-col">
-<div class="fork-head" style="background:var(--surface2);color:var(--text);">Nobody picks up</div>
-<div class="fork-body">
-<div>
-<div class="fork-step">Voicemail — keep it under 20 seconds</div>
-<div class="script-block">"Hi [Name], it's Declan, one of the local agents around [suburb]. You came through one of my open homes a while back — I'm just checking in to see how you went and whether you found something. Give me a call back on [number] whenever suits. Cheers [Name]."</div>
-</div>
-<div>
-<div class="fork-step">Text straight after</div>
-<div class="sms-bubble">Hi [Name], Declan here — local agent, just left you a voicemail. You came through one of my [suburb] opens a while back; just checking in to see how you ended up going. Did you find something in the end?</div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="tip-box"><strong>Diagnose before you pitch:</strong> you have zero context on these people. The first question does all the work — most agents skip it and pitch into the dark.</div>
-</div>
-<!-- BD FOLLOW-UP — two touches on no answer, then nurture (v6.2) -->
-<div id="bd-followup" class="bd-track" style="display:none;">
+<div class="fu-method" id="fu-bd" style="display:none;">
+<div class="script-label" style="margin-top:0;">Follow-up — pick the branch that matches the call</div>
+<div id="bd-followup" class="fu-block">
 <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches the call. Always lead with value, never a pitch.</div>
 <div class="btn-bar">
 <button class="bdf-tab branch-tab active" onclick="showJsfTab('bdf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">No answer</button>
@@ -2003,8 +1763,8 @@
 <div class="tip-box"><strong>Tip:</strong> People's next move often comes around sooner than they expect. Warmth now is what earns the call later. Move them into WARM or COLD nurture.</div>
 </div>
 </div>
-<!-- BD NURTURE -->
-<div id="bd-nurture" class="bd-track" style="display:none;">
+<div class="script-label" style="margin-top:26px;">Nurture — for anyone who didn't convert</div>
+<div id="bd-nurture" class="fu-block">
 <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Long-term nurture for buyer-database contacts who didn't convert. Slow burns — stay warm, stay useful, stay patient. Pick the track that matches their temperature.</div>
 <div class="btn-bar">
 <button class="bdn-tab branch-tab active" onclick="showJsnTab('bdn-hot',this)" style="border:none;font-weight:600;background:var(--danger-bg);color:var(--danger);"> HOT</button>
@@ -2054,66 +1814,9 @@
 </div>
 </div>
 </div>
-<!-- ===================== STEAL LISTINGS ===================== -->
-<div id="steallist" class="panel">
-<div class="panel-header">
-<div class="badge" style="background:var(--danger-bg);color:var(--danger)">Prospect method</div>
-<h2>Steal listings</h2>
-<p>Listings that have been sitting — a vendor who is losing patience with their current agent. The opener reads the room first, then you choose your approach.</p>
-</div>
-<div class="method-tabs">
-<button class="sl-tab method-tab active" onclick="showSlTab('sl-openers',this)" style="border:none;font-weight:600;background:var(--danger-bg);color:var(--danger);">Openers</button>
-<button class="sl-tab method-tab" onclick="showSlTab('sl-followup',this)">Follow-up</button>
-<button class="sl-tab method-tab" onclick="showSlTab('sl-nurture',this)">Nurture</button>
-</div>
-<!-- SL OPENERS — universal opener + mood branch picker -->
-<div id="sl-openers" class="sl-track">
-<div class="script-label" style="margin-top:0;">The opener — use every time</div>
-<div class="opener-lead">
-<div class="script-block">"Hi [Name], it's Declan — I hope I'm not interrupting. I noticed your property at [address] is currently on the market and I just wanted to reach out. How are you finding the whole process so far?"</div>
-</div>
-<div class="fork-arrow">Their tone tells you which call you're on</div>
-<div class="br-picker" data-br="sl"></div>
-
-<div class="script-label" style="margin-top:24px;">When they push back</div>
-<div class="obj-picker" data-obj="sl"></div>
-
-<div class="fork" style="margin-top:24px;">
-
-<div class="fork-col">
-<div class="fork-head" style="background:var(--surface2);color:var(--text);">Someone else answers</div>
-<div class="fork-body">
-<div>
-<div class="fork-step">Wrong person / partner picks up</div>
-<div class="script-block">"Oh sorry — I was after [Name]. It's Declan, one of the local agents in [suburb]. Nothing urgent: I noticed [address] is on the market and I wanted to introduce myself. Are you selling it together? … Then you'd want to hear this as much as they would."</div>
-</div>
-<div>
-<div class="fork-step">The listing agent's office answers</div>
-<div class="script-block">"Apologies — I've got the wrong number, I was after the owner directly. No trouble at all, I'll leave it there."</div>
-</div>
-</div>
-</div>
-
-<div class="fork-col">
-<div class="fork-head" style="background:var(--surface2);color:var(--text);">Nobody picks up</div>
-<div class="fork-body">
-<div>
-<div class="fork-step">Voicemail — keep it under 20 seconds</div>
-<div class="script-block">"Hi [Name], it's Declan, one of the local agents around [suburb]. I noticed [address] is on the market — I'm not calling to poach anything, I just track this area closely and there are a couple of recent sales that are relevant to your campaign. Give me a call back on [number] and I'll run you through them. Cheers [Name]."</div>
-</div>
-<div>
-<div class="fork-step">Text straight after</div>
-<div class="sms-bubble">Hi [Name], Declan here — local agent, just left you a voicemail. Not chasing your listing; I just track [suburb] closely and there are a couple of recent comparable sales worth you seeing. Give me a call when you get a chance and I'll send them through.</div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="tip-box"><strong>Timing:</strong> call around week 3–4, when the early optimism starts to fade but there's still a campaign to save. If a listing has just expired, reach out within 24 hours — they're still emotionally engaged.</div>
-<div class="tip-box"><strong>Let them vent:</strong> when a vendor is frustrated, repeat their last three words back as a question — "Not moving at all?" — and stop. The more they talk, the more you learn about what's actually wrong.</div>
-</div>
-<!-- SL FOLLOW-UP -->
-<div id="sl-followup" class="sl-track" style="display:none;">
+<div class="fu-method" id="fu-sl" style="display:none;">
+<div class="script-label" style="margin-top:0;">Follow-up — pick the branch that matches the call</div>
+<div id="sl-followup" class="fu-block">
 <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches the call. The agreement-expiry window is everything — time your run to it.</div>
 <div class="btn-bar">
 <button class="slf-tab branch-tab active" onclick="showJsfTab('slf-noanswer',this)" style="font-weight:600;background:var(--surface2);color:var(--text);border:1px solid var(--border2);">No answer</button>
@@ -2221,8 +1924,8 @@
 <div class="tip-box"><strong>Tip:</strong> "Happy with my agent" often changes by expiry if results don't land. Stay warm and be the name they already know. Move them into WARM or COLD nurture.</div>
 </div>
 </div>
-<!-- SL NURTURE -->
-<div id="sl-nurture" class="sl-track" style="display:none;">
+<div class="script-label" style="margin-top:26px;">Nurture — for anyone who didn't convert</div>
+<div id="sl-nurture" class="fu-block">
 <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">For vendors who re-listed with their current agent or withdrew from market. They'll likely be back — be the obvious choice when they are. Pick the track that matches their temperature.</div>
 <div class="btn-bar">
 <button class="sln-tab branch-tab active" onclick="showJsnTab('sln-hot',this)" style="border:none;font-weight:600;background:var(--danger-bg);color:var(--danger);"> HOT</button>
@@ -2271,6 +1974,323 @@
 <div class="tip-box"><strong>COLD tip:</strong> Withdrawn vendors still need to sell eventually — they just had a bad run. Your patience is what earns the second chance.</div>
 </div>
 </div>
+</div>
+</div>
+<!-- ===================== JUST SOLD STREET ===================== -->
+<div id="justsold" class="panel">
+<div class="panel-header">
+<div class="badge" style="background:var(--blue-bg);color:var(--blue)">Prospect method</div>
+<h2>Just sold street</h2>
+<p>You've just sold a property on their street. That result is your reason to call every neighbour. Full call flow from opener to close, plus follow-up for every scenario.</p>
+</div>
+<!-- JS OPENERS -->
+<div id="js-openers" class="js-track">
+<div class="script-label" style="margin-top:0;">The opener</div>
+<div class="opener-lead">
+<div class="script-block">"Hi [Name], it's Declan here — I'm one of the local agents around [suburb]. We haven't met, so I'll keep this genuine and quick. I just helped some of your neighbours sell their place on [street], and I'm letting a few people nearby know how it went before word gets around. Is now an okay moment for a quick one?"</div>
+</div>
+<div class="fork-arrow">Then it goes one of two ways</div>
+<div class="fork">
+
+<div class="fork-col fork-yes">
+<div class="fork-head">They're happy to talk</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">1 — Give them the result</div>
+<div class="script-block">"So [address] just sold — [X days on market, $X]. That's well above what most people in the street would have guessed, and it does move the number on your place too."</div>
+</div>
+<div>
+<div class="fork-step">2 — Make it about them</div>
+<div class="script-block">"How long have you been in the street yourself? … And has selling ever crossed your mind, even down the track?"</div>
+</div>
+<div>
+<div class="fork-step">3 — The ask</div>
+<div class="script-block">"I'm in [suburb] this week anyway — it'd take me 20 minutes to walk through and give you a real number rather than a guess. Is that something you'd want me to do for you?"</div>
+</div>
+<div>
+<div class="fork-step">4 — They say yes: lock it in</div>
+<div class="script-block">"Perfect. What does your week look like? … [their answer] — that works for me. Let's say [day] at [time], I'll put it in the diary now."</div>
+</div>
+<div>
+<div class="fork-step">5 — Get the details before you hang up</div>
+<div class="script-block">"Best mobile to reach you on? … And it's [address], isn't it? Last thing — is there anything you've done to the place I should know about before I come through?"</div>
+</div>
+<div>
+<div class="fork-step">6 — Confirm by text straight after</div>
+<div class="sms-bubble">Hi [Name], Declan here — great chatting. Locked in for [day] [time] at [address]. I'll bring the recent [street] sales with me so you can see exactly where you sit. Any dramas, just text me back.</div>
+</div>
+<div>
+<div class="fork-step">If they're not ready for that</div>
+<div class="script-block">"No worries at all — can I text you the sold data for your street so you've got it? What's the best mobile?"</div>
+</div>
+</div>
+</div>
+
+<div class="fork-col fork-no">
+<div class="fork-head">They push back</div>
+<div class="fork-body">
+<div class="obj-picker" data-obj="js"></div>
+</div>
+</div>
+
+</div>
+
+<div class="fork">
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Someone else answers</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Wrong person / partner picks up</div>
+<div class="script-block">"Oh sorry — I was after [Name]. It's Declan, one of the local agents. Nothing urgent at all: I sold [address] on your street and I've been letting the neighbours know how it went. Are you at that address as well? … Then honestly you'd want to hear it too."</div>
+</div>
+<div>
+<div class="fork-step">If they'd rather you call back</div>
+<div class="script-block">"No problem — when's usually a better time to catch you both? I'll make a note and try then."</div>
+</div>
+<div>
+<div class="fork-step">Renting, not the owner</div>
+<div class="script-block">"Ah, you're renting — thanks for letting me know, I'll leave you be. Sorry to bother you."</div>
+</div>
+</div>
+</div>
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Nobody picks up</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Voicemail — keep it under 20 seconds</div>
+<div class="script-block">"Hi [Name], it's Declan, one of the local agents around [suburb] — we haven't met. I just sold [address] on your street and I'm ringing the neighbours to let them know how it went before word gets around. Give me a call back on [number] and I'll run you through it — I'll have the numbers in front of me. Otherwise I'll try you again shortly. Cheers [Name]."</div>
+</div>
+<div>
+<div class="fork-step">Text straight after</div>
+<div class="sms-bubble">Hi [Name], Declan here — local agent. Just left you a voicemail. We sold [address] on your street for [$X] in [X days]. Give me a call when you get a chance and I'll tell you what it means for your place.</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="tip-box"><strong>Mirroring:</strong> Repeat their last 2–3 words back as a question — "Not interested?" — then stop talking. Gets them explaining instead of hanging up.</div>
+<div class="tip-box"><strong>Timing:</strong> Wed &amp; Thu outperform all other days. Best windows 8–9 AM and 4–5 PM.</div>
+</div>
+<!-- JS FOLLOW-UP -->
+
+<!-- JS NURTURE -->
+
+</div>
+<!-- ===================== JUST LISTED ===================== -->
+<div id="listed" class="panel">
+<div class="panel-header">
+<div class="badge" style="background:var(--green-bg);color:var(--green)">Prospect method</div>
+<h2>Just listed</h2>
+<p>Call the 20–30 closest homes before the listing hits the portals. Neighbours often know a buyer — or become one. One of the easiest ways to generate your next appraisal for free.</p>
+</div>
+<!-- JL OPENERS (opener + fork) -->
+<div id="jl-openers" class="jl-track">
+<div class="script-label" style="margin-top:0;">The opener</div>
+<div class="opener-lead">
+<div class="script-block">"Hi [Name], it's Declan here — I'm one of the local agents around [suburb]. I'm calling before this hits realestate.com.au: I've just listed [address] on your street, and I always give the neighbours the heads up first. Sometimes the best buyer for a home in a street is someone who already loves the area. Do you know anyone who's been trying to get into [suburb]?"</div>
+</div>
+<div class="fork-arrow">Then it goes one of two ways</div>
+<div class="fork">
+
+<div class="fork-col fork-yes">
+<div class="fork-head">They're happy to talk</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">1 — Get them through the door</div>
+<div class="script-block">"I'm doing a neighbours-only walk-through the morning before the first open — just the street, before the public comes through. It's [day] at [time]. Would you like to come along?"</div>
+</div>
+<div>
+<div class="fork-step">2 — The referral ask</div>
+<div class="script-block">"And if anyone does come to mind — family, friends, someone who's been priced out elsewhere — I'd much rather it went to someone from around here than a stranger off the portal. What's the best way to send you the details so you can pass them on?"</div>
+</div>
+<div>
+<div class="fork-step">3 — The pivot to them</div>
+<div class="script-block">"While I've got you — on your own end, have you ever thought about upsizing, downsizing, or a change of scenery? Even down the track?"</div>
+</div>
+<div>
+<div class="fork-step">4 — If the pivot lands: the ask</div>
+<div class="script-block">"I'm in the street this week anyway — it'd take me 20 minutes to walk through and give you a real number rather than a guess. Is that something you'd want me to do for you?"</div>
+</div>
+<div>
+<div class="fork-step">5 — Lock it in and get the details</div>
+<div class="script-block">"Perfect. What does your week look like? … Let's say [day] at [time], I'll put it in the diary now. Best mobile to reach you on? … And is there anything you've done to the place I should know about before I come through?"</div>
+</div>
+<div>
+<div class="fork-step">6 — Confirm by text straight after</div>
+<div class="sms-bubble">Hi [Name], Declan here — great chatting. Locked in for [day] [time] at [address]. I'll bring the recent [street] sales with me so you can see exactly where you sit. Any dramas, just text me back.</div>
+</div>
+<div>
+<div class="fork-step">If they only want the listing</div>
+<div class="sms-bubble">Hi [Name], Declan here — as promised, here's [address] before it goes public: [price guide], [brief description]. Neighbours preview is [day] [time] if you'd like a look. Feel free to forward it to anyone who'd suit it.</div>
+</div>
+</div>
+</div>
+
+<div class="fork-col fork-no">
+<div class="fork-head">They push back</div>
+<div class="fork-body">
+<div class="obj-picker" data-obj="jl"></div>
+</div>
+</div>
+
+</div>
+
+<div class="fork">
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Someone else answers</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Wrong person / partner picks up</div>
+<div class="script-block">"Oh sorry — I was after [Name]. It's Declan, one of the local agents. Nothing urgent: I've just listed [address] on your street and I'm giving the neighbours first look before it goes public. Are you at that address too? … Then you'd want to know as well."</div>
+</div>
+<div>
+<div class="fork-step">If they'd rather you call back</div>
+<div class="script-block">"No problem — when's usually a better time to catch you both? The preview's [day] so I'd like to get you in before that if you're keen."</div>
+</div>
+<div>
+<div class="fork-step">Renting, not the owner</div>
+<div class="script-block">"Ah, you're renting — no dramas. Actually, if you're ever looking to buy in the area, this one might be worth a look. Otherwise I'll leave you be."</div>
+</div>
+</div>
+</div>
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Nobody picks up</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Voicemail — keep it under 20 seconds</div>
+<div class="script-block">"Hi [Name], it's Declan, one of the local agents around [suburb]. I've just listed [address] on your street and I always give the neighbours first look before it goes public. Give me a call back on [number] and I'll run you through it — there's a neighbours-only preview on [day] I can get you into. Cheers [Name]."</div>
+</div>
+<div>
+<div class="fork-step">Text straight after</div>
+<div class="sms-bubble">Hi [Name], Declan here — local agent, just left you a voicemail. Just listed [address] on your street, going public in a few days. Neighbours-only preview is [day] [time] — give me a call if you'd like to come through, or pass it on to anyone who'd suit it.</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="tip-box"><strong>Pro move:</strong> Call the morning before the first open, not a week out — recency creates urgency. Have a market update for their street ready: anyone who comes through out of curiosity will ask what their own place is worth on the way out.</div>
+</div>
+<!-- JL FOLLOW-UP -->
+
+<!-- JL NURTURE -->
+
+</div>
+<!-- ===================== BUYER DATABASE ===================== -->
+<div id="buyerdb" class="panel">
+<div class="panel-header">
+<div class="badge" style="background:var(--teal-bg);color:var(--teal)">Prospect method</div>
+<h2>Buyer database</h2>
+<p>People who registered at your opens 1–5+ years ago. You have no idea if they bought, rented, or are still looking. Diagnose first, pitch second.</p>
+</div>
+<!-- BD OPENERS — diagnostic opener + branch picker -->
+<div id="bd-openers" class="bd-track">
+<div class="script-label" style="margin-top:0;">The diagnostic opener — use every time</div>
+<div class="opener-lead">
+<div class="script-block">"Hi [Name], it's Declan here — I know this might be a little out of the blue. You came through one of my open homes in [suburb] a while back, and I just wanted to touch base and see how things ended up for you. Did you manage to find something?"</div>
+</div>
+<div class="fork-arrow">Their answer tells you which call you're on</div>
+<div class="br-picker" data-br="bd"></div>
+<div class="tip-box" style="margin-top:18px;"><strong>"I don't remember coming to your open."</strong> — "No worries at all, it was a while back. I keep my open home registrations so I can stay in touch with people who were interested in the area. You had a look around [suburb] — I just wanted to see if anything had changed for you." Then carry on with the diagnostic question.</div>
+
+<div class="fork" style="margin-top:22px;">
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Someone else answers</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Wrong person / partner picks up</div>
+<div class="script-block">"Oh sorry — I was after [Name]. It's Declan, one of the local agents in [suburb]. Nothing urgent: they came through one of my open homes a while back and I'm just checking in to see how they went. Did you two end up finding something?"</div>
+</div>
+<div>
+<div class="fork-step">Number's been reassigned</div>
+<div class="script-block">"Ah, my apologies — I've got an old number then. Sorry to trouble you, I'll take it off my list. Have a good one."</div>
+</div>
+</div>
+</div>
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Nobody picks up</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Voicemail — keep it under 20 seconds</div>
+<div class="script-block">"Hi [Name], it's Declan, one of the local agents around [suburb]. You came through one of my open homes a while back — I'm just checking in to see how you went and whether you found something. Give me a call back on [number] whenever suits. Cheers [Name]."</div>
+</div>
+<div>
+<div class="fork-step">Text straight after</div>
+<div class="sms-bubble">Hi [Name], Declan here — local agent, just left you a voicemail. You came through one of my [suburb] opens a while back; just checking in to see how you ended up going. Did you find something in the end?</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="tip-box"><strong>Diagnose before you pitch:</strong> you have zero context on these people. The first question does all the work — most agents skip it and pitch into the dark.</div>
+</div>
+<!-- BD FOLLOW-UP — two touches on no answer, then nurture (v6.2) -->
+
+<!-- BD NURTURE -->
+
+</div>
+<!-- ===================== STEAL LISTINGS ===================== -->
+<div id="steallist" class="panel">
+<div class="panel-header">
+<div class="badge" style="background:var(--danger-bg);color:var(--danger)">Prospect method</div>
+<h2>Steal listings</h2>
+<p>Listings that have been sitting — a vendor who is losing patience with their current agent. The opener reads the room first, then you choose your approach.</p>
+</div>
+<!-- SL OPENERS — universal opener + mood branch picker -->
+<div id="sl-openers" class="sl-track">
+<div class="script-label" style="margin-top:0;">The opener — use every time</div>
+<div class="opener-lead">
+<div class="script-block">"Hi [Name], it's Declan — I hope I'm not interrupting. I noticed your property at [address] is currently on the market and I just wanted to reach out. How are you finding the whole process so far?"</div>
+</div>
+<div class="fork-arrow">Their tone tells you which call you're on</div>
+<div class="br-picker" data-br="sl"></div>
+
+<div class="script-label" style="margin-top:24px;">When they push back</div>
+<div class="obj-picker" data-obj="sl"></div>
+
+<div class="fork" style="margin-top:24px;">
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Someone else answers</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Wrong person / partner picks up</div>
+<div class="script-block">"Oh sorry — I was after [Name]. It's Declan, one of the local agents in [suburb]. Nothing urgent: I noticed [address] is on the market and I wanted to introduce myself. Are you selling it together? … Then you'd want to hear this as much as they would."</div>
+</div>
+<div>
+<div class="fork-step">The listing agent's office answers</div>
+<div class="script-block">"Apologies — I've got the wrong number, I was after the owner directly. No trouble at all, I'll leave it there."</div>
+</div>
+</div>
+</div>
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Nobody picks up</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Voicemail — keep it under 20 seconds</div>
+<div class="script-block">"Hi [Name], it's Declan, one of the local agents around [suburb]. I noticed [address] is on the market — I'm not calling to poach anything, I just track this area closely and there are a couple of recent sales that are relevant to your campaign. Give me a call back on [number] and I'll run you through them. Cheers [Name]."</div>
+</div>
+<div>
+<div class="fork-step">Text straight after</div>
+<div class="sms-bubble">Hi [Name], Declan here — local agent, just left you a voicemail. Not chasing your listing; I just track [suburb] closely and there are a couple of recent comparable sales worth you seeing. Give me a call when you get a chance and I'll send them through.</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="tip-box"><strong>Timing:</strong> call around week 3–4, when the early optimism starts to fade but there's still a campaign to save. If a listing has just expired, reach out within 24 hours — they're still emotionally engaged.</div>
+<div class="tip-box"><strong>Let them vent:</strong> when a vendor is frustrated, repeat their last three words back as a question — "Not moving at all?" — and stop. The more they talk, the more you learn about what's actually wrong.</div>
+</div>
+<!-- SL FOLLOW-UP -->
+
+<!-- SL NURTURE -->
+
 </div>
 <!-- ===================== BUYERS DATABASE ===================== -->
 <div id="buyers" class="panel">
@@ -2651,7 +2671,7 @@
 </div>
 <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:18px 20px;margin-bottom:22px;">
 <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">You're running</div>
-<div id="about-version" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Version 7.0.0</div>
+<div id="about-version" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.02em;">Version 7.1.0</div>
 </div>
 <div style="background:var(--blue-bg);border-radius:var(--r-xs);padding:14px 16px;margin-bottom:22px;">
 <div style="font-size:13px;font-weight:600;color:var(--blue);margin-bottom:6px;">How updates work</div>
@@ -2659,7 +2679,7 @@
 <button class="crm-btn crm-btn-primary" style="margin-top:12px;" onclick="checkForUpdates(this)">Check for updates</button>
 </div>
 <div class="script-label">Version history</div>
-<div style="margin-top:4px;"><div class="changelog-row"><div class="changelog-ver">v7.0.0</div><div class="muted-sm"><strong style="color:var(--text);">Every script page rebuilt around the call you&rsquo;re actually on.</strong> Each method used to spread its material across five tabs &mdash; Openers, Objections, Closes, Follow-up, Nurture &mdash; with the same lines repeated in two or three places. Now there is <strong style="color:var(--text);">one opener</strong> per method and the page forks the way the call does: what to say when it&rsquo;s going your way on the left, and the pushbacks as <strong style="color:var(--text);">clickable pills</strong> on the right &mdash; tap the objection you just heard and only that answer shows, with the line that follows it if it lands. Gatekeeper (&ldquo;someone else answers&rdquo;) and voicemail scripts sit underneath. <strong style="color:var(--text);">Objections and Closes tabs are gone</strong>; every method is now Openers, Follow-up, Nurture. Buyer database branches three ways on their answer (bought / still looking / gave up) and <strong style="color:var(--text);">Steal listings</strong> branches on their tone (frustrated / neutral / positive) &mdash; fresh listings dropped, it&rsquo;s stale listings only now. Follow-up sequences are <strong style="color:var(--text);">shorter and the Tracker matches</strong>: no-answer is two touches on most methods (three where the campaign or the expiry gives you a reason), with the value from the deleted texts folded into the final one. Nurture runs a <strong style="color:var(--text);">full twelve months</strong> instead of six, and HOT no longer stops dead &mdash; it ends with a call and hands over to WARM. Research badges, &ldquo;why it works&rdquo; notes and most emoji removed so a page can be read mid-call. The appraisal ask no longer forces &ldquo;Tuesday or Wednesday?&rdquo;, and voicemails now assume you want to talk.</div></div><div class="changelog-row"><div class="changelog-ver">v6.1.0</div><div class="muted-sm"><strong style="color:var(--text);">The app now tells you when Google Sheets stops updating — and catches the sheet up itself.</strong> Until now a failed sync was completely silent: the Tracker kept saying &ldquo;Syncing to Google Sheets&rdquo; even when nothing had reached the sheet for days. Now a failed push says so on the Tracker (<strong style="color:var(--text);">&ldquo;Google Sheets is behind&rdquo;</strong> with a <strong style="color:var(--text);">Sync now</strong> link), pops a one-off notice, and Settings &rarr; Data &amp; sync spells out the actual reason in plain English &mdash; expired sign-in, no permission, sheet deleted, Sheets API switched off, or no internet &mdash; with <strong style="color:var(--text);">Sync everything now</strong> and, when it&rsquo;s a sign-in problem, <strong style="color:var(--text);">Sign in with Google again</strong> (which uploads everything the sheet missed straight after). Two important safety fixes came with it: this computer&rsquo;s newer data is <strong style="color:var(--text);">never overwritten by a stale sheet</strong> (it used to be possible to lose recent work the moment syncing recovered), and the app <strong style="color:var(--text);">retries by itself</strong> each time you open it until the sheet accepts everything. Creating a brand-new sheet now uploads your <strong style="color:var(--text);">Drops</strong> too, which it previously skipped. <span class="muted-sm">Tip: if your sign-in keeps expiring after about a week, set your Google Cloud app&rsquo;s publishing status to <strong style="color:var(--text);">In production</strong> &mdash; apps left in &ldquo;Testing&rdquo; have their sign-in expire every 7 days.</span></div></div><div class="changelog-row"><div class="changelog-ver">v6.0.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 6.0 — the workbench layout.</strong> Same app, everything where you expect it, but arranged like a tool you work in all day. The tabs moved from the top into a <strong style="color:var(--text);">left sidebar</strong> (your four prospecting methods live in one group, and Settings, light/dark and Calm mode sit at the bottom) — which hands the whole width of your screen back to your lists. Add and edit forms no longer sit between the heading and your list pushing everything down the page: hit <strong style="color:var(--text);">＋ New …</strong> and the form <strong style="color:var(--text);">slides in from the right</strong>, then closes when you save. The <strong style="color:var(--text);">Tracker is now a dashboard</strong> — who's due fills the page, with your stats, this week's numbers and the log button in a column beside it. <strong style="color:var(--text);">Buyers, Properties and Inspections</strong> became a tidy list on the left with the <strong style="color:var(--text);">full record beside it</strong> — click a name and their budget, enquiries, offer candidates or attendees open in the pane next door instead of expanding rows down the page. <strong style="color:var(--text);">Drops</strong> puts the map and the due-to-re-drop checklist <strong style="color:var(--text);">side by side</strong>, and the script pages keep their <strong style="color:var(--text);">Openers / Objections / Closes tabs pinned</strong> at the top while you scroll. Narrow windows and laptops stack it all back the way it was.</div></div><div class="changelog-row"><div class="changelog-ver">v5.0.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 5.0 — a classic, easier app.</strong> A full redesign guided by a professional UI/UX rulebook: a <strong style="color:var(--text);">clean white-and-grey look</strong> in classic <strong style="color:var(--text);">Times New Roman</strong>, where colour only ever means something — <strong style="color:var(--blue);">blue</strong> for actions and where you are, <strong style="color:var(--green);">green</strong> for good, <strong style="color:var(--amber);">yellow</strong> for waiting, <strong style="color:var(--danger);">red</strong> for overdue. Every emoji icon became a <strong style="color:var(--text);">proper drawn icon</strong> that looks identical on Windows, Mac and Linux (your SMS scripts keep their friendly emoji — that's your voice, not the app's). Buttons and controls are bigger and easier to hit, faint grey text is darker and readable everywhere, <strong style="color:var(--text);">date boxes finally show dd/mm/yyyy</strong>, menus and pop-ups work fully with the keyboard, reading text is larger, and narrow windows scroll tables inside their box instead of squashing them. The theme picker still has all five looks, light and dark.</div></div><div class="changelog-row"><div class="changelog-ver">v4.2.0</div><div class="muted-sm"><strong style="color:var(--text);">Add a buyer's details right from the open home.</strong> When you type a new name into an inspection's attendee search and choose <strong style="color:var(--text);">＋ New buyer</strong>, a quick form now pops up — pre-filled with the name and mobile you typed — so you can capture their <strong style="color:var(--text);">email, buyer type, budget, preferred suburbs and notes</strong> on the spot. One save adds them to your Buyers database <strong style="color:var(--text);">and</strong> marks them as attending the inspection (with the usual duplicate warning). Anything you skip can be filled in later from the Buyers page.</div></div><div class="changelog-row"><div class="changelog-ver">v4.1.0</div><div class="muted-sm"><strong style="color:var(--text);">Glassier, and a much tidier Drops page.</strong> The glass look is turned up properly — every page now sits on a <strong style="color:var(--text);">frosted glass sheet</strong> over a richer glow, with translucent cards and buttons to match. And the Drops <strong style="color:var(--text);">"due to re-drop" list is completely condensed</strong>: instead of a big card per address repeating the same advice, drops are now <strong style="color:var(--text);">grouped by type</strong> — the play appears once per group, each address is one compact line with a <strong style="color:var(--text);">✓ Dropped</strong> button, and a new <strong style="color:var(--text);">"✓ All dropped today"</strong> marks a whole group done in one click after a drop run (with Undo). Edit / Stop / Delete tuck into a ⋯ menu on each line — way less scrolling, same information.</div></div><div class="changelog-row"><div class="changelog-ver">v4.0.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 4.0 — a complete redesign, built on real usability research.</strong> The whole app moves to a <strong style="color:var(--text);">liquid-glass look</strong>: a frosted floating top bar, soft rounded corners everywhere, capsule buttons with one clear main action per page, and glass menus and pop-ups — while everything you read sits on clean solid panels so it's always easy on the eyes. It's simpler to use too: the <strong style="color:var(--text);">storage &amp; Google Sheets setup moved into Settings</strong> (the Tracker now opens straight onto your day, with a one-line sync status), <strong style="color:var(--text);">editing shows a clear "Editing: …" banner</strong> with a Cancel link so you can't overwrite something by mistake, the property form <strong style="color:var(--text);">hides sold/archived fields until they apply</strong>, every list search gets a <strong style="color:var(--text);">✕ clear</strong>, tabs and filters share <strong style="color:var(--text);">one consistent selected style</strong>, the Prospecting menu shows <strong style="color:var(--text);">which method you're in</strong>, snooze and outcome pickers became neat little menus, and the call session's 👍/👋 buttons are now clearly labelled. Plus a new <strong style="color:var(--text);">Calm mode</strong> in Settings → Appearance if you ever want the moving background off. Every theme, light and dark, all features exactly where you left them.</div></div><div class="changelog-row"><div class="changelog-ver">v3.6.0</div><div class="muted-sm"><strong style="color:var(--text);">A deep polish pass over the last three updates.</strong> <strong style="color:var(--text);">Backups now include your Drops</strong> (they were missing — restoring on a new computer would have lost them), and Drops get their own sheet in the <strong style="color:var(--text);">Excel export</strong>. The map now <strong style="color:var(--text);">keeps your view</strong> instead of jumping back out every time you record a drop, streets named <strong style="color:var(--text);">Victoria St</strong> now locate correctly, a failed address lookup <strong style="color:var(--text);">retries next time</strong> instead of getting stuck (with a new one-click <strong style="color:var(--text);">Retry failed</strong>), and address lookups sync far more gently. The <strong style="color:var(--text);">Inspections buttons</strong> on buyers and properties now show every inspection they count (including archived ones), reporting never archives an <strong style="color:var(--text);">upcoming</strong> open home, and due cards on the Tracker now properly <strong style="color:var(--text);">tilt under your cursor</strong> like the rest.</div></div><div class="changelog-row"><div class="changelog-ver">v3.5.0</div><div class="muted-sm"><strong style="color:var(--text);">Drops get a map — and can’t double up.</strong> The Drops page now has an <strong style="color:var(--text);">interactive map</strong> with a pin for every address you’ve dropped, colour-coded by drop type, with pins that pulse when they’re due for a re-drop — click a pin to see the details or record another drop. And <strong style="color:var(--text);">duplicates are now impossible</strong>: each address can hold one of each drop type (a pocket-appraisal card and a new-listing card are fine), but if you try to log the same type at an address you’ve already dropped, it records a <strong style="color:var(--text);">re-drop</strong> on the existing one instead of creating a copy — with a heads-up as you type. Any accidental doubles already in your data get merged automatically. <span class="muted-sm">(The map uses free OpenStreetMap — it needs internet for the map tiles and to place each address the first time; after that the location is remembered.)</span></div></div><div class="changelog-row"><div class="changelog-ver">v3.4.0</div><div class="muted-sm"><strong style="color:var(--text);">Inspections tidy themselves up after you report.</strong> When you <strong style="color:var(--text);">Copy</strong> or <strong style="color:var(--text);">Save</strong> an inspection report — either a single one or the combined <strong style="color:var(--text);">Copy report (filtered)</strong> — those inspections now <strong style="color:var(--text);">automatically archive</strong> off your active list, since they've done their job. A quick <strong style="color:var(--text);">Undo</strong> pops up in case you didn't mean to. Inspections also gain an <strong style="color:var(--text);">Active / Archived / All</strong> filter and an <strong style="color:var(--text);">Archive / Reopen</strong> button on every row, so you can hide finished open homes or bring them back any time.</div></div><div class="changelog-row"><div class="changelog-ver">v3.3.0</div><div class="muted-sm"><strong style="color:var(--text);">A more alive, tactile look.</strong> The background now has a <strong style="color:var(--text);">soft drifting glow</strong> that gently shifts as you move the mouse, so the app feels alive even when you're not doing anything. The <strong style="color:var(--text);">dashboard cards</strong> (your stats, due cards and theme tiles) now <strong style="color:var(--text);">tilt slightly and light up under your cursor</strong>, and buttons give a subtle <strong style="color:var(--text);">ripple</strong> when you press them. All tasteful and in every theme, light and dark — and it automatically calms down if your computer is set to reduce motion.</div></div><div class="changelog-row"><div class="changelog-ver">v3.2.2</div><div class="muted-sm">Simplified the drop form for targeted drops: removed the <strong style="color:var(--text);">letterboxes-dropped</strong> count and the <strong style="color:var(--text);">linked-property</strong> picker. Logging a drop now just needs the address, the type and the date — and the <strong style="color:var(--text);">date defaults to today</strong> (still changeable if you're recording one a few days late).</div></div><div class="changelog-row"><div class="changelog-ver">v3.2.1</div><div class="muted-sm">Tuned the drop reminders to how you actually farm: <strong style="color:var(--text);">pocket appraisal</strong> drops now remind you <strong style="color:var(--text);">once a month</strong>, and both <strong style="color:var(--text);">new listing</strong> and <strong style="color:var(--text);">stale listing</strong> drops remind you <strong style="color:var(--text);">every 14 days</strong>. Drops are now logged against a specific <strong style="color:var(--text);">address</strong> (targeted drops), not a street or area.</div></div><div class="changelog-row"><div class="changelog-ver">v3.2</div><div class="muted-sm">New <strong style="color:var(--text);">Drops</strong> section for letterbox drops. Log every address you drop and <strong style="color:var(--text);">why</strong> — <strong style="color:var(--text);">pocket appraisal</strong>, <strong style="color:var(--text);">new listing</strong> or <strong style="color:var(--text);">stale listing</strong> — and the app reminds you when each one is due for another drop, with the right play to run for that drop type. Each type has its own re-drop cadence. Hit <strong style="color:var(--text);">Dropped again</strong> to reset the timer and keep a count of how many times you've hit each one. It all syncs to your Google Sheet too.</div></div><div class="changelog-row"><div class="changelog-ver">v3.1</div><div class="muted-sm"><strong style="color:var(--text);">Easier on the eyes.</strong> Every page now sits on a <strong style="color:var(--text);">clean solid sheet</strong> — the dotted backdrop stays out in the margins, never behind your text. The background and mouse-glow are much subtler, the top bar is solid again, and <strong style="color:var(--text);">text is bigger everywhere it counts</strong>: scripts, SMS bubbles, tables, due cards, forms and headings, with more breathing room throughout. Same sharp modern style — just properly readable.</div></div><div class="changelog-row"><div class="changelog-ver">v3.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 3.0 ✨ — a sharper, livelier look.</strong> The whole app moved to a <strong style="color:var(--text);">modern boxy design</strong>: crisp square corners everywhere, a frosted-glass top bar, panels and cards that <strong style="color:var(--text);">slide in and lift when you hover</strong>, stat numbers that count up, a subtle dot-grid background with a <strong style="color:var(--text);">glow that follows your mouse</strong>, and sleek themed scrollbars — all in every theme, light and dark. Plus: <strong style="color:var(--text);">listing previews</strong> — paste an REA or Domain link on a property and the app pulls in the <strong style="color:var(--text);">photo, headline and description</strong>; the photo shows right in your Properties list and opens a full preview card. (Some sites block previews now and then — the link always works regardless.)</div></div><div class="changelog-row"><div class="changelog-ver">v2.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 2.0 🚀 — built for working the phones.</strong> New <strong style="color:var(--text);">▶ Call session</strong> on the Tracker walks you through everyone due, one at a time, with the right script on screen and one-tap buttons (done / 👍 / 👋 / snooze / skip) and a session summary at the end. <strong style="color:var(--text);">📞 Call and 💬 Text buttons</strong> dial or open a pre-filled text straight from a due card. <strong style="color:var(--text);">⏰ Snooze</strong> pushes anyone back 1 day / 3 days / a week without losing their progress. A new <strong style="color:var(--text);">This week</strong> strip counts your calls, texts, new contacts and interested prospects (with a trend vs last week). <strong style="color:var(--text);">🔍 Search everything</strong> (the magnifier, or Ctrl/Cmd+K) finds any contact, buyer or property instantly. Settings gains <strong style="color:var(--text);">backup &amp; restore</strong> — one file with all your data. And logging a contact now <strong style="color:var(--text);">warns about duplicate mobiles</strong>.</div></div><div class="changelog-row"><div class="changelog-ver">v1.4.0</div><div class="muted-sm">You can now <strong style="color:var(--text);">edit a tracked contact</strong>: hit <strong style="color:var(--text);">Edit</strong> on any row and it loads into the form above — fix names, numbers, the address, notes, the call date, or move the contact to a <strong style="color:var(--text);">different prospecting method</strong> — then Update. Changing the <strong style="color:var(--text);">outcome</strong> restarts that person's follow-up schedule from today (same as changing it in the table); every other edit keeps their progress exactly where it was.</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.2</div><div class="muted-sm">Safer importing: bringing an Excel file into the tracker now <strong style="color:var(--text);">skips the Buyers, Properties and Inspections tabs</strong> from a full export — they used to be read as contacts by mistake. And if a file has <strong style="color:var(--text);">no contact rows at all</strong>, the import now tells you and leaves your tracker untouched instead of emptying it.</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.1</div><div class="muted-sm">Dates everywhere now read the Australian way — <strong style="color:var(--text);">dd/mm/yyyy</strong> (e.g. 15/06/2026) — on the Tracker's due cards, the contacts table, inspections and their reports, and in Excel/CSV exports. Importing understands both the new format and older exports, and dates typed as dd/mm/yyyy straight into the Google Sheet are now read correctly too (they used to risk being taken as American month-first).</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.0</div><div class="muted-sm">A fifth theme: <strong style="color:var(--text);">Noir</strong> — pure greyscale, just blacks, whites and greys (urgent things stand out by contrast instead of red). Also tidied the <strong style="color:var(--text);">top bar on small windows</strong>: the tabs now shrink neatly, and if they still need a second row the bar grows downward instead of spilling over the page.</div></div><div class="changelog-row"><div class="changelog-ver">v1.2.0</div><div class="muted-sm">New <strong style="color:var(--text);">⚙ Settings</strong> tab with a <strong style="color:var(--text);">theme picker</strong> — every look the app has ever had, in one place: <strong style="color:var(--text);">Claude</strong> (the cream &amp; coral signature), the brand-new <strong style="color:var(--text);">Racing Green</strong> (graphite greys with black chrome and forest-green accents, Aston Martin inspired), <strong style="color:var(--text);">Espresso</strong> (the warm grey + brown look), and <strong style="color:var(--text);">Classic Blue</strong> (the original). The ☀ / 🌙 button still flips whichever theme you pick between light and dark, and your choice is remembered.</div></div><div class="changelog-row"><div class="changelog-ver">v1.1.0</div><div class="muted-sm">Each property's <strong style="color:var(--text);">Buyers panel</strong> now shows three tiers: <strong style="color:var(--text);">Offer candidates</strong> (buyers you've flagged as likely to offer), <strong style="color:var(--text);">Inspected</strong> (anyone who attended an open home for that property, pulled automatically from your Inspections records), and <strong style="color:var(--text);">Enquired only</strong>. Hit <strong style="color:var(--text);">＋ Offer candidate</strong> to move a buyer up when they get serious. Every buyer card also shows their <strong style="color:var(--text);">fit score</strong> and inspection count at a glance, and the property row shows a <strong style="color:var(--text);"># offering</strong> count so you can see offer momentum without clicking in.</div></div><div class="changelog-row"><div class="changelog-ver">v1.0.1</div><div class="muted-sm">The Google Sheets box now shows the <strong style="color:var(--text);">Client ID and secret</strong> you're connected with (secret hidden behind a Show button), each with a Copy button, so you can check or move your credentials.</div></div><div class="changelog-row"><div class="changelog-ver">v1.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 1.0 🎉</strong> — the first full release. Fresh <strong style="color:var(--text);">Claude-inspired look</strong>: a warm cream background with a coral/clay accent (and a matching warm dark mode). Everything from the journey is in: prospecting scripts, the smart Tracker, Buyers, Properties with matching, and Inspections.</div></div><div class="changelog-row"><div class="changelog-ver">v0.28</div><div class="muted-sm">New <strong style="color:var(--text);">Inspections</strong> section for open homes: create an inspection for a property + date/time, then add the buyers who attended. As you type a name it searches your buyer database to <strong style="color:var(--text);">link an existing buyer</strong> (or create a new one, warning you about likely duplicates), so you don't get doubles. Keep notes and a follow-up flag against each attendee, and hit <strong style="color:var(--text);">Report</strong> to copy a clean, email-ready summary. Inspection history shows on each buyer and property, and there's a tool to <strong style="color:var(--text);">merge duplicate buyers</strong>.</div></div><div class="changelog-row"><div class="changelog-ver">v0.27</div><div class="muted-sm">Properties now have an <strong style="color:var(--text);">Enquiries</strong> panel that opens out under each property to list every buyer who enquired. For each one you can jot <strong style="color:var(--text);">notes</strong> and toggle whether they're still an <strong style="color:var(--text);">active buyer</strong> of that property (vs just a past enquiry), and add or remove buyers right there.</div></div><div class="changelog-row"><div class="changelog-ver">v0.26.3</div><div class="muted-sm">The <strong style="color:var(--text);">Prospecting</strong> menu now opens on hover and stays open as you move down to pick a method, and the top tabs show a clear outline when you hover them.</div></div><div class="changelog-row"><div class="changelog-ver">v0.26</div><div class="muted-sm">A fresh look and a smarter workspace: clean <strong style="color:var(--text);">tabs across the top</strong> (with a Prospecting menu for your four methods), a calm <strong style="color:var(--text);">black-and-white design</strong> with subtle brown accents and a tidied dark mode, and a rebuilt <strong style="color:var(--text);">Tracker</strong> — each due person now shows you the exact call or text to use for their next step, with a one-tap <strong style="color:var(--text);">Copy SMS</strong>, so you never have to go hunting through the script pages.</div></div><div class="changelog-row"><div class="changelog-ver">v0.25</div><div class="muted-sm">Big one: a proper <strong style="color:var(--text);">Buyers database</strong> (budget, preferences, preferred suburbs, and the properties each buyer enquired on) and a <strong style="color:var(--text);">Properties</strong> inventory (on market / off market / archived). Hit <strong style="color:var(--text);">Match</strong> on any buyer or property to instantly see the best fits, ranked — including off-market properties. Everything syncs to Google Sheets too (new Buyers and Properties tabs).</div></div><div class="changelog-row"><div class="changelog-ver">v0.24.1</div><div class="muted-sm">Behind-the-scenes tidy-up of the app's styling so it's quicker and safer to improve from here — nothing changed in how the app looks or works.</div></div><div class="changelog-row"><div class="changelog-ver">v0.24</div><div class="muted-sm">Sync your contacts to a <strong style="color:var(--text);">Google Sheet</strong>: connect once from the Storage box and your contacts stay in step on every computer — and you can view or edit them right in Google Sheets, even from your phone. Also added <strong style="color:var(--text);">Linux support</strong> (Linux Mint), so the app now runs on Windows, Mac and Linux.</div></div><div class="changelog-row"><div class="changelog-ver">v0.23</div><div class="muted-sm">Made updating easy on Mac: added a <strong style="color:var(--text);">Check for updates</strong> button on this page (and an automatic check when you open the app). When a new version is out it tells you and opens the download — just open the .dmg and drag the app into Applications. Windows keeps installing updates by itself.</div></div><div class="changelog-row"><div class="changelog-ver">v0.22</div><div class="muted-sm">Share your contacts across computers: point the tracker at a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) from the Storage box, then choose the same folder on your other computer. Also turned on automatic updates (via GitHub) so new versions can install themselves.</div></div><div class="changelog-row"><div class="changelog-ver">v0.21</div><div class="muted-sm">Windows support is back: the app now installs and runs on Windows as well as Mac. Added a Windows installer build (<strong style="color:var(--text);">npm run build:win</strong>) and double-click launchers, and fixed a first-time setup issue where the app engine sometimes didn't finish installing.</div></div><div class="changelog-row"><div class="changelog-ver">v0.20.1</div><div class="muted-sm">Brought Just listed, Buyer database and Steal listings up to the same standard as Just sold — branched follow-ups (no answer / interested / not interested) and HOT / WARM / COLD nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.18</div><div class="muted-sm">Rebuilt as a cross-platform desktop app (Electron) with a local database and native Excel/CSV export &amp; import — no browser, no sandbox.</div></div><div class="changelog-row"><div class="changelog-ver">v0.17</div><div class="muted-sm">Added a call-outcome option (no answer / interested / not interested) when logging a contact, so the follow-up reminders use the right branch. You can also change a contact's outcome later and the schedule restarts from that day.</div></div><div class="changelog-row"><div class="changelog-ver">v0.16</div><div class="muted-sm">Added this About &amp; what's new page, with version history.</div></div><div class="changelog-row"><div class="changelog-ver">v0.15</div><div class="muted-sm">Renamed to a stable filename so data survives updates; added optional project-folder data file (auto-saves to prospecting-data.json on Chrome/Edge).</div></div><div class="changelog-row"><div class="changelog-ver">v0.14</div><div class="muted-sm">Split the Just sold follow-up into three branches: no answer (voicemail + SMS), answered &amp; interested, answered &amp; not interested.</div></div><div class="changelog-row"><div class="changelog-ver">v0.13</div><div class="muted-sm">Rewrote the Just sold openers to feel warmer and more genuine — dropped the "this is a cold call" line while keeping the research behind each one.</div></div><div class="changelog-row"><div class="changelog-ver">v0.12</div><div class="muted-sm">Added a search box to the contact tracker.</div></div><div class="changelog-row"><div class="changelog-ver">v0.11</div><div class="muted-sm">Built the contact tracker: quick logging, automatic due/overdue reminders from each call date, and Excel export/import (one sheet per method).</div></div><div class="changelog-row"><div class="changelog-ver">v0.10</div><div class="muted-sm">Added dark mode with a light/dark toggle and a full themed colour system.</div></div><div class="changelog-row"><div class="changelog-ver">v0.9</div><div class="muted-sm">Gave each prospect method its own openers, objections, closes, follow-up and nurture; removed the old shared sections. Stripped all email steps — calls and messages only.</div></div><div class="changelog-row"><div class="changelog-ver">v0.8</div><div class="muted-sm">Moved Just listed into the prospect methods with its own openers, objections and closes.</div></div><div class="changelog-row"><div class="changelog-ver">v0.7</div><div class="muted-sm">Consolidated the core openers, objections and closes into the Just sold street method.</div></div><div class="changelog-row"><div class="changelog-ver">v0.6</div><div class="muted-sm">Added two new prospect methods: Buyer database and Steal listings.</div></div><div class="changelog-row"><div class="changelog-ver">v0.5</div><div class="muted-sm">Reorganised into prospect methods and a special opens section.</div></div><div class="changelog-row"><div class="changelog-ver">v0.4</div><div class="muted-sm">Rebuilt the openers around proven psychology and cold-calling data.</div></div><div class="changelog-row"><div class="changelog-ver">v0.3</div><div class="muted-sm">Added the HOT / WARM / COLD SMS nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.2</div><div class="muted-sm">Added voicemail scripts, the follow-up sequence and the no-answer nurture.</div></div><div class="changelog-row"><div class="changelog-ver">v0.1</div><div class="muted-sm">First downloadable version with the core just-sold scripts.</div></div></div>
+<div style="margin-top:4px;"><div class="changelog-row"><div class="changelog-ver">v7.1.0</div><div class="muted-sm"><strong style="color:var(--text);">New Follow-ups section — your reminders and the scripts that go with them, in one place.</strong> The due queue has moved off the Tracker into its own <strong style="color:var(--text);">Follow-ups</strong> page, and the follow-up and nurture scripts have moved out of the four method pages to sit underneath it &mdash; pick a method with the pills and you get its branches and nurture tracks. So the reminder and the script it needs are now on the same screen. The four method pages are now purely <strong style="color:var(--text);">openers</strong>, with no sub-tabs at all. <strong style="color:var(--text);">Follow-ups and Tracker both live in the Prospecting menu</strong> in the sidebar, alongside the four methods. The Tracker keeps everything about your records &mdash; all contacts, search, this week&rsquo;s activity, the log/edit form, import and export &mdash; plus the <strong style="color:var(--text);">Start call session</strong> button.</div></div><div class="changelog-row"><div class="changelog-ver">v7.0.0</div><div class="muted-sm"><strong style="color:var(--text);">Every script page rebuilt around the call you&rsquo;re actually on.</strong> Each method used to spread its material across five tabs &mdash; Openers, Objections, Closes, Follow-up, Nurture &mdash; with the same lines repeated in two or three places. Now there is <strong style="color:var(--text);">one opener</strong> per method and the page forks the way the call does: what to say when it&rsquo;s going your way on the left, and the pushbacks as <strong style="color:var(--text);">clickable pills</strong> on the right &mdash; tap the objection you just heard and only that answer shows, with the line that follows it if it lands. Gatekeeper (&ldquo;someone else answers&rdquo;) and voicemail scripts sit underneath. <strong style="color:var(--text);">Objections and Closes tabs are gone</strong>; every method is now Openers, Follow-up, Nurture. Buyer database branches three ways on their answer (bought / still looking / gave up) and <strong style="color:var(--text);">Steal listings</strong> branches on their tone (frustrated / neutral / positive) &mdash; fresh listings dropped, it&rsquo;s stale listings only now. Follow-up sequences are <strong style="color:var(--text);">shorter and the Tracker matches</strong>: no-answer is two touches on most methods (three where the campaign or the expiry gives you a reason), with the value from the deleted texts folded into the final one. Nurture runs a <strong style="color:var(--text);">full twelve months</strong> instead of six, and HOT no longer stops dead &mdash; it ends with a call and hands over to WARM. Research badges, &ldquo;why it works&rdquo; notes and most emoji removed so a page can be read mid-call. The appraisal ask no longer forces &ldquo;Tuesday or Wednesday?&rdquo;, and voicemails now assume you want to talk.</div></div><div class="changelog-row"><div class="changelog-ver">v6.1.0</div><div class="muted-sm"><strong style="color:var(--text);">The app now tells you when Google Sheets stops updating — and catches the sheet up itself.</strong> Until now a failed sync was completely silent: the Tracker kept saying &ldquo;Syncing to Google Sheets&rdquo; even when nothing had reached the sheet for days. Now a failed push says so on the Tracker (<strong style="color:var(--text);">&ldquo;Google Sheets is behind&rdquo;</strong> with a <strong style="color:var(--text);">Sync now</strong> link), pops a one-off notice, and Settings &rarr; Data &amp; sync spells out the actual reason in plain English &mdash; expired sign-in, no permission, sheet deleted, Sheets API switched off, or no internet &mdash; with <strong style="color:var(--text);">Sync everything now</strong> and, when it&rsquo;s a sign-in problem, <strong style="color:var(--text);">Sign in with Google again</strong> (which uploads everything the sheet missed straight after). Two important safety fixes came with it: this computer&rsquo;s newer data is <strong style="color:var(--text);">never overwritten by a stale sheet</strong> (it used to be possible to lose recent work the moment syncing recovered), and the app <strong style="color:var(--text);">retries by itself</strong> each time you open it until the sheet accepts everything. Creating a brand-new sheet now uploads your <strong style="color:var(--text);">Drops</strong> too, which it previously skipped. <span class="muted-sm">Tip: if your sign-in keeps expiring after about a week, set your Google Cloud app&rsquo;s publishing status to <strong style="color:var(--text);">In production</strong> &mdash; apps left in &ldquo;Testing&rdquo; have their sign-in expire every 7 days.</span></div></div><div class="changelog-row"><div class="changelog-ver">v6.0.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 6.0 — the workbench layout.</strong> Same app, everything where you expect it, but arranged like a tool you work in all day. The tabs moved from the top into a <strong style="color:var(--text);">left sidebar</strong> (your four prospecting methods live in one group, and Settings, light/dark and Calm mode sit at the bottom) — which hands the whole width of your screen back to your lists. Add and edit forms no longer sit between the heading and your list pushing everything down the page: hit <strong style="color:var(--text);">＋ New …</strong> and the form <strong style="color:var(--text);">slides in from the right</strong>, then closes when you save. The <strong style="color:var(--text);">Tracker is now a dashboard</strong> — who's due fills the page, with your stats, this week's numbers and the log button in a column beside it. <strong style="color:var(--text);">Buyers, Properties and Inspections</strong> became a tidy list on the left with the <strong style="color:var(--text);">full record beside it</strong> — click a name and their budget, enquiries, offer candidates or attendees open in the pane next door instead of expanding rows down the page. <strong style="color:var(--text);">Drops</strong> puts the map and the due-to-re-drop checklist <strong style="color:var(--text);">side by side</strong>, and the script pages keep their <strong style="color:var(--text);">Openers / Objections / Closes tabs pinned</strong> at the top while you scroll. Narrow windows and laptops stack it all back the way it was.</div></div><div class="changelog-row"><div class="changelog-ver">v5.0.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 5.0 — a classic, easier app.</strong> A full redesign guided by a professional UI/UX rulebook: a <strong style="color:var(--text);">clean white-and-grey look</strong> in classic <strong style="color:var(--text);">Times New Roman</strong>, where colour only ever means something — <strong style="color:var(--blue);">blue</strong> for actions and where you are, <strong style="color:var(--green);">green</strong> for good, <strong style="color:var(--amber);">yellow</strong> for waiting, <strong style="color:var(--danger);">red</strong> for overdue. Every emoji icon became a <strong style="color:var(--text);">proper drawn icon</strong> that looks identical on Windows, Mac and Linux (your SMS scripts keep their friendly emoji — that's your voice, not the app's). Buttons and controls are bigger and easier to hit, faint grey text is darker and readable everywhere, <strong style="color:var(--text);">date boxes finally show dd/mm/yyyy</strong>, menus and pop-ups work fully with the keyboard, reading text is larger, and narrow windows scroll tables inside their box instead of squashing them. The theme picker still has all five looks, light and dark.</div></div><div class="changelog-row"><div class="changelog-ver">v4.2.0</div><div class="muted-sm"><strong style="color:var(--text);">Add a buyer's details right from the open home.</strong> When you type a new name into an inspection's attendee search and choose <strong style="color:var(--text);">＋ New buyer</strong>, a quick form now pops up — pre-filled with the name and mobile you typed — so you can capture their <strong style="color:var(--text);">email, buyer type, budget, preferred suburbs and notes</strong> on the spot. One save adds them to your Buyers database <strong style="color:var(--text);">and</strong> marks them as attending the inspection (with the usual duplicate warning). Anything you skip can be filled in later from the Buyers page.</div></div><div class="changelog-row"><div class="changelog-ver">v4.1.0</div><div class="muted-sm"><strong style="color:var(--text);">Glassier, and a much tidier Drops page.</strong> The glass look is turned up properly — every page now sits on a <strong style="color:var(--text);">frosted glass sheet</strong> over a richer glow, with translucent cards and buttons to match. And the Drops <strong style="color:var(--text);">"due to re-drop" list is completely condensed</strong>: instead of a big card per address repeating the same advice, drops are now <strong style="color:var(--text);">grouped by type</strong> — the play appears once per group, each address is one compact line with a <strong style="color:var(--text);">✓ Dropped</strong> button, and a new <strong style="color:var(--text);">"✓ All dropped today"</strong> marks a whole group done in one click after a drop run (with Undo). Edit / Stop / Delete tuck into a ⋯ menu on each line — way less scrolling, same information.</div></div><div class="changelog-row"><div class="changelog-ver">v4.0.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 4.0 — a complete redesign, built on real usability research.</strong> The whole app moves to a <strong style="color:var(--text);">liquid-glass look</strong>: a frosted floating top bar, soft rounded corners everywhere, capsule buttons with one clear main action per page, and glass menus and pop-ups — while everything you read sits on clean solid panels so it's always easy on the eyes. It's simpler to use too: the <strong style="color:var(--text);">storage &amp; Google Sheets setup moved into Settings</strong> (the Tracker now opens straight onto your day, with a one-line sync status), <strong style="color:var(--text);">editing shows a clear "Editing: …" banner</strong> with a Cancel link so you can't overwrite something by mistake, the property form <strong style="color:var(--text);">hides sold/archived fields until they apply</strong>, every list search gets a <strong style="color:var(--text);">✕ clear</strong>, tabs and filters share <strong style="color:var(--text);">one consistent selected style</strong>, the Prospecting menu shows <strong style="color:var(--text);">which method you're in</strong>, snooze and outcome pickers became neat little menus, and the call session's 👍/👋 buttons are now clearly labelled. Plus a new <strong style="color:var(--text);">Calm mode</strong> in Settings → Appearance if you ever want the moving background off. Every theme, light and dark, all features exactly where you left them.</div></div><div class="changelog-row"><div class="changelog-ver">v3.6.0</div><div class="muted-sm"><strong style="color:var(--text);">A deep polish pass over the last three updates.</strong> <strong style="color:var(--text);">Backups now include your Drops</strong> (they were missing — restoring on a new computer would have lost them), and Drops get their own sheet in the <strong style="color:var(--text);">Excel export</strong>. The map now <strong style="color:var(--text);">keeps your view</strong> instead of jumping back out every time you record a drop, streets named <strong style="color:var(--text);">Victoria St</strong> now locate correctly, a failed address lookup <strong style="color:var(--text);">retries next time</strong> instead of getting stuck (with a new one-click <strong style="color:var(--text);">Retry failed</strong>), and address lookups sync far more gently. The <strong style="color:var(--text);">Inspections buttons</strong> on buyers and properties now show every inspection they count (including archived ones), reporting never archives an <strong style="color:var(--text);">upcoming</strong> open home, and due cards on the Tracker now properly <strong style="color:var(--text);">tilt under your cursor</strong> like the rest.</div></div><div class="changelog-row"><div class="changelog-ver">v3.5.0</div><div class="muted-sm"><strong style="color:var(--text);">Drops get a map — and can’t double up.</strong> The Drops page now has an <strong style="color:var(--text);">interactive map</strong> with a pin for every address you’ve dropped, colour-coded by drop type, with pins that pulse when they’re due for a re-drop — click a pin to see the details or record another drop. And <strong style="color:var(--text);">duplicates are now impossible</strong>: each address can hold one of each drop type (a pocket-appraisal card and a new-listing card are fine), but if you try to log the same type at an address you’ve already dropped, it records a <strong style="color:var(--text);">re-drop</strong> on the existing one instead of creating a copy — with a heads-up as you type. Any accidental doubles already in your data get merged automatically. <span class="muted-sm">(The map uses free OpenStreetMap — it needs internet for the map tiles and to place each address the first time; after that the location is remembered.)</span></div></div><div class="changelog-row"><div class="changelog-ver">v3.4.0</div><div class="muted-sm"><strong style="color:var(--text);">Inspections tidy themselves up after you report.</strong> When you <strong style="color:var(--text);">Copy</strong> or <strong style="color:var(--text);">Save</strong> an inspection report — either a single one or the combined <strong style="color:var(--text);">Copy report (filtered)</strong> — those inspections now <strong style="color:var(--text);">automatically archive</strong> off your active list, since they've done their job. A quick <strong style="color:var(--text);">Undo</strong> pops up in case you didn't mean to. Inspections also gain an <strong style="color:var(--text);">Active / Archived / All</strong> filter and an <strong style="color:var(--text);">Archive / Reopen</strong> button on every row, so you can hide finished open homes or bring them back any time.</div></div><div class="changelog-row"><div class="changelog-ver">v3.3.0</div><div class="muted-sm"><strong style="color:var(--text);">A more alive, tactile look.</strong> The background now has a <strong style="color:var(--text);">soft drifting glow</strong> that gently shifts as you move the mouse, so the app feels alive even when you're not doing anything. The <strong style="color:var(--text);">dashboard cards</strong> (your stats, due cards and theme tiles) now <strong style="color:var(--text);">tilt slightly and light up under your cursor</strong>, and buttons give a subtle <strong style="color:var(--text);">ripple</strong> when you press them. All tasteful and in every theme, light and dark — and it automatically calms down if your computer is set to reduce motion.</div></div><div class="changelog-row"><div class="changelog-ver">v3.2.2</div><div class="muted-sm">Simplified the drop form for targeted drops: removed the <strong style="color:var(--text);">letterboxes-dropped</strong> count and the <strong style="color:var(--text);">linked-property</strong> picker. Logging a drop now just needs the address, the type and the date — and the <strong style="color:var(--text);">date defaults to today</strong> (still changeable if you're recording one a few days late).</div></div><div class="changelog-row"><div class="changelog-ver">v3.2.1</div><div class="muted-sm">Tuned the drop reminders to how you actually farm: <strong style="color:var(--text);">pocket appraisal</strong> drops now remind you <strong style="color:var(--text);">once a month</strong>, and both <strong style="color:var(--text);">new listing</strong> and <strong style="color:var(--text);">stale listing</strong> drops remind you <strong style="color:var(--text);">every 14 days</strong>. Drops are now logged against a specific <strong style="color:var(--text);">address</strong> (targeted drops), not a street or area.</div></div><div class="changelog-row"><div class="changelog-ver">v3.2</div><div class="muted-sm">New <strong style="color:var(--text);">Drops</strong> section for letterbox drops. Log every address you drop and <strong style="color:var(--text);">why</strong> — <strong style="color:var(--text);">pocket appraisal</strong>, <strong style="color:var(--text);">new listing</strong> or <strong style="color:var(--text);">stale listing</strong> — and the app reminds you when each one is due for another drop, with the right play to run for that drop type. Each type has its own re-drop cadence. Hit <strong style="color:var(--text);">Dropped again</strong> to reset the timer and keep a count of how many times you've hit each one. It all syncs to your Google Sheet too.</div></div><div class="changelog-row"><div class="changelog-ver">v3.1</div><div class="muted-sm"><strong style="color:var(--text);">Easier on the eyes.</strong> Every page now sits on a <strong style="color:var(--text);">clean solid sheet</strong> — the dotted backdrop stays out in the margins, never behind your text. The background and mouse-glow are much subtler, the top bar is solid again, and <strong style="color:var(--text);">text is bigger everywhere it counts</strong>: scripts, SMS bubbles, tables, due cards, forms and headings, with more breathing room throughout. Same sharp modern style — just properly readable.</div></div><div class="changelog-row"><div class="changelog-ver">v3.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 3.0 ✨ — a sharper, livelier look.</strong> The whole app moved to a <strong style="color:var(--text);">modern boxy design</strong>: crisp square corners everywhere, a frosted-glass top bar, panels and cards that <strong style="color:var(--text);">slide in and lift when you hover</strong>, stat numbers that count up, a subtle dot-grid background with a <strong style="color:var(--text);">glow that follows your mouse</strong>, and sleek themed scrollbars — all in every theme, light and dark. Plus: <strong style="color:var(--text);">listing previews</strong> — paste an REA or Domain link on a property and the app pulls in the <strong style="color:var(--text);">photo, headline and description</strong>; the photo shows right in your Properties list and opens a full preview card. (Some sites block previews now and then — the link always works regardless.)</div></div><div class="changelog-row"><div class="changelog-ver">v2.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 2.0 🚀 — built for working the phones.</strong> New <strong style="color:var(--text);">▶ Call session</strong> on the Tracker walks you through everyone due, one at a time, with the right script on screen and one-tap buttons (done / 👍 / 👋 / snooze / skip) and a session summary at the end. <strong style="color:var(--text);">📞 Call and 💬 Text buttons</strong> dial or open a pre-filled text straight from a due card. <strong style="color:var(--text);">⏰ Snooze</strong> pushes anyone back 1 day / 3 days / a week without losing their progress. A new <strong style="color:var(--text);">This week</strong> strip counts your calls, texts, new contacts and interested prospects (with a trend vs last week). <strong style="color:var(--text);">🔍 Search everything</strong> (the magnifier, or Ctrl/Cmd+K) finds any contact, buyer or property instantly. Settings gains <strong style="color:var(--text);">backup &amp; restore</strong> — one file with all your data. And logging a contact now <strong style="color:var(--text);">warns about duplicate mobiles</strong>.</div></div><div class="changelog-row"><div class="changelog-ver">v1.4.0</div><div class="muted-sm">You can now <strong style="color:var(--text);">edit a tracked contact</strong>: hit <strong style="color:var(--text);">Edit</strong> on any row and it loads into the form above — fix names, numbers, the address, notes, the call date, or move the contact to a <strong style="color:var(--text);">different prospecting method</strong> — then Update. Changing the <strong style="color:var(--text);">outcome</strong> restarts that person's follow-up schedule from today (same as changing it in the table); every other edit keeps their progress exactly where it was.</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.2</div><div class="muted-sm">Safer importing: bringing an Excel file into the tracker now <strong style="color:var(--text);">skips the Buyers, Properties and Inspections tabs</strong> from a full export — they used to be read as contacts by mistake. And if a file has <strong style="color:var(--text);">no contact rows at all</strong>, the import now tells you and leaves your tracker untouched instead of emptying it.</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.1</div><div class="muted-sm">Dates everywhere now read the Australian way — <strong style="color:var(--text);">dd/mm/yyyy</strong> (e.g. 15/06/2026) — on the Tracker's due cards, the contacts table, inspections and their reports, and in Excel/CSV exports. Importing understands both the new format and older exports, and dates typed as dd/mm/yyyy straight into the Google Sheet are now read correctly too (they used to risk being taken as American month-first).</div></div><div class="changelog-row"><div class="changelog-ver">v1.3.0</div><div class="muted-sm">A fifth theme: <strong style="color:var(--text);">Noir</strong> — pure greyscale, just blacks, whites and greys (urgent things stand out by contrast instead of red). Also tidied the <strong style="color:var(--text);">top bar on small windows</strong>: the tabs now shrink neatly, and if they still need a second row the bar grows downward instead of spilling over the page.</div></div><div class="changelog-row"><div class="changelog-ver">v1.2.0</div><div class="muted-sm">New <strong style="color:var(--text);">⚙ Settings</strong> tab with a <strong style="color:var(--text);">theme picker</strong> — every look the app has ever had, in one place: <strong style="color:var(--text);">Claude</strong> (the cream &amp; coral signature), the brand-new <strong style="color:var(--text);">Racing Green</strong> (graphite greys with black chrome and forest-green accents, Aston Martin inspired), <strong style="color:var(--text);">Espresso</strong> (the warm grey + brown look), and <strong style="color:var(--text);">Classic Blue</strong> (the original). The ☀ / 🌙 button still flips whichever theme you pick between light and dark, and your choice is remembered.</div></div><div class="changelog-row"><div class="changelog-ver">v1.1.0</div><div class="muted-sm">Each property's <strong style="color:var(--text);">Buyers panel</strong> now shows three tiers: <strong style="color:var(--text);">Offer candidates</strong> (buyers you've flagged as likely to offer), <strong style="color:var(--text);">Inspected</strong> (anyone who attended an open home for that property, pulled automatically from your Inspections records), and <strong style="color:var(--text);">Enquired only</strong>. Hit <strong style="color:var(--text);">＋ Offer candidate</strong> to move a buyer up when they get serious. Every buyer card also shows their <strong style="color:var(--text);">fit score</strong> and inspection count at a glance, and the property row shows a <strong style="color:var(--text);"># offering</strong> count so you can see offer momentum without clicking in.</div></div><div class="changelog-row"><div class="changelog-ver">v1.0.1</div><div class="muted-sm">The Google Sheets box now shows the <strong style="color:var(--text);">Client ID and secret</strong> you're connected with (secret hidden behind a Show button), each with a Copy button, so you can check or move your credentials.</div></div><div class="changelog-row"><div class="changelog-ver">v1.0</div><div class="muted-sm"><strong style="color:var(--text);">Version 1.0 🎉</strong> — the first full release. Fresh <strong style="color:var(--text);">Claude-inspired look</strong>: a warm cream background with a coral/clay accent (and a matching warm dark mode). Everything from the journey is in: prospecting scripts, the smart Tracker, Buyers, Properties with matching, and Inspections.</div></div><div class="changelog-row"><div class="changelog-ver">v0.28</div><div class="muted-sm">New <strong style="color:var(--text);">Inspections</strong> section for open homes: create an inspection for a property + date/time, then add the buyers who attended. As you type a name it searches your buyer database to <strong style="color:var(--text);">link an existing buyer</strong> (or create a new one, warning you about likely duplicates), so you don't get doubles. Keep notes and a follow-up flag against each attendee, and hit <strong style="color:var(--text);">Report</strong> to copy a clean, email-ready summary. Inspection history shows on each buyer and property, and there's a tool to <strong style="color:var(--text);">merge duplicate buyers</strong>.</div></div><div class="changelog-row"><div class="changelog-ver">v0.27</div><div class="muted-sm">Properties now have an <strong style="color:var(--text);">Enquiries</strong> panel that opens out under each property to list every buyer who enquired. For each one you can jot <strong style="color:var(--text);">notes</strong> and toggle whether they're still an <strong style="color:var(--text);">active buyer</strong> of that property (vs just a past enquiry), and add or remove buyers right there.</div></div><div class="changelog-row"><div class="changelog-ver">v0.26.3</div><div class="muted-sm">The <strong style="color:var(--text);">Prospecting</strong> menu now opens on hover and stays open as you move down to pick a method, and the top tabs show a clear outline when you hover them.</div></div><div class="changelog-row"><div class="changelog-ver">v0.26</div><div class="muted-sm">A fresh look and a smarter workspace: clean <strong style="color:var(--text);">tabs across the top</strong> (with a Prospecting menu for your four methods), a calm <strong style="color:var(--text);">black-and-white design</strong> with subtle brown accents and a tidied dark mode, and a rebuilt <strong style="color:var(--text);">Tracker</strong> — each due person now shows you the exact call or text to use for their next step, with a one-tap <strong style="color:var(--text);">Copy SMS</strong>, so you never have to go hunting through the script pages.</div></div><div class="changelog-row"><div class="changelog-ver">v0.25</div><div class="muted-sm">Big one: a proper <strong style="color:var(--text);">Buyers database</strong> (budget, preferences, preferred suburbs, and the properties each buyer enquired on) and a <strong style="color:var(--text);">Properties</strong> inventory (on market / off market / archived). Hit <strong style="color:var(--text);">Match</strong> on any buyer or property to instantly see the best fits, ranked — including off-market properties. Everything syncs to Google Sheets too (new Buyers and Properties tabs).</div></div><div class="changelog-row"><div class="changelog-ver">v0.24.1</div><div class="muted-sm">Behind-the-scenes tidy-up of the app's styling so it's quicker and safer to improve from here — nothing changed in how the app looks or works.</div></div><div class="changelog-row"><div class="changelog-ver">v0.24</div><div class="muted-sm">Sync your contacts to a <strong style="color:var(--text);">Google Sheet</strong>: connect once from the Storage box and your contacts stay in step on every computer — and you can view or edit them right in Google Sheets, even from your phone. Also added <strong style="color:var(--text);">Linux support</strong> (Linux Mint), so the app now runs on Windows, Mac and Linux.</div></div><div class="changelog-row"><div class="changelog-ver">v0.23</div><div class="muted-sm">Made updating easy on Mac: added a <strong style="color:var(--text);">Check for updates</strong> button on this page (and an automatic check when you open the app). When a new version is out it tells you and opens the download — just open the .dmg and drag the app into Applications. Windows keeps installing updates by itself.</div></div><div class="changelog-row"><div class="changelog-ver">v0.22</div><div class="muted-sm">Share your contacts across computers: point the tracker at a cloud-synced folder (Dropbox, iCloud, OneDrive or Google Drive) from the Storage box, then choose the same folder on your other computer. Also turned on automatic updates (via GitHub) so new versions can install themselves.</div></div><div class="changelog-row"><div class="changelog-ver">v0.21</div><div class="muted-sm">Windows support is back: the app now installs and runs on Windows as well as Mac. Added a Windows installer build (<strong style="color:var(--text);">npm run build:win</strong>) and double-click launchers, and fixed a first-time setup issue where the app engine sometimes didn't finish installing.</div></div><div class="changelog-row"><div class="changelog-ver">v0.20.1</div><div class="muted-sm">Brought Just listed, Buyer database and Steal listings up to the same standard as Just sold — branched follow-ups (no answer / interested / not interested) and HOT / WARM / COLD nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.18</div><div class="muted-sm">Rebuilt as a cross-platform desktop app (Electron) with a local database and native Excel/CSV export &amp; import — no browser, no sandbox.</div></div><div class="changelog-row"><div class="changelog-ver">v0.17</div><div class="muted-sm">Added a call-outcome option (no answer / interested / not interested) when logging a contact, so the follow-up reminders use the right branch. You can also change a contact's outcome later and the schedule restarts from that day.</div></div><div class="changelog-row"><div class="changelog-ver">v0.16</div><div class="muted-sm">Added this About &amp; what's new page, with version history.</div></div><div class="changelog-row"><div class="changelog-ver">v0.15</div><div class="muted-sm">Renamed to a stable filename so data survives updates; added optional project-folder data file (auto-saves to prospecting-data.json on Chrome/Edge).</div></div><div class="changelog-row"><div class="changelog-ver">v0.14</div><div class="muted-sm">Split the Just sold follow-up into three branches: no answer (voicemail + SMS), answered &amp; interested, answered &amp; not interested.</div></div><div class="changelog-row"><div class="changelog-ver">v0.13</div><div class="muted-sm">Rewrote the Just sold openers to feel warmer and more genuine — dropped the "this is a cold call" line while keeping the research behind each one.</div></div><div class="changelog-row"><div class="changelog-ver">v0.12</div><div class="muted-sm">Added a search box to the contact tracker.</div></div><div class="changelog-row"><div class="changelog-ver">v0.11</div><div class="muted-sm">Built the contact tracker: quick logging, automatic due/overdue reminders from each call date, and Excel export/import (one sheet per method).</div></div><div class="changelog-row"><div class="changelog-ver">v0.10</div><div class="muted-sm">Added dark mode with a light/dark toggle and a full themed colour system.</div></div><div class="changelog-row"><div class="changelog-ver">v0.9</div><div class="muted-sm">Gave each prospect method its own openers, objections, closes, follow-up and nurture; removed the old shared sections. Stripped all email steps — calls and messages only.</div></div><div class="changelog-row"><div class="changelog-ver">v0.8</div><div class="muted-sm">Moved Just listed into the prospect methods with its own openers, objections and closes.</div></div><div class="changelog-row"><div class="changelog-ver">v0.7</div><div class="muted-sm">Consolidated the core openers, objections and closes into the Just sold street method.</div></div><div class="changelog-row"><div class="changelog-ver">v0.6</div><div class="muted-sm">Added two new prospect methods: Buyer database and Steal listings.</div></div><div class="changelog-row"><div class="changelog-ver">v0.5</div><div class="muted-sm">Reorganised into prospect methods and a special opens section.</div></div><div class="changelog-row"><div class="changelog-ver">v0.4</div><div class="muted-sm">Rebuilt the openers around proven psychology and cold-calling data.</div></div><div class="changelog-row"><div class="changelog-ver">v0.3</div><div class="muted-sm">Added the HOT / WARM / COLD SMS nurture tracks.</div></div><div class="changelog-row"><div class="changelog-ver">v0.2</div><div class="muted-sm">Added voicemail scripts, the follow-up sequence and the no-answer nurture.</div></div><div class="changelog-row"><div class="changelog-ver">v0.1</div><div class="muted-sm">First downloadable version with the core just-sold scripts.</div></div></div>
 </div>
 </main>
 </div>
@@ -2799,7 +2819,39 @@
     document.querySelectorAll('.method-tab, .branch-tab').forEach(function(b){ b.removeAttribute('style'); });
   });
 
+  /* v7.1: the Follow-ups panel holds one block per method; the pills swap between them. */
+  var FU_METHODS = ['js','jl','bd','sl'];
+  var FU_SEL = 'js';
+  function fuPick(pre, btn){
+    FU_SEL = pre;
+    for (var i = 0; i < FU_METHODS.length; i++){
+      var b = document.getElementById('fu-' + FU_METHODS[i]);
+      if (b) b.style.display = (FU_METHODS[i] === pre) ? '' : 'none';
+    }
+    var pills = document.querySelectorAll('.fu-pill');
+    for (var p = 0; p < pills.length; p++){
+      var on = FU_METHODS[p] === pre;
+      pills[p].classList.toggle('active', on);
+      pills[p].setAttribute('aria-selected', on ? 'true' : 'false');
+      pills[p].tabIndex = on ? 0 : -1;
+    }
+    if (btn && btn.focus) btn.focus();
+  }
+  function fuKeys(e, pre){
+    var i = FU_METHODS.indexOf(pre), n = FU_METHODS.length, j = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') j = (i + 1) % n;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') j = (i - 1 + n) % n;
+    else if (e.key === 'Home') j = 0;
+    else if (e.key === 'End') j = n - 1;
+    if (j < 0) return;
+    e.preventDefault();
+    fuPick(FU_METHODS[j], document.querySelectorAll('.fu-pill')[j]);
+  }
+
+  // Panels that live under the sidebar's Prospecting group — the group stays open and
+  // highlighted for all of them, but only the four methods name a method label.
   var METHOD_PANELS = { justsold:1, listed:1, buyerdb:1, steallist:1 };
+  var PROSPECTING_PANELS = { justsold:1, listed:1, buyerdb:1, steallist:1, contacts:1, followups:1 };
   var lastMethod = 'justsold';
   function showPanel(id, el) {
     // A form left open in the drawer belongs to the panel you're leaving — shut it first.
@@ -2813,11 +2865,11 @@
       var oc = a.getAttribute('onclick') || '';
       if (oc.indexOf("'" + id + "'") > -1) a.classList.add('active');
     });
-    if (METHOD_PANELS[id]) {
-      lastMethod = id;
+    if (PROSPECTING_PANELS[id]) {
+      if (METHOD_PANELS[id]) lastMethod = id;
       var np = document.getElementById('nav-prospecting'); if (np) np.classList.add('active');
-      prospSetLabel(id);
-      _ddSet(true);   // keep the group open so the method you're in stays visible
+      prospSetLabel(METHOD_PANELS[id] ? id : null);
+      _ddSet(true);   // keep the group open so where you are stays visible
     } else {
       prospSetLabel(null);
     }
