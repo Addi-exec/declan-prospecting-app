@@ -2059,113 +2059,58 @@
 <div class="panel-header">
 <div class="badge" style="background:var(--danger-bg);color:var(--danger)">Prospect method</div>
 <h2>Steal listings</h2>
-<p>Two targets: stale listings (frustrated vendor) and fresh listings (plant the seed early). The opener reads the room first — then you choose your approach.</p>
+<p>Listings that have been sitting — a vendor who is losing patience with their current agent. The opener reads the room first, then you choose your approach.</p>
 </div>
 <div class="method-tabs">
 <button class="sl-tab method-tab active" onclick="showSlTab('sl-openers',this)" style="border:none;font-weight:600;background:var(--danger-bg);color:var(--danger);">Openers</button>
-<button class="sl-tab method-tab" onclick="showSlTab('sl-objections',this)">Objections</button>
-<button class="sl-tab method-tab" onclick="showSlTab('sl-closes',this)">Closes</button>
 <button class="sl-tab method-tab" onclick="showSlTab('sl-followup',this)">Follow-up</button>
 <button class="sl-tab method-tab" onclick="showSlTab('sl-nurture',this)">Nurture</button>
 </div>
-<!-- SL OPENERS -->
+<!-- SL OPENERS — universal opener + mood branch picker -->
 <div id="sl-openers" class="sl-track">
-<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:14px 18px;margin-bottom:18px;">
-<div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">The golden rule — read the room first</div>
-<p class="muted-sm">The opener reads their frustration level. Their answer tells you whether to go direct (frustrated) or soft (neutral/positive). Never pitch before you've diagnosed.</p>
+<div class="script-label" style="margin-top:0;">The opener — use every time</div>
+<div class="opener-lead">
+<div class="script-block">"Hi [Name], it's Declan — I hope I'm not interrupting. I noticed your property at [address] is currently on the market and I just wanted to reach out. How are you finding the whole process so far?"</div>
 </div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--text);">Universal opener — use every time</div>
-<span style="font-size:11px;background:var(--green-bg);color:var(--green);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;">Start here</span>
+<div class="fork-arrow">Their tone tells you which call you're on</div>
+<div class="br-picker" data-br="sl"></div>
+
+<div class="script-label" style="margin-top:24px;">When they push back</div>
+<div class="obj-picker" data-obj="sl"></div>
+
+<div class="fork" style="margin-top:24px;">
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Someone else answers</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Wrong person / partner picks up</div>
+<div class="script-block">"Oh sorry — I was after [Name]. It's Declan, one of the local agents in [suburb]. Nothing urgent: I noticed [address] is on the market and I wanted to introduce myself. Are you selling it together? … Then you'd want to hear this as much as they would."</div>
 </div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Hi [Name], it's Declan — I hope I'm not interrupting. I noticed your property at [address] is currently on the market and I just wanted to reach out. How are you finding the whole process so far?"</div>
-<div style="background:var(--blue-bg);border-radius:var(--r-xs);padding:10px 14px;margin-top:12px;">
-<div style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--blue);margin-bottom:6px;">Branch guide</div>
-<div style="font-size:13px;color:var(--text2);margin-bottom:6px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Frustrated / venting</span> → Go <strong>direct</strong> below</div>
-<div style="font-size:13px;color:var(--text2);margin-bottom:6px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Positive / confident</span> → Go <strong>soft / seed</strong> below</div>
-<div class="muted-sm"><span style="font-weight:600;color:var(--text);">Neutral / unsure</span> → Use the <strong>data angle</strong> below</div>
-</div>
-</div>
-</div>
-<div style="border:2px solid var(--danger-border);border-radius:var(--r-xs);overflow:hidden;margin-bottom:14px;">
-<div style="background:var(--danger-soft);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--danger);">Stale listing — direct (frustrated vendor)</div>
-<span style="font-size:11px;background:var(--danger-bg);color:var(--danger);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;">45+ days on market</span>
-</div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="border-left-color:var(--danger);margin-top:0;">"I hear you — it can be really frustrating when a home doesn't move the way you expected. I want to be upfront: I'm not here to bag your current agent. But I have sold [X properties] in [suburb] in the last [timeframe], and I think I know why some properties sit and others fly. Would you be open to a quick conversation about what might make the difference? No commitment — just a second perspective."</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Empathy first</span><span class="tag">Authority — your results</span><span class="tag">Low commitment ask</span></div>
+<div>
+<div class="fork-step">The listing agent's office answers</div>
+<div class="script-block">"Apologies — I've got the wrong number, I was after the owner directly. No trouble at all, I'll leave it there."</div>
 </div>
 </div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--text);">Stale listing — soft (neutral vendor)</div>
-<span style="font-size:11px;background:var(--amber-bg);color:var(--amber);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;">30–60 days</span>
 </div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"That's good to hear. I won't take up much of your time — I just wanted to introduce myself. I work this area closely and I've had a few buyers through recently who couldn't find quite the right thing. I'm not suggesting anything about your current campaign — I'd just love to keep your property in mind. Would it be okay if I gave you a call in a few weeks to see where things are at?"</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Seed planting</span><span class="tag">Follow-up permission</span><span class="tag">Non-threatening</span></div>
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Nobody picks up</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Voicemail — keep it under 20 seconds</div>
+<div class="script-block">"Hi [Name], it's Declan, one of the local agents around [suburb]. I noticed [address] is on the market — I'm not calling to poach anything, I just track this area closely and there are a couple of recent sales that are relevant to your campaign. Give me a call back on [number] and I'll run you through them. Cheers [Name]."</div>
 </div>
-</div>
-<div style="border:1px solid var(--green-border);border-radius:var(--r-xs);overflow:hidden;margin-bottom:14px;">
-<div style="background:var(--green-bg);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--green);">Fresh listing — plant the seed</div>
-<span style="font-size:11px;background:var(--green-bg);color:var(--green);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;">New to market</span>
-</div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="border-left-color:var(--green);margin-top:0;">"That's great — sounds like you're off to a good start. Look, I'll be completely transparent — I'm not calling to poach your listing. I just wanted to introduce myself as someone who works this area closely. Sometimes campaigns take unexpected turns and vendors end up wanting a fresh perspective. I'd just love to be someone you've already met if that moment ever came. Is it okay if I check in with you in a few weeks?"</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Radical honesty — builds trust</span><span class="tag">Insurance policy framing</span><span class="tag">Check-in permission</span></div>
+<div>
+<div class="fork-step">Text straight after</div>
+<div class="sms-bubble">Hi [Name], Declan here — local agent, just left you a voicemail. Not chasing your listing; I just track [suburb] closely and there are a couple of recent comparable sales worth you seeing. Give me a call when you get a chance and I'll send them through.</div>
 </div>
 </div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;">
-<div style="font-size:13px;font-weight:600;color:var(--text);">Fresh listing — data angle (neutral vendor)</div>
 </div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Glad to hear it. I do just want to share one thing — I've been tracking the [suburb] market closely and there are a couple of comparable sales from the last 30 days that are really relevant to your campaign. I'm not suggesting anything — but would you find it useful to have that data? I can send it through, no strings attached."</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Cialdini — reciprocity</span><span class="tag">Authority — market data</span><span class="tag">No strings</span></div>
+
 </div>
-</div>
-<div class="tip-box"><strong>Timing:</strong> For stale listings, reach out within 24 hours of expiry — vendors are still emotionally engaged. For active listings, call around week 3–4 when early optimism starts to fade.</div>
-</div>
-<!-- SL OBJECTIONS -->
-<div id="sl-objections" class="sl-track" style="display:none;">
-<div class="objection-item" style="padding-top:0;border-top:none;">
-<div class="objection-q">"I'm happy with my current agent."</div>
-<div class="objection-a">"Completely fine — and I hope they get you a great result. I just wanted to introduce myself so if you ever want a second opinion or things don't go to plan, you've already got someone in your corner. Would you mind if I checked in with you in a few weeks?"</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"Why should I switch agents?"</div>
-<div class="objection-a">"I'm not asking you to — not yet. What I am asking is whether you'd be open to hearing a different perspective on why it might not have moved yet. Sometimes it's price, sometimes presentation, sometimes the wrong buyer pool. I'd just like 20 minutes to walk you through what I'd do differently. If nothing resonates, you've lost nothing."</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"We've had a lot of agents call us."</div>
-<div class="objection-a">"I bet you have — and I'm sure most of them were pretty pushy. I'm not going to do that. What I will say is I've sold [X] properties in [suburb] in the last [timeframe] and I have a specific view on what's holding this one back. Would it be worth a quick conversation — not to commit to anything, just to hear it?"</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"Our contract doesn't expire for X weeks."</div>
-<div class="objection-a">"Completely understand — I'm not asking you to do anything about that. I'd just love to stay in touch and make sure when the time comes, you've got options. Can I check back in with you in [X weeks] once that wraps up?"</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"The price is the problem, not the agent."</div>
-<div class="objection-a">"You might be right — and that's worth exploring. Sometimes it's pricing strategy, sometimes it's how the property's being presented to justify the price. I'd love to look at both with you. Would it be worth a conversation about what comparable sales are telling us right now?"</div>
-</div>
-<div class="tip-box"><strong>Mirroring tip:</strong> When vendors are frustrated, let them vent. Repeat their last 3 words as a question — "Not moving at all?" — and they'll keep going. The more they talk, the more you learn.</div>
-</div>
-<!-- SL CLOSES -->
-<div id="sl-closes" class="sl-track" style="display:none;">
-<div class="script-label">Close 1 — the appraisal ask (stale listing)</div>
-<div class="script-block">"You've been on the market for [X weeks] and I think you deserve a second set of eyes. I'm not asking for the listing. I'm asking for 20 minutes to walk through what I'd do differently, show you some comparable sales, and give you my honest take on price. If nothing resonates, you've lost nothing. Would [day] or [day] work?"</div>
-<div class="script-label">Close 2 — the check-in lock (fresh listing)</div>
-<div class="script-block">"I'll leave you to it — I genuinely hope your campaign goes amazingly. Can I just put a note in my calendar to check in with you in [3–4 weeks]? Not to push anything — just to see how things are tracking."</div>
-<div class="script-label">Close 3 — the contract expiry close</div>
-<div class="script-block">"I completely respect your commitment to your current agent. Can I ask — when does your agency agreement expire? ... Perfect. I'd love to have a proper conversation with you around that time. Would you be open to a meeting the week it expires, just to explore your options before you decide what's next?"</div>
-<div class="script-label">Close 4 — the fresh perspective close</div>
-<div class="script-block">"Let me put together a full marketing comparison and a pricing analysis based on the last 60 days of sales in [suburb]. No charge, no obligation. If it tells you nothing new, fair enough. If it shows something your current campaign is missing, at least you'll know. Can I send it through?"</div>
-<div class="tags"><span class="tag">No commitment ask</span><span class="tag">Check-in permission</span><span class="tag">Contract expiry timing</span><span class="tag">Value before ask</span></div>
-<div class="tip-box"><strong>The long game:</strong> Most vendors on fresh listings won't switch agents for 4–6 weeks minimum. Your goal on the first call is simply to be remembered warmly.</div>
+<div class="tip-box"><strong>Timing:</strong> call around week 3–4, when the early optimism starts to fade but there's still a campaign to save. If a listing has just expired, reach out within 24 hours — they're still emotionally engaged.</div>
+<div class="tip-box"><strong>Let them vent:</strong> when a vendor is frustrated, repeat their last three words back as a question — "Not moving at all?" — and stop. The more they talk, the more you learn about what's actually wrong.</div>
 </div>
 <!-- SL FOLLOW-UP -->
 <div id="sl-followup" class="sl-track" style="display:none;">
@@ -2192,25 +2137,6 @@
 <div class="seq-content">
 <h4>SMS — comparable sales</h4>
 <div class="sms-bubble">Hi [Name], Declan here. In case it's useful — a couple of recent comparable sales near [address]: [Sale 1 — result, days], [Sale 2 — result, days]. No strings, just thought the data might help your campaign 😊</div>
-</div>
-</div>
-<div class="seq-item">
-<div class="seq-day">Day 10</div>
-<div class="seq-content">
-<h4>Voicemail + SMS</h4>
-<div class="sms-label">Voicemail</div>
-<div class="script-block" style="font-size:13px;">"Hi [Name], Declan again — no pressure at all. I know how frustrating it can be when a campaign doesn't move the way you'd hoped. If you'd ever value a fresh perspective on what might make the difference, I'm happy to share. [number] whenever suits."</div>
-<div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
-<div class="sms-bubble">Hi [Name], Declan here — left you another quick voicemail 😊 No pressure — just here with a fresh perspective if your campaign ever stalls. Happy to help 👍</div></div>
-</div>
-</div>
-<div class="seq-item">
-<div class="seq-day">Week 3–4</div>
-<div class="seq-content">
-<h4>Call — the check-in</h4>
-<div class="script-block" style="font-size:13px;">"Hi [Name], Declan here — I said I'd keep an eye on things. How's the campaign tracking? Any offers come through yet?"</div>
-<div style="margin-top:8px;"><div class="sms-label">SMS if no answer</div>
-<div class="sms-bubble">Hi [Name], Declan here — tried you just now 😊 Just checking how the campaign's going. No pressure — here for a chat or a second opinion anytime 👍</div></div>
 </div>
 </div>
 <div class="seq-item">
@@ -2311,6 +2237,9 @@
 <div class="sms-bubble">Hi [Name], Declan here — happy to come to you, after hours if easier. I'll bring a full marketing plan and pricing view for [address]. Worth a look before you decide what's next? 🙏</div>
 <div class="script-label" style="margin-top:14px;">SMS 3 — Day 3, expiry urgency</div>
 <div class="sms-bubble">Hi [Name], Declan here. If your agreement's wrapping up, the days right after are the best time to relaunch with fresh momentum. I'd love to be ready to go for you. Quick chat? 👍</div>
+<div class="script-label" style="margin-top:14px;">Day 5 — one call, then let it cool</div>
+<div class="script-block" style="font-size:13px;">"Hi [Name], Declan here — I sent you a couple of texts so I won't keep chasing. I just didn't want to leave it hanging. Is a second opinion still something you'd want before the agreement runs out, or have you decided to see it through?"</div>
+<div class="tip-box" style="margin-top:12px;"><strong>No reply to any of it?</strong> Move them to the WARM track — change their outcome in the tracker and they pick up the monthly touches instead.</div>
 <div class="tip-box"><strong>HOT tip:</strong> The days right after an agreement expires are gold — a frustrated vendor and a clean slate. Be first and be ready.</div>
 </div>
 <div id="sln-warm" class="sln-track" style="display:none;">
@@ -2323,6 +2252,10 @@
 <div class="sms-bubble">Hi [Name], Declan here — hope things have settled. No pressure at all, just checking how you're going and whether anything's changed with [address] 😊</div>
 <div class="script-label" style="margin-top:14px;">Month 6 — gentle re-engagement</div>
 <div class="sms-bubble">Hi [Name], Declan here — the [suburb] market has shifted a fair bit and conditions look more favourable than they were. If you ever think about giving it another go, I'd love to share what I'm seeing. No obligation 👍</div>
+<div class="script-label" style="margin-top:14px;">Month 9 — the year in one line</div>
+<div class="sms-bubble">Hi [Name], Declan here. [suburb] has moved a fair bit this year — [one line stat]. If the place is still on your mind, worth knowing what it would realistically do now versus when you had it listed.</div>
+<div class="script-label" style="margin-top:14px;">Month 12 — the anniversary check</div>
+<div class="sms-bubble">Hi [Name], Declan here — it's been about a year since [address] was on the market. Has anything changed on your end? Happy to give you an honest read on where it sits now, no strings.</div>
 <div class="tip-box"><strong>WARM tip:</strong> A useful, no-agenda touch every few weeks keeps you front of mind for the day they're ready to try again.</div>
 </div>
 <div id="sln-cold" class="sln-track" style="display:none;">
@@ -3001,6 +2934,32 @@ var OBJECTIONS = {
       q:'"How did you get my number?"',
       a:'"Fair question — it’s from the public property register. I call the street whenever I list in it so the neighbours hear it from me first. Happy to take you off my list if you’d prefer."',
       f:'"While I’ve got you — it’s [address], going to market at [price guide]. Worth knowing what’s happening in your own street."' }
+  ],
+  sl: [
+    { pill:'Happy with my agent',
+      q:'"I’m happy with my current agent."',
+      a:'"Completely fine — and I hope they get you a great result. I just wanted to introduce myself so that if you ever want a second opinion, you’ve already got someone in your corner rather than starting from scratch."',
+      f:'"Would you mind if I checked in with you in a few weeks, just to see how it’s tracking? No pitch — two minutes."' },
+    { pill:'Why would I switch?',
+      q:'"Why should I switch agents?"',
+      a:'"I’m not asking you to — not yet. What I’m asking is whether you’d be open to a different read on why it hasn’t moved. Sometimes it’s price, sometimes presentation, sometimes it’s simply the wrong buyer pool."',
+      f:'"Give me 20 minutes to walk you through what I’d do differently. If it tells you nothing new, you’ve lost 20 minutes and I’ll leave you alone."' },
+    { pill:'Agents keep calling',
+      q:'"We’ve had a lot of agents call us."',
+      a:'"I bet you have — and I’d guess most were pretty pushy about it. I’m not going to do that."',
+      f:'"What I will say is I’ve sold [X] in [suburb] in the last [timeframe] and I’ve got a specific view on what’s holding this one back. Worth a quick conversation — no commitment either way?"' },
+    { pill:'Still under contract',
+      q:'"Our contract doesn’t expire for [X] weeks."',
+      a:'"Completely understand — and I’m not asking you to do anything about that. I’d rather you finished it properly than broke it."',
+      f:'"When does it wrap up? … I’d love to have a proper conversation the week before that, so when the time comes you’ve got options ready rather than starting cold."' },
+    { pill:'It’s the price, not the agent',
+      q:'"The price is the problem, not the agent."',
+      a:'"You might be right — and that’s worth exploring properly. Though it’s usually both: the price, and how the property’s being presented to justify it."',
+      f:'"Let me show you what the comparable sales are actually saying right now. If the price is the only issue, you’ll see it straight away — and you’ll know exactly how far off you are."' },
+    { pill:'Bad time',
+      q:'"This isn’t a good time."',
+      a:'"No dramas — I’ll be quick. I noticed [address] is on the market and I just wanted to introduce myself, not hold you up."',
+      f:'"What’s the best mobile? I’ll text you a couple of recent [suburb] comparables that are relevant to your campaign — no obligation, just useful to have."' }
   ]
 };
 /* Branch picker — same interaction as the objection pills, but each choice holds a
@@ -3049,6 +3008,46 @@ var BRANCHES = {
           t:'"No dramas at all. Can I drop you a [suburb] update every few months by text? Just what\'s sold and what things are worth, so if it ever comes up again you\'ve already got the picture. What\'s the best mobile?"' },
         { s:'If something HAS changed',
           t:'"That does change things. Would it be worth me giving you an honest read on what you could buy — and what your place is worth — so you know where you actually stand? No pitch, just the numbers."' }
+      ] }
+  ],
+  sl: [
+    { pill:'Frustrated / venting',
+      sub:'Go direct — they already know it isn\'t working',
+      steps:[
+        { s:'1 — Let them vent, then name it',
+          t:'"I hear you — it\'s really frustrating when a home doesn\'t move the way you expected. How long has it been on now? … And what\'s your agent putting it down to?"' },
+        { s:'2 — Be upfront about what you\'re not doing',
+          t:'"I want to be straight with you: I\'m not here to bag your agent. But I have sold [X properties] in [suburb] in the last [timeframe], and I\'ve got a specific view on what tends to hold a place like yours back."' },
+        { s:'3 — The ask',
+          t:'"You\'ve been on the market [X weeks] — I reckon you deserve a second set of eyes. I\'m not asking for the listing. I\'m asking for 20 minutes to show you what I\'d do differently and give you my honest take on price. If nothing lands, you\'ve lost 20 minutes."' },
+        { s:'4 — Lock it in and get the details',
+          t:'"Good. What does your week look like? … Let\'s say [day] at [time]. Best mobile? … And just so I come prepared — what was the campaign price when you launched?"' },
+        { s:'If they\'re still under agreement',
+          t:'"Completely respect that — I\'m not asking you to break anything. When does the agreement run out? … Perfect. I\'d rather have the conversation before that date than after, so you walk into it with options."' }
+      ] },
+    { pill:'Neutral / unsure',
+      sub:'Lead with the data, no opinion on their agent',
+      steps:[
+        { s:'1 — Take the temperature',
+          t:'"Fair enough. Where\'s it at — much interest through the opens? … And has the feedback been about price, or the property itself?"' },
+        { s:'2 — Offer something useful, no strings',
+          t:'"I\'ve been tracking [suburb] pretty closely and there are a couple of comparable sales in the last 30 days that are really relevant to your campaign. I\'m not suggesting anything about what you\'re doing — would it be useful if I sent them through?"' },
+        { s:'3 — Get the number, earn the next call',
+          t:'"What\'s the best mobile? I\'ll put together the comparables and a rough read on where the market\'s pricing you. No charge, no obligation — if it tells you nothing new, fair enough."' },
+        { s:'4 — Book the follow-up while you\'re there',
+          t:'"I\'ll send that through today. Can I give you a quick call in a couple of weeks to see how it\'s tracking? Not to push anything — just to see where you\'re at."' }
+      ] },
+    { pill:'Positive / confident',
+      sub:'Plant the seed and get permission to come back',
+      steps:[
+        { s:'1 — Be genuinely pleased, and honest',
+          t:'"That\'s good to hear. Look, I\'ll be completely transparent — I\'m not calling to poach your listing. I just wanted to introduce myself as someone who works this area closely."' },
+        { s:'2 — The insurance-policy framing',
+          t:'"Campaigns don\'t always go the way everyone hopes. If yours does, brilliant — you\'ll never need me. If it doesn\'t, you\'ll already know who to call rather than starting from scratch."' },
+        { s:'3 — The permission ask',
+          t:'"Would you mind if I checked in with you in three or four weeks, just to see how it\'s tracking? No pitch — I\'ll keep it to two minutes."' },
+        { s:'4 — Get the mobile and confirm',
+          t:'"What\'s the best mobile for you? … I\'ll make a note and give you a ring around [date]. Genuinely hope the campaign flies and you never hear from me again."' }
       ] }
   ]
 };
@@ -3170,9 +3169,9 @@ var METHODS = {
     notinterested:[{d:0,t:'Gracious SMS'},{d:14,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:120,t:'Nurture touch'},{d:240,t:'Nurture touch'},{d:330,t:'Nurture touch'},{d:400,t:'Nurture touch'}]
   }},
   steallist:{ label:'Steal listings', sheet:'Steal Listings', chipBg:'var(--danger-bg)', chipFg:'var(--danger)', ms:{
-    noanswer:[{d:1,t:'Intro SMS'},{d:3,t:'Comparable sales SMS'},{d:10,t:'Follow-up SMS'},{d:24,t:'Check-in call'},{d:45,t:'Expiry SMS'},{d:90,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
+    noanswer:[{d:1,t:'Voicemail + SMS'},{d:3,t:'Comparable sales SMS'},{d:45,t:'Expiry conversation call'},{d:90,t:'Nurture touch'},{d:180,t:'Nurture touch'},{d:270,t:'Nurture touch'}],
     interested:[{d:0,t:'Intro SMS'},{d:3,t:'Comparable sales SMS'},{d:24,t:'Week 3–4 check-in call'},{d:45,t:'Expiry conversation call'}],
-    notinterested:[{d:0,t:'Polite SMS'},{d:30,t:'Market shift SMS'},{d:90,t:'Re-engagement SMS'},{d:180,t:'Nurture touch'}]
+    notinterested:[{d:0,t:'Polite SMS'},{d:30,t:'Market shift SMS'},{d:90,t:'Re-engagement SMS'},{d:180,t:'Nurture touch'},{d:270,t:'Nurture touch'},{d:365,t:'Nurture touch'}]
   }}
 };
 var OUTCOMES={ noanswer:'No answer', interested:'Answered — interested', notinterested:'Answered — not interested' };
