@@ -1914,7 +1914,7 @@
 </div>
 <div class="tip-box"><strong>Diagnose before you pitch:</strong> you have zero context on these people. The first question does all the work — most agents skip it and pitch into the dark.</div>
 </div>
-<!-- BD FOLLOW-UP -->
+<!-- BD FOLLOW-UP — two touches on no answer, then nurture (v6.2) -->
 <div id="bd-followup" class="bd-track" style="display:none;">
 <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.6;">Pick the branch that matches the call. Always lead with value, never a pitch.</div>
 <div class="btn-bar">
@@ -1923,7 +1923,7 @@
 <button class="bdf-tab branch-tab" onclick="showJsfTab('bdf-notinterested',this)"> Answered — not interested</button>
 </div>
 <div id="bdf-noanswer" class="bdf-track">
-<div style="background:var(--surface2);border-radius:var(--r-xs);padding:10px 14px;font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;">They didn't pick up. Alternate voicemail + SMS with value touches over two weeks.</div>
+<div style="background:var(--surface2);border-radius:var(--r-xs);padding:10px 14px;font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;">Two touches, then they move into nurture. They didn't pick up. Alternate voicemail + SMS with value touches over two weeks.</div>
 <div class="seq-item">
 <div class="seq-day">Day 1</div>
 <div class="seq-content">
@@ -1931,38 +1931,14 @@
 <div class="sms-label">Voicemail</div>
 <div class="script-block" style="font-size:13px;">"Hi [Name], it's Declan — you came through one of my open homes in [suburb] a while back, and I just wanted to check in and see how your search ended up. Give me a call when you get a sec on [number] — that's [number]. Cheers."</div>
 <div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
-<div class="sms-bubble">Hi [Name], Declan here — just left a voicemail 😊 You looked through [suburb] with me a while back; just checking in to see how things ended up. No rush at all 👍</div></div>
+<div class="sms-bubble">Hi [Name], Declan here — just left a voicemail. You looked through [suburb] with me a while back; just checking in to see how things ended up. No rush at all 👍</div></div>
 </div>
 </div>
 <div class="seq-item">
-<div class="seq-day">Day 4</div>
-<div class="seq-content">
-<h4>SMS — give value</h4>
-<div class="sms-bubble">Hi [Name], Declan here. In case it's handy — [suburb] has shifted a fair bit since you were looking: [Recent sale 1], [Recent sale 2], median now around [X]. No need to reply, just thought you'd want to know 😊</div>
-</div>
-</div>
-<div class="seq-item">
-<div class="seq-day">Day 8</div>
-<div class="seq-content">
-<h4>Voicemail + SMS</h4>
-<div class="sms-label">Voicemail</div>
-<div class="script-block" style="font-size:13px;">"Hi [Name], Declan again — no stress at all. I've actually had a couple of places come up that didn't make it online. If you're still keeping an eye on [suburb], I'd be happy to share them. [number] whenever suits."</div>
-<div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
-<div class="sms-bubble">Hi [Name], Declan here — left you another quick voicemail 😊 Had a couple of off-market places in [suburb] I thought of you for. Happy to share anytime 👍</div></div>
-</div>
-</div>
-<div class="seq-item">
-<div class="seq-day">Day 12</div>
-<div class="seq-content">
-<h4>SMS — soft check in</h4>
-<div class="sms-bubble">Hi [Name], Declan here. Just checking in — happy to help whether you're still looking or just curious what your situation's worth these days. No pressure at all 😊</div>
-</div>
-</div>
-<div class="seq-item">
-<div class="seq-day">Day 14</div>
+<div class="seq-day">Day 7</div>
 <div class="seq-content">
 <h4>Final SMS — hand to nurture</h4>
-<div class="sms-bubble">Hi [Name], Declan here — I won't keep pestering you 😊 I'll just drop you the odd [suburb] update so you've got the numbers if anything ever changes. Happy to stop anytime — just say the word 👍</div>
+<div class="sms-bubble">Hi [Name], Declan here — I won't keep pestering you. In case it's handy, [suburb] has shifted a fair bit since you were looking: [Recent sale 1], [Recent sale 2]. I'll drop you the odd [suburb] update so you've got the numbers if anything ever changes. Happy to stop anytime — just say the word 👍</div>
 </div>
 </div>
 <div class="tip-box"><strong>Key insight:</strong> These are warm contacts — they raised their hand once. A genuine "how did it end up?" reopens far more doors than a pitch.</div>
@@ -2043,6 +2019,9 @@
 <div class="sms-bubble">Hi [Name], Declan here — following up 😊 Happy to tailor it exactly to what you want. What's the must-have and the budget range?</div>
 <div class="script-label" style="margin-top:14px;">SMS 3 — Day 3, create momentum</div>
 <div class="sms-bubble">Hey [Name], a couple of places are about to come up in [suburb] that haven't hit the portals yet. Want me to send them your way before they go public? 🙏</div>
+<div class="script-label" style="margin-top:14px;">Day 5 — one call, then let it cool</div>
+<div class="script-block" style="font-size:13px;">"Hi [Name], Declan here — I sent you a couple of texts so I won't keep chasing. I just didn't want to let it go without speaking to you. Is it worth me keeping you on the off-market list, or has that ship sailed for now?"</div>
+<div class="tip-box" style="margin-top:12px;"><strong>No reply to any of it?</strong> Move them to the WARM track — change their outcome in the tracker and they pick up the monthly touches instead.</div>
 <div class="tip-box"><strong>HOT tip:</strong> Off-market and "before it's public" framing is your edge with database buyers — it makes them feel like insiders.</div>
 </div>
 <div id="bdn-warm" class="bdn-track" style="display:none;">
@@ -2055,6 +2034,10 @@
 <div class="sms-bubble">Hi [Name], Declan here — just a quick hello, hope things are going well. Still keeping an eye on [suburb] for you. Here whenever you need anything 😊</div>
 <div class="script-label" style="margin-top:14px;">Month 6 — gentle re-engagement</div>
 <div class="sms-bubble">Hey [Name]! [suburb] has shifted a fair bit lately — happy to send you the latest if it's useful, or a rough figure on your place. No pressure at all 👍</div>
+<div class="script-label" style="margin-top:14px;">Month 9 — the year in one line</div>
+<div class="sms-bubble">Hi [Name], Declan here. [suburb] has moved a fair bit this year — [one line stat]. If you're still in the market, worth knowing what your budget actually buys now versus when you were looking.</div>
+<div class="script-label" style="margin-top:14px;">Month 12 — the anniversary check</div>
+<div class="sms-bubble">Hi [Name], Declan here — it's been about a year since we caught up about [suburb]. Has anything changed on your end? Happy to have a proper chat whenever it's useful.</div>
 <div class="tip-box"><strong>WARM tip:</strong> A useful touch every few weeks keeps you top of mind without ever feeling like a pitch.</div>
 </div>
 <div id="bdn-cold" class="bdn-track" style="display:none;">
@@ -3182,9 +3165,9 @@ var METHODS = {
     notinterested:[{d:0,t:'Gracious SMS'},{d:7,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:90,t:'Nurture touch'},{d:180,t:'Nurture touch'},{d:270,t:'Nurture touch'},{d:365,t:'Nurture touch'}]
   }},
   buyerdb:{ label:'Buyer database', sheet:'Buyer Database', chipBg:'var(--amber-bg)', chipFg:'var(--amber)', ms:{
-    noanswer:[{d:1,t:'Voicemail + SMS'},{d:4,t:'SMS — value'},{d:8,t:'Voicemail + SMS'},{d:12,t:'SMS — check in'},{d:14,t:'Final SMS → nurture'},{d:60,t:'Nurture touch'},{d:120,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
+    noanswer:[{d:1,t:'Voicemail + SMS'},{d:7,t:'Final SMS → nurture'},{d:60,t:'Nurture touch'},{d:120,t:'Nurture touch'},{d:180,t:'Nurture touch'},{d:270,t:'Nurture touch'},{d:365,t:'Nurture touch'}],
     interested:[{d:0,t:'Reconnect SMS'},{d:3,t:'Market data SMS'},{d:7,t:'Call — was it useful'},{d:14,t:'Soft close SMS'}],
-    notinterested:[{d:0,t:'Gracious SMS'},{d:14,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:120,t:'Nurture touch'},{d:240,t:'Nurture touch'}]
+    notinterested:[{d:0,t:'Gracious SMS'},{d:14,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:120,t:'Nurture touch'},{d:240,t:'Nurture touch'},{d:330,t:'Nurture touch'},{d:400,t:'Nurture touch'}]
   }},
   steallist:{ label:'Steal listings', sheet:'Steal Listings', chipBg:'var(--danger-bg)', chipFg:'var(--danger)', ms:{
     noanswer:[{d:1,t:'Intro SMS'},{d:3,t:'Comparable sales SMS'},{d:10,t:'Follow-up SMS'},{d:24,t:'Check-in call'},{d:45,t:'Expiry SMS'},{d:90,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
