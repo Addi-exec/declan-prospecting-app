@@ -1179,6 +1179,19 @@
   .fork-step { font-size: 11px; font-weight: 700; letter-spacing: .07em;
     text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
   @media (max-width: 1100px) { .fork { grid-template-columns: 1fr; } }
+
+  /* Objection picker: pick the pushback, read one answer. Nothing else on screen. */
+  .obj-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .obj-pill { font: inherit; font-size: 12.5px; line-height: 1.2; cursor: pointer;
+    padding: 8px 13px; min-height: 34px; border-radius: var(--r-pill);
+    border: 1px solid var(--border2); background: transparent; color: var(--text2);
+    transition: background .12s, color .12s, border-color .12s; }
+  .obj-pill:hover { background: var(--hover-ink); color: var(--text); }
+  .obj-pill.active { background: var(--danger-bg); border-color: var(--danger-border);
+    color: var(--danger); font-weight: 600; }
+  .obj-panel .obj-q { font-size: 13.5px; font-style: italic; color: var(--text2);
+    margin-bottom: 8px; }
+  .obj-panel .script-block { font-size: 15px; }
 </style>
 </head>
 <body>
@@ -1380,54 +1393,7 @@
 <div class="fork-col fork-no">
 <div class="fork-head">They push back</div>
 <div class="fork-body">
-<div class="objection-item">
-<div class="objection-q">"We're not interested in selling."</div>
-<div class="objection-a">"Not interested in selling? Completely fine — I'm not here to push anything. I just wanted to share what [address] sold for while it's relevant. Would you be curious what that sale means for the value of your place?"</div>
-<div class="fork-step" style="margin:8px 0 4px;">If that lands</div>
-<div class="objection-a">"It's [$X] — which is [$X] more than the street was doing a year ago. If you ever did want the real number on yours rather than a guess, I'm happy to come through and do that for you."</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"We already have an agent."</div>
-<div class="objection-a">"You've got someone you work with — that's great, I'm not looking to step on toes. I did want to mention we had buyers from that last sale who didn't get across the line. Would it be worth knowing who they are, just in case?"</div>
-<div class="fork-step" style="margin:8px 0 4px;">If that lands</div>
-<div class="objection-a">"I'll keep them in mind for you. Are you signed with your agent at the moment, or is it more that you've dealt with them before? … Either way, no rush — I'll send you the [street] result so you've got it."</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"This isn't a good time."</div>
-<div class="objection-a">"Not a good time — I hear you. Can I just leave you with this: I'll text through what [address] sold for and a rough street comparison. No follow-up unless you want it. What's the best mobile?"</div>
-<div class="fork-step" style="margin:8px 0 4px;">If that lands</div>
-<div class="objection-a">"Great — and when's usually a better time to catch you? I'll give you a quick ring then and run you through it properly."</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"How did you get my number?"</div>
-<div class="objection-a">"Fair question — it's from the public property register. I call the streets I've sold in to keep neighbours in the loop. Happy to take you off my list if you'd prefer — no hard feelings."</div>
-<div class="fork-step" style="margin:8px 0 4px;">If that lands</div>
-<div class="objection-a">"While I've got you though — [address] sold for [$X]. Worth knowing, since it sets the benchmark for your place too."</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"What's it worth then?" (they want a number now)</div>
-<div class="objection-a">"Honestly? Anyone who gives you a number over the phone is guessing. Based on [address] and the street, you'd be somewhere in [range] — but that swings [$X] either way depending on what you've done inside."</div>
-<div class="fork-step" style="margin:8px 0 4px;">Follow through</div>
-<div class="objection-a">"That's exactly why it's worth me putting my head in for 20 minutes — then you've got a real figure instead of a range. Want me to do that for you?"</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"We'd sell if we got [$X]." (conditional / high)</div>
-<div class="objection-a">"So [$X] is your number. Fair enough — that's useful to know. What would you do if you got it? Are you looking to upsize, downsize, move out of the area?"</div>
-<div class="fork-step" style="margin:8px 0 4px;">Follow through</div>
-<div class="objection-a">"Here's what I'd suggest — let me come through and tell you honestly how far off [$X] you are right now. If it's close, you'd want to know. If it's not, you've lost nothing but 20 minutes."</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"We're waiting for the market." (next year, after Christmas, when rates drop)</div>
-<div class="objection-a">"A lot of people are thinking that. The thing is, that's the same reason there's not much stock right now — which is exactly why [address] got the result it did. Waiting has a cost as well as a benefit."</div>
-<div class="fork-step" style="margin:8px 0 4px;">Follow through</div>
-<div class="objection-a">"You don't have to decide anything today. But when you do move, you'll want to know what you're working with. Let me get you a current number now so you're deciding on facts rather than a feeling."</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"Just send me something in the mail."</div>
-<div class="objection-a">"Happy to. I'll include the recent comparable sales so it's actually useful rather than a flyer. What's the best address?"</div>
-<div class="fork-step" style="margin:8px 0 4px;">Follow through</div>
-<div class="objection-a">"And what's the best mobile? I'll text you when it's on its way so it doesn't get lost in the junk mail."</div>
-</div>
+<div class="obj-picker" data-obj="js"></div>
 </div>
 </div>
 
@@ -3036,6 +3002,95 @@
   });
 </script>
 <script>
+/* ===== Objection picker =====
+   The objection list on a script page is a row of pills; clicking one swaps the
+   answer panel underneath. Data-driven so every method can have its own set and
+   the markup stays one line: <div class="obj-picker" data-obj="js"></div>. */
+var OBJECTIONS = {
+  js: [
+    { pill:'Not interested',
+      q:'"We’re not interested in selling."',
+      a:'"Not interested in selling? Completely fine — I’m not here to push anything. I just wanted to share what [address] sold for while it’s relevant. Would you be curious what that sale means for the value of your place?"',
+      f:'"It’s [$X] — which is [$X] more than the street was doing a year ago. If you ever did want the real number on yours rather than a guess, I’m happy to come through and do that for you."' },
+    { pill:'Got an agent',
+      q:'"We already have an agent."',
+      a:'"You’ve got someone you work with — that’s great, I’m not looking to step on toes. I did want to mention we had buyers from that last sale who didn’t get across the line. Would it be worth knowing who they are, just in case?"',
+      f:'"I’ll keep them in mind for you. Are you signed with your agent at the moment, or is it more that you’ve dealt with them before? … Either way, no rush — I’ll send you the [street] result so you’ve got it."' },
+    { pill:'Bad time',
+      q:'"This isn’t a good time."',
+      a:'"Not a good time — I hear you. Can I just leave you with this: I’ll text through what [address] sold for and a rough street comparison. No follow-up unless you want it. What’s the best mobile?"',
+      f:'"Great — and when’s usually a better time to catch you? I’ll give you a quick ring then and run you through it properly."' },
+    { pill:'What’s it worth?',
+      q:'"What’s it worth then?" — they want a number on the phone',
+      a:'"Honestly? Anyone who gives you a number over the phone is guessing. Based on [address] and the street, you’d be somewhere in [range] — but that swings [$X] either way depending on what you’ve done inside."',
+      f:'"That’s exactly why it’s worth me putting my head in for 20 minutes — then you’ve got a real figure instead of a range. Want me to do that for you?"' },
+    { pill:'Only for [$X]',
+      q:'"We’d sell if we got [$X]." — conditional or high',
+      a:'"So [$X] is your number. Fair enough — that’s useful to know. What would you do if you got it? Are you looking to upsize, downsize, move out of the area?"',
+      f:'"Here’s what I’d suggest — let me come through and tell you honestly how far off [$X] you are right now. If it’s close, you’d want to know. If it’s not, you’ve lost nothing but 20 minutes."' },
+    { pill:'Waiting for the market',
+      q:'"We’re waiting for the market." — next year, after Christmas, when rates drop',
+      a:'"A lot of people are thinking that. The thing is, that’s the same reason there’s not much stock right now — which is exactly why [address] got the result it did. Waiting has a cost as well as a benefit."',
+      f:'"You don’t have to decide anything today. But when you do move, you’ll want to know what you’re working with. Let me get you a current number now so you’re deciding on facts rather than a feeling."' },
+    { pill:'Send me something',
+      q:'"Just send me something in the mail."',
+      a:'"Happy to. I’ll include the recent comparable sales so it’s actually useful rather than a flyer. What’s the best address?"',
+      f:'"And what’s the best mobile? I’ll text you when it’s on its way so it doesn’t get lost in the junk mail."' },
+    { pill:'How’d you get my number?',
+      q:'"How did you get my number?"',
+      a:'"Fair question — it’s from the public property register. I call the streets I’ve sold in to keep neighbours in the loop. Happy to take you off my list if you’d prefer — no hard feelings."',
+      f:'"While I’ve got you though — [address] sold for [$X]. Worth knowing, since it sets the benchmark for your place too."' }
+  ]
+};
+var OBJ_SEL = {};
+function objPick(set, i, btn){
+  OBJ_SEL[set] = i;
+  var host = document.querySelector('.obj-picker[data-obj="' + set + '"]');
+  if (!host) return;
+  var pills = host.querySelectorAll('.obj-pill');
+  for (var p = 0; p < pills.length; p++){
+    var on = p === i;
+    pills[p].classList.toggle('active', on);
+    pills[p].setAttribute('aria-selected', on ? 'true' : 'false');
+    pills[p].tabIndex = on ? 0 : -1;
+  }
+  var o = OBJECTIONS[set][i];
+  host.querySelector('.obj-panel').innerHTML =
+    '<div class="obj-q">' + o.q + '</div>' +
+    '<div class="script-block">' + o.a + '</div>' +
+    '<div class="fork-step" style="margin:12px 0 5px;">If that lands</div>' +
+    '<div class="script-block" style="margin:0;">' + o.f + '</div>';
+  if (btn && btn.focus) btn.focus();
+}
+function objKeys(e, set, i){
+  var n = OBJECTIONS[set].length, j = -1;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') j = (i + 1) % n;
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') j = (i - 1 + n) % n;
+  else if (e.key === 'Home') j = 0;
+  else if (e.key === 'End') j = n - 1;
+  if (j < 0) return;
+  e.preventDefault();
+  var host = document.querySelector('.obj-picker[data-obj="' + set + '"]');
+  objPick(set, j, host && host.querySelectorAll('.obj-pill')[j]);
+}
+function objInit(){
+  var hosts = document.querySelectorAll('.obj-picker');
+  for (var h = 0; h < hosts.length; h++){
+    var set = hosts[h].getAttribute('data-obj'), list = OBJECTIONS[set];
+    if (!list) continue;
+    var row = '<div class="obj-pills" role="tablist" aria-label="Objections">';
+    for (var i = 0; i < list.length; i++){
+      row += '<button type="button" class="obj-pill' + (i === 0 ? ' active' : '') + '" role="tab"' +
+        ' aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '"' +
+        ' onclick="objPick(\'' + set + '\',' + i + ',this)"' +
+        ' onkeydown="objKeys(event,\'' + set + '\',' + i + ')">' + list[i].pill + '</button>';
+    }
+    hosts[h].innerHTML = row + '</div><div class="obj-panel" role="tabpanel"></div>';
+    objPick(set, OBJ_SEL[set] || 0);
+  }
+}
+document.addEventListener('DOMContentLoaded', objInit);
+
 /* ===== Contact tracker engine ===== */
 var METHODS = {
   justsold:{ label:'Just sold street', sheet:'Just Sold Street', chipBg:'var(--blue-bg)', chipFg:'var(--blue)', ms:{
