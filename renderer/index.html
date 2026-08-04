@@ -1156,6 +1156,29 @@
   .method-tabs { display: flex; gap: 8px; flex-wrap: wrap;
     position: sticky; top: 0; z-index: 5; background: var(--surface);
     padding: 10px 0 12px; margin-bottom: 10px; border-bottom: 1px solid var(--border); }
+
+  /* --- v6.2 opener pages: ONE opener, then the call forks — what they said yes to on the
+         left, what they pushed back with on the right. Colour is state only (green = it's
+         going your way, red = resistance); everything derives from palette vars. --- */
+  .opener-lead { border: 1px solid var(--border); border-radius: var(--r-sm);
+    background: var(--surface2); padding: 16px 18px; margin-bottom: 4px; }
+  .opener-lead .script-block { margin: 0; font-size: 16px; line-height: 1.85; }
+  .fork-arrow { text-align: center; color: var(--text3); font-size: 12px;
+    letter-spacing: .06em; text-transform: uppercase; font-weight: 700; padding: 12px 0 10px; }
+  .fork { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px; align-items: start; margin-bottom: 22px; }
+  .fork-col { min-width: 0; border: 1px solid var(--border); border-radius: var(--r-sm);
+    overflow: hidden; }
+  .fork-head { padding: 9px 14px; font-size: 12.5px; font-weight: 700;
+    display: flex; align-items: center; gap: 7px; }
+  .fork-yes .fork-head { background: var(--green-bg); color: var(--green); }
+  .fork-no .fork-head { background: var(--danger-bg); color: var(--danger); }
+  .fork-body { padding: 14px; display: grid; gap: 14px; }
+  .fork-body .script-block { margin: 0; }
+  .fork-body .objection-item { padding: 0; border-top: none; }
+  .fork-step { font-size: 11px; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+  @media (max-width: 1100px) { .fork { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -1326,105 +1349,95 @@
 </div>
 <!-- JS OPENERS -->
 <div id="js-openers" class="js-track">
-<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-xs);padding:16px 18px;margin-bottom:22px;">
-<div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">The 7-second framework — what research says</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-<div style="font-size:12.5px;color:var(--text2);line-height:1.6;"><span style="font-weight:600;color:var(--text);">0–1s</span> — Use their name correctly</div>
-<div style="font-size:12.5px;color:var(--text2);line-height:1.6;"><span style="font-weight:600;color:var(--text);">1–3s</span> — Gently acknowledge it's out of the blue</div>
-<div style="font-size:12.5px;color:var(--text2);line-height:1.6;"><span style="font-weight:600;color:var(--text);">3–5s</span> — Give them a reason to listen</div>
-<div style="font-size:12.5px;color:var(--text2);line-height:1.6;"><span style="font-weight:600;color:var(--text);">5–7s</span> — Connect to their specific world</div>
+<div class="script-label" style="margin-top:0;">The opener</div>
+<div class="opener-lead">
+<div class="script-block">"Hi [Name], it's Declan here — I'm one of the local agents around [suburb]. We haven't met, so I'll keep this genuine and quick. I just helped some of your neighbours sell their place on [street], and I'm letting a few people nearby know how it went before word gets around. Is now an okay moment for a quick one?"</div>
 </div>
-<div style="font-size:12px;color:var(--text3);margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">Source: Gong analysis of 300M+ calls · Cold Call Genius framework · Cialdini's Pre-Suasion principles</div>
+<div class="fork-arrow">Then it goes one of two ways</div>
+<div class="fork">
+
+<div class="fork-col fork-yes">
+<div class="fork-head">They're happy to talk</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">1 — Give them the result</div>
+<div class="script-block">"So [address] just sold — [X days on market, $X]. That's well above what most people in the street would have guessed, and it does move the number on your place too."</div>
 </div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--text);">1 — The warm reach-out</div>
-<div style="display:flex;gap:6px;flex-wrap:wrap;"><span style="font-size:11px;background:var(--danger-bg);color:var(--danger);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;"> 11.18% success rate</span><span style="font-size:11px;background:var(--green-bg);color:var(--green);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;">Best all-round opener</span></div>
+<div>
+<div class="fork-step">2 — Make it about them</div>
+<div class="script-block">"How long have you been in the street yourself? … And has selling ever crossed your mind, even down the track?"</div>
 </div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Hi [Name], it's Declan here — I'm one of the local agents around [suburb]. We haven't met, so I'll keep this genuine and quick. I just helped some of your neighbours sell their place on [street], and I'm personally letting a few people nearby know how it went before word gets around. Is now an okay moment for a quick one?"</div>
-<div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> Naming that you haven't met — warmly, not apologetically — builds instant honesty and likeability (Cialdini's liking principle) without the defensiveness of announcing "a cold call." Framing it as letting them know "before word gets around" makes the call feel like a favour, and the soft "is now okay?" earns a small yes (micro-commitment) rather than forcing a pitch. A tracked study found ~30% of prospects stayed past 30 seconds with a genuine, permission-led opener vs 14% for a standard pitch.</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Cialdini — liking (genuine honesty)</span><span class="tag">Favour framing</span><span class="tag">Micro-commitment ask</span></div>
+<div>
+<div class="fork-step">3 — The ask</div>
+<div class="script-block">"I'm in [suburb] this week anyway — it'd take me 20 minutes to walk through and give you a real number rather than a guess. Would Tuesday morning or Wednesday afternoon suit you better?"</div>
 </div>
-</div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--text);">2 — The curiosity gap</div>
-<div style="display:flex;gap:6px;flex-wrap:wrap;"><span style="font-size:11px;background:var(--purple-bg);color:var(--purple);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;"> Open loop psychology</span><span style="font-size:11px;background:var(--green-bg);color:var(--green);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;">Best for engaged streets</span></div>
-</div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Hi [Name], it's Declan — I'm a local agent here in [suburb]. I won't keep you long, but something just happened on your street that I reckon you'd genuinely want to know about. Have you got thirty seconds for me to explain?"</div>
-<div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> Telling them there's something worth knowing — without saying what yet — creates an "open loop" the brain is wired to want closed, so they stay on to hear it. Keeping it warm and specific to "your street" makes the curiosity feel personal rather than like a gimmick.</div>
-<div style="margin-top:10px;font-size:13px;color:var(--text2);"><span style="font-weight:600;color:var(--text);">If they say yes:</span></div>
-<div class="script-block" style="border-left-color:var(--purple);margin-top:6px;">"So [address] just sold — and the result was well above what most people in the street would have guessed. Based on that, your property is probably sitting at [range]. I can give you a more accurate number in about 20 minutes if you ever wanted to know."</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Open loop / curiosity gap</span><span class="tag">Warm + personal</span><span class="tag">Information gap theory</span></div>
+<div>
+<div class="fork-step">If they're not ready for that</div>
+<div class="script-block">"No worries at all — can I text you the sold data for your street so you've got it? What's the best mobile?"</div>
 </div>
 </div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--text);">3 — Permission + context</div>
-<div style="display:flex;gap:6px;flex-wrap:wrap;"><span style="font-size:11px;background:var(--danger-bg);color:var(--danger);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;"> 11.24% — #1 by data</span></div>
 </div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Hi [Name], Declan here — I know you weren't expecting my call. I sold [address] just recently and I'm reaching out to a few of the neighbours directly. If it's not relevant, just say the word and I'll leave you to it. Worth 20 seconds?"</div>
-<div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> The permission ask creates a micro-commitment — once someone says "sure", they've psychologically opted in (self-determination theory). Offering a clean exit lowers resistance.</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Self-determination theory</span><span class="tag">Micro-commitment</span><span class="tag">Low exit friction</span></div>
+
+<div class="fork-col fork-no">
+<div class="fork-head">They push back</div>
+<div class="fork-body">
+<div class="objection-item">
+<div class="objection-q">"We're not interested in selling."</div>
+<div class="objection-a">"Not interested in selling? Completely fine — I'm not here to push anything. I just wanted to share what [address] sold for while it's relevant. Would you be curious what that sale means for the value of your place?"</div>
 </div>
+<div class="objection-item">
+<div class="objection-q">"We already have an agent."</div>
+<div class="objection-a">"You've got someone you work with — that's great, I'm not looking to step on toes. I did want to mention we had buyers from that last sale who didn't get across the line. Would it be worth knowing who they are, just in case?"</div>
 </div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--text);">4 — Reciprocity + social proof</div>
-<span style="font-size:11px;background:var(--teal-bg);color:var(--teal);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;">Best for warm streets</span>
+<div class="objection-item">
+<div class="objection-q">"This isn't a good time."</div>
+<div class="objection-a">"Not a good time — I hear you. Can I just leave you with this: I'll text through what [address] sold for and a rough street comparison. No follow-up unless you want it. What's the best mobile?"</div>
 </div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Hi [Name], Declan here. I just sold [address] — went in [X days, $X above reserve] — and a couple of neighbours flagged me down in the street and asked what it meant for their place. I figured rather than let rumour do the work, I'd just call a few people directly and share the data. Takes two minutes and I'm not here to sell you anything today."</div>
-<div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> Leading with free data triggers Cialdini's reciprocity principle. Social proof from neighbours validates curiosity as a normal response. "Not here to sell you anything today" disarms resistance before it forms.</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Cialdini — reciprocity</span><span class="tag">Cialdini — social proof</span><span class="tag">Pre-suasion — disarm first</span></div>
-</div>
-</div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--text);">5 — The loss aversion hook</div>
-<span style="font-size:11px;background:var(--amber-bg);color:var(--amber);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;"> Most powerful trigger</span>
-</div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Hi [Name], Declan here — quick one. I've got a buyer who missed out on [address] last week and they're still in the market specifically for [suburb]. I don't want to assume, but I'd feel bad not at least asking — is selling something that's ever crossed your mind? Even down the track?"</div>
-<div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> People feel the pain of missing out roughly twice as strongly as gaining something equivalent (Kahneman). "I'd feel bad not asking" shifts the dynamic — it's now them potentially missing out if they say no too quickly.</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Loss aversion — Kahneman</span><span class="tag">Cialdini — scarcity</span><span class="tag">FOMO trigger</span></div>
+<div class="objection-item">
+<div class="objection-q">"How did you get my number?"</div>
+<div class="objection-a">"Fair question — it's from the public property register. I call the streets I've sold in to keep neighbours in the loop. Happy to take you off my list if you'd prefer — no hard feelings."</div>
 </div>
 </div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--text);">6 — The unity / in-group opener</div>
-<span style="font-size:11px;background:var(--purple-bg);color:var(--purple);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;"> Cialdini's 7th principle</span>
 </div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Hi [Name], Declan here. I've been working in [suburb] for a while now and I like to personally call the street after every sale — I'd rather people hear the result from me than read some generic flyer in the letterbox. You're a [suburb] local, so I wanted to make sure you had the actual number."</div>
-<div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> People are far more influenced by those they see as part of their community. Positioning yourself as the local agent activates in-group belonging. "You're a local" makes them feel seen, not targeted.</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">Cialdini — unity</span><span class="tag">Community identity</span><span class="tag">Anti-pitch positioning</span></div>
+
 </div>
+
+<div class="fork">
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Someone else answers</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Wrong person / partner picks up</div>
+<div class="script-block">"Oh sorry — I was after [Name]. It's Declan, one of the local agents. Nothing urgent at all: I sold [address] on your street and I've been letting the neighbours know how it went. Are you at that address as well? … Then honestly you'd want to hear it too."</div>
 </div>
-<div class="card-box">
-<div style="background:var(--surface2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-<div style="font-size:13px;font-weight:600;color:var(--text);">7 — The XYZ data opener</div>
-<span style="font-size:11px;background:var(--teal-bg);color:var(--teal);border-radius:var(--r-xs);padding:2px 8px;font-weight:500;">Situation → Action → Result</span>
+<div>
+<div class="fork-step">If they'd rather you call back</div>
+<div class="script-block">"No problem — when's usually a better time to catch you both? I'll make a note and try then."</div>
 </div>
-<div style="padding:14px 16px;">
-<div class="script-block" style="margin-top:0;">"Hi [Name], Declan here. Quick one — the market in [suburb] has been moving fast: [X homes sold in 60 days, median up X%]. I just sold [address] — ran a full campaign, had [X] buyer groups through, ended up with competing offers. Sold in [X days] for [result]. I'm calling the neighbours because that result affects your value too, and I've got a few buyers still looking. Worth 20 minutes to find out what your place is sitting at?"</div>
-<div style="font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.6;"><span style="font-weight:600;color:var(--text);">Why it works:</span> Specific numbers are nearly impossible to ignore. Vague claims like "the market's hot" lose people — but "sold in 9 days, 4% above asking" creates instant authority and FOMO. Pull your actual data before each session.</div>
-<div class="tags" style="margin-top:10px;"><span class="tag">XYZ — situation action result</span><span class="tag">Authority via specifics</span><span class="tag">Data-led credibility</span></div>
-</div>
-</div>
-<div style="background:var(--danger-soft);border:1px solid var(--danger-border);border-radius:var(--r-xs);padding:14px 16px;margin-bottom:14px;">
-<div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--danger);margin-bottom:10px;"> Never open with these</div>
-<div style="display:grid;gap:8px;">
-<div style="font-size:13px;color:var(--text2);"><span style="font-weight:600;color:var(--danger);">"Did I catch you at a bad time?"</span> — Gong data: drops success by 40%. Invites a "yes" that ends the call.</div>
-<div style="font-size:13px;color:var(--text2);"><span style="font-weight:600;color:var(--danger);">"How are you today?"</span> — Screams script. Brain enters "polite rejection mode" immediately.</div>
-<div style="font-size:13px;color:var(--text2);"><span style="font-weight:600;color:var(--danger);">"I just wanted to quickly..."</span> — Signals you know you're unwanted. Kills authority instantly.</div>
-<div style="font-size:13px;color:var(--text2);"><span style="font-weight:600;color:var(--danger);">"I'm calling about your property..."</span> — Telegraphs the pitch. Brain closes before the sentence finishes.</div>
+<div>
+<div class="fork-step">Renting, not the owner</div>
+<div class="script-block">"Ah, you're renting — thanks for letting me know, I'll leave you be. Sorry to bother you."</div>
 </div>
 </div>
-<div class="tip-box"><strong>Timing:</strong> Wed &amp; Thu outperform all other days. Best windows 8–9 AM and 4–5 PM — lifts connect rates by 40–70% over midday.</div>
+</div>
+
+<div class="fork-col">
+<div class="fork-head" style="background:var(--surface2);color:var(--text);">Nobody picks up</div>
+<div class="fork-body">
+<div>
+<div class="fork-step">Voicemail — keep it under 20 seconds</div>
+<div class="script-block">"Hi [Name], it's Declan, one of the local agents around [suburb] — we haven't met. I just sold [address] on your street and I'm letting the neighbours know how it went before word gets around. No need to call back if you'd rather not, I'll send you a quick text with the number. Cheers."</div>
+</div>
+<div>
+<div class="fork-step">Text straight after</div>
+<div class="sms-bubble">Hi [Name], Declan here — local agent. Just left you a voicemail. We sold [address] on your street for [$X] in [X days]. Happy to send the street comparison if it's useful — no obligation.</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="tip-box"><strong>Timing:</strong> Wed &amp; Thu outperform all other days. Best windows 8–9 AM and 4–5 PM.</div>
 </div>
 <!-- JS OBJECTIONS -->
 <div id="js-objections" class="js-track" style="display:none;">
