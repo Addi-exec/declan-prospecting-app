@@ -337,8 +337,8 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
   like listingMeta, and the import skip-list `NON_CONTACT_SHEETS` covers the Drops sheet).
 
 ## The four prospect methods
-Each is a top-level `.panel` with 5 sub-tabs: Openers, Objections, Closes,
-Follow-up, Nurture.
+Each is a top-level `.panel` with **3 sub-tabs: Openers, Follow-up, Nurture** (v7.0.0 —
+Objections and Closes were folded into the Openers page; don't re-add them).
 | id          | label             | accent var   |
 |-------------|-------------------|--------------|
 | justsold    | Just sold street  | --blue       |
@@ -346,10 +346,36 @@ Follow-up, Nurture.
 | buyerdb     | Buyer database    | --teal       |
 | steallist   | Steal listings    | --coral/danger |
 
+- **Openers** sub-tab (v7.0.0 shape) = ONE opener, then the call forks:
+  - `justsold` / `listed`: a `.fork` two-column grid — `.fork-yes` (the positive path, numbered
+    `.fork-step`s from the result through to the confirmation SMS) and `.fork-no` holding an
+    **objection pill picker**. A second `.fork` below carries "Someone else answers" (gatekeeper)
+    and "Nobody picks up" (voicemail + the SMS after it).
+  - `buyerdb` / `steallist`: the call forks on their REPLY, not on a pushback, so these use the
+    **branch picker** instead — `buyerdb` on what happened (bought / still looking / gave up),
+    `steallist` on their tone (frustrated / neutral / positive). `steallist` also carries an
+    objection picker below it; `buyerdb`'s objections are folded into the branch they belong to.
+  - **Pickers are data-driven — never hand-write the markup.** `OBJECTIONS[key]` (`{pill,q,a,f}`)
+    renders via `objInit`/`objPick` into `<div class="obj-picker" data-obj="key">`; `BRANCHES[key]`
+    (`{pill,sub,steps:[{s,t}]}`, a `t` starting `SMS: ` renders as an `.sms-bubble`) renders via
+    `brInit`/`brPick` into `<div class="br-picker" data-br="key">`. Both are `role="tablist"` with a
+    roving tabindex and arrow/Home/End keys. `.br-pill.active` is green, `.obj-pill.active` red.
+  - NO research furniture on these pages — no success-rate badges, no "Why it works", no `.tags`.
+    Emoji: at most one per SMS, none in the call scripts.
 - **Follow-up** sub-tab = three branches: **No answer** (voicemail + SMS),
   **Answered – interested** (call + SMS), **Answered – not interested** (call + SMS).
   Every call is paired with an "SMS if no answer".
 - **Nurture** sub-tab = three temperature tracks: **HOT / WARM / COLD** (SMS + calls).
+  HOT ends with a Day 5 call and a note to move them to WARM; WARM and COLD run to **12 months**.
+- **The Follow-up + Nurture pages ARE the Tracker's script source** (`scriptForDue` counts
+  `.seq-item`s in the branch and `.sms-bubble`s in the nurture track, by POSITION). Adding or
+  removing a step there changes the due queue: keep `METHODS[method].ms[outcome]` in step with the
+  page, and make sure each track holds at least as many `.sms-bubble`s as it has `Nurture touch`
+  milestones. After any such edit, walk every `stepsDone` from 0 to `ms.length-1` and confirm
+  `scriptForDue` still returns a script. Current no-answer cadences: justsold 2 touches (d1/d7),
+  listed 3 (d1/d2/d12), buyerdb 2 (d1/d7), steallist 3 (d1/d3/d45).
+- **Steal listings targets stale listings only** — the fresh-listing scripts were removed in
+  v7.0.0 at Declan's request. Don't reintroduce them.
 
 ## Navigation + layout (v6.0 "workbench")
 The v6 redesign changed STRUCTURE only — every feature, id and data path is unchanged.
@@ -450,7 +476,7 @@ topbar CSS is left in place as a historical layer.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **6.1.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **7.0.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
