@@ -1342,7 +1342,6 @@
 </div>
 <div class="method-tabs">
 <button class="js-tab method-tab active" onclick="showJsTab('js-openers',this)" style="border:none;font-weight:600;background:var(--blue-bg);color:var(--blue);">Openers</button>
-<button class="js-tab method-tab" onclick="showJsTab('js-objections',this)">Objections</button>
 <button class="js-tab method-tab" onclick="showJsTab('js-closes',this)">Closes</button>
 <button class="js-tab method-tab" onclick="showJsTab('js-followup',this)">Follow-up</button>
 <button class="js-tab method-tab" onclick="showJsTab('js-nurture',this)">Nurture</button>
@@ -1384,18 +1383,50 @@
 <div class="objection-item">
 <div class="objection-q">"We're not interested in selling."</div>
 <div class="objection-a">"Not interested in selling? Completely fine — I'm not here to push anything. I just wanted to share what [address] sold for while it's relevant. Would you be curious what that sale means for the value of your place?"</div>
+<div class="fork-step" style="margin:8px 0 4px;">If that lands</div>
+<div class="objection-a">"It's [$X] — which is [$X] more than the street was doing a year ago. If you ever did want the real number on yours rather than a guess, I'm happy to come through and do that for you."</div>
 </div>
 <div class="objection-item">
 <div class="objection-q">"We already have an agent."</div>
 <div class="objection-a">"You've got someone you work with — that's great, I'm not looking to step on toes. I did want to mention we had buyers from that last sale who didn't get across the line. Would it be worth knowing who they are, just in case?"</div>
+<div class="fork-step" style="margin:8px 0 4px;">If that lands</div>
+<div class="objection-a">"I'll keep them in mind for you. Are you signed with your agent at the moment, or is it more that you've dealt with them before? … Either way, no rush — I'll send you the [street] result so you've got it."</div>
 </div>
 <div class="objection-item">
 <div class="objection-q">"This isn't a good time."</div>
 <div class="objection-a">"Not a good time — I hear you. Can I just leave you with this: I'll text through what [address] sold for and a rough street comparison. No follow-up unless you want it. What's the best mobile?"</div>
+<div class="fork-step" style="margin:8px 0 4px;">If that lands</div>
+<div class="objection-a">"Great — and when's usually a better time to catch you? I'll give you a quick ring then and run you through it properly."</div>
 </div>
 <div class="objection-item">
 <div class="objection-q">"How did you get my number?"</div>
 <div class="objection-a">"Fair question — it's from the public property register. I call the streets I've sold in to keep neighbours in the loop. Happy to take you off my list if you'd prefer — no hard feelings."</div>
+<div class="fork-step" style="margin:8px 0 4px;">If that lands</div>
+<div class="objection-a">"While I've got you though — [address] sold for [$X]. Worth knowing, since it sets the benchmark for your place too."</div>
+</div>
+<div class="objection-item">
+<div class="objection-q">"What's it worth then?" (they want a number now)</div>
+<div class="objection-a">"Honestly? Anyone who gives you a number over the phone is guessing. Based on [address] and the street, you'd be somewhere in [range] — but that swings [$X] either way depending on what you've done inside."</div>
+<div class="fork-step" style="margin:8px 0 4px;">Follow through</div>
+<div class="objection-a">"That's exactly why it's worth me putting my head in for 20 minutes — then you've got a real figure instead of a range. Want me to do that for you?"</div>
+</div>
+<div class="objection-item">
+<div class="objection-q">"We'd sell if we got [$X]." (conditional / high)</div>
+<div class="objection-a">"So [$X] is your number. Fair enough — that's useful to know. What would you do if you got it? Are you looking to upsize, downsize, move out of the area?"</div>
+<div class="fork-step" style="margin:8px 0 4px;">Follow through</div>
+<div class="objection-a">"Here's what I'd suggest — let me come through and tell you honestly how far off [$X] you are right now. If it's close, you'd want to know. If it's not, you've lost nothing but 20 minutes."</div>
+</div>
+<div class="objection-item">
+<div class="objection-q">"We're waiting for the market." (next year, after Christmas, when rates drop)</div>
+<div class="objection-a">"A lot of people are thinking that. The thing is, that's the same reason there's not much stock right now — which is exactly why [address] got the result it did. Waiting has a cost as well as a benefit."</div>
+<div class="fork-step" style="margin:8px 0 4px;">Follow through</div>
+<div class="objection-a">"You don't have to decide anything today. But when you do move, you'll want to know what you're working with. Let me get you a current number now so you're deciding on facts rather than a feeling."</div>
+</div>
+<div class="objection-item">
+<div class="objection-q">"Just send me something in the mail."</div>
+<div class="objection-a">"Happy to. I'll include the recent comparable sales so it's actually useful rather than a flyer. What's the best address?"</div>
+<div class="fork-step" style="margin:8px 0 4px;">Follow through</div>
+<div class="objection-a">"And what's the best mobile? I'll text you when it's on its way so it doesn't get lost in the junk mail."</div>
 </div>
 </div>
 </div>
@@ -1437,31 +1468,8 @@
 </div>
 
 </div>
+<div class="tip-box"><strong>Mirroring:</strong> Repeat their last 2–3 words back as a question — "Not interested?" — then stop talking. Gets them explaining instead of hanging up.</div>
 <div class="tip-box"><strong>Timing:</strong> Wed &amp; Thu outperform all other days. Best windows 8–9 AM and 4–5 PM.</div>
-</div>
-<!-- JS OBJECTIONS -->
-<div id="js-objections" class="js-track" style="display:none;">
-<div class="objection-item" style="padding-top:0;border-top:none;">
-<div class="objection-q">"We're not interested in selling."</div>
-<div class="objection-a">"Not interested in selling? Completely fine — I'm not here to push anything. I actually just wanted to share what [address] sold for while it's relevant. Would you be curious to know what that sale means for the value of your place?"</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"We already have an agent."</div>
-<div class="objection-a">"You've got someone you work with — that's great. I'm not looking to step on toes. I did want to mention we had some buyers from that last sale who didn't get across the line. Would it be worth knowing who those buyers are, just in case?"</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"This isn't a good time."</div>
-<div class="objection-a">"Not a good time — I hear you. Can I just leave you with this: I'll send through what [address] sold for and a rough street comparison by text. No follow-up unless you want it. What's the best mobile for you?"</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"How did you get my number?"</div>
-<div class="objection-a">"Fair question — it's from the public property register. I call the streets I've sold in to keep neighbours in the loop. I can remove you from my list if you prefer — no hard feelings."</div>
-</div>
-<div class="objection-item">
-<div class="objection-q">"Just send me something in the mail."</div>
-<div class="objection-a">"Happy to. I'll include the recent comparable sales so it's actually useful. What's the best address?"</div>
-</div>
-<div class="tip-box"><strong>Mirroring (Chris Voss):</strong> Repeat their last 2–3 words back as a question. "Not interested?" Gets them talking instead of shutting down.</div>
 </div>
 <!-- JS CLOSES -->
 <div id="js-closes" class="js-track" style="display:none;">
