@@ -255,7 +255,8 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
   archiveReason /* when archived: 'sold'|'undercontract'|'takenoff' (v7.3.0). Legacy 'withdrawn'
                     and '' both READ as takenoff — nothing is rewritten on disk */,
   address, suburb, postcode, type /* 'house'|'townhouse'|'unit'|'land' */,
-  price /* number, used for matching */, priceType /* 'fixed'|'range'|'auction'|'eoi' */, priceMax,
+  price /* number, used for matching */, priceType /* 'fixed'|'range'|'auction' — 'eoi' was
+                    removed in v7.3.0; legacy values read as 'fixed' via propPriceType() */, priceMax,
   beds, baths, car, land /* numbers */, salePrice, saleDate /* for sold */,
   listingUrl, listedDate,
   listingMeta /* '' or {title,image,desc,site,fetchedAt} (v3.0) — OpenGraph preview fetched
