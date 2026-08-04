@@ -493,7 +493,7 @@ topbar CSS is left in place as a historical layer.
    import accept both; never show a raw ISO string in the UI or an export.
 2. **Theming**: every colour MUST be a CSS variable. Since v1.2.0 there are selectable
    theme palettes (Settings ⚙️ → Appearance) — **two as of v7.2.0**: `claude`
-   ("Classic minimal", the default) and `noir` (pure greyscale). Racing Green,
+   ("Classic minimal", the default) and `noir` (greyscale chrome, real colour for status only — v7.2.0). Racing Green,
    Espresso and Classic Blue were REMOVED in v7.2.0 (the boot script rewrites any
    stored palette other than those two to `claude`). The active palette is a `data-palette`
    attribute on `<html>` (absent/`claude` = default), persisted in `localStorage` key
