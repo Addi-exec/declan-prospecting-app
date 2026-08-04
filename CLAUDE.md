@@ -251,7 +251,9 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
 
 ### Property record shape (Properties inventory — panel `id="properties"`)
 ```js
-{ id /* 'p…' */, status /* 'onmarket'|'offmarket'|'archived' */, archiveReason /* ''|'sold'|'withdrawn' */,
+{ id /* 'p…' */, status /* 'onmarket'|'offmarket'|'archived' */,
+  archiveReason /* when archived: 'sold'|'undercontract'|'takenoff' (v7.3.0). Legacy 'withdrawn'
+                    and '' both READ as takenoff — nothing is rewritten on disk */,
   address, suburb, postcode, type /* 'house'|'townhouse'|'unit'|'land' */,
   price /* number, used for matching */, priceType /* 'fixed'|'range'|'auction'|'eoi' */, priceMax,
   beds, baths, car, land /* numbers */, salePrice, saleDate /* for sold */,
@@ -263,6 +265,17 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
                  the fetch — UI degrades to the plain link + ↻ Preview button */,
   notes }
 ```
+- **Status model (v7.3.0):** the UI works in ONE key — `propStateKey(p)` →
+  `onmarket|offmarket|undercontract|sold|takenoff` — mapping the stored `status`+`archiveReason`
+  pair. `PROP_CLOSED` marks the three that persist as `status:'archived'`. The form's `p-status`
+  select offers all five (the old `p-archiveReason` select is gone); sale price/date show only for
+  `sold`. Filter chips mirror the five, and an On-market-only `#prop-saletype-bar`
+  (`propSaleType` = `all|private|auction`, auction = `priceType==='auction'`) filters by listing
+  type. Use `propStateLabel`/`propPillClass`, never `PROP_STATUS_LABEL[p.status]`.
+- The properties `.md-list` carries `.md-list-scroll` — sticky, `max-height: calc(100vh - 36px)`,
+  matching `.md-detail`, so the inventory scrolls in place instead of lengthening the page.
+- The listing **Preview** buttons were removed in v7.3.0 (the portals block the fetch).
+  `propFetchPreview` remains, called silently once on save.
 
 ### Buyer↔property matching (renderer, pure functions)
 - `fitScore(buyer, property)` -> `{ score 0-100, why:[], gaps:[] }`. Weighted (price 35, type 20,
@@ -487,7 +500,7 @@ topbar CSS is left in place as a historical layer.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **7.2.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **7.3.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
