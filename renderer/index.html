@@ -979,9 +979,9 @@
     display: flex; flex-direction: column; gap: 10px; }
   .md-list-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
     padding-right: 4px; }
-  /* The listing-type capsule sits centred over the rows it filters (the column is a flex
-     column, so align-self centres the capsule itself and keeps its chips tight). */
-  #prop-saletype-bar { align-self: center; justify-content: center; }
+  /* The listing-type capsule keeps the full column width (the flex column stretches it);
+     only the chips inside are centred. */
+  #prop-saletype-bar { align-self: stretch; justify-content: center; }
   .md-rows { display: flex; flex-direction: column; gap: 6px; }
   .md-row { display: flex; align-items: flex-start; gap: 10px; width: 100%; min-height: 44px;
     padding: 9px 12px; text-align: left; cursor: pointer; font-family: inherit; font-size: 14px;
