@@ -275,10 +275,12 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
   type — it lives at the TOP OF THE LIST COLUMN, above the rows, not in the full-width filter row.
   `priceMax` now applies to `auction` as well as `range` (both in `propFormSync` and
   `propPriceLabel`), so an auction can quote a guide range. Use `propStateLabel`/`propPillClass`, never `PROP_STATUS_LABEL[p.status]`.
-- The properties left column is `.md-list.md-col-sticky` — a sticky flex column of fixed
-  `height: calc(100vh - 36px)` (matching `.md-detail`) holding the filter bar plus
-  `.md-list-scroll` (`flex:1; min-height:0; overflow-y:auto`). The rows scroll INDEPENDENTLY of
-  the page. Stacked (≤1100px) the column goes static and the rows cap at 55vh.
+- The properties left column is `.md-list.md-col-sticky` — a sticky flex column
+  (`max-height: calc(100vh - 36px)`) holding the filter bar plus `.md-list-scroll`
+  (`flex:1; min-height:0; overflow-y:auto`). The rows scroll INDEPENDENTLY of the page.
+  `propCapList()` sets the box's `max-height` to exactly **ten rows** (measured off the tenth
+  `.md-row`, since a row is not a fixed height, and skipped while the panel is hidden — hence
+  the `showPanel` re-run). That JS cap is the only height rule at any width.
 - The listing **Preview** buttons were removed in v7.3.0 (the portals block the fetch).
   `propFetchPreview` remains, called silently once on save.
 
