@@ -1458,7 +1458,7 @@
 </div>
 <!-- NO ANSWER -->
 <div id="jsf-noanswer" class="jsf-track">
-<div style="background:var(--surface2);border-radius:var(--r-xs);padding:10px 14px;font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;">They didn't pick up. Alternate voicemail + SMS with text-only touches. Five attempts over 12 days — most agents stop at two.</div>
+<div style="background:var(--surface2);border-radius:var(--r-xs);padding:10px 14px;font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;">They didn't pick up. Two touches, then they move into nurture — a voicemail and text up front, one final text a week later.</div>
 <div class="seq-item">
 <div class="seq-day">Day 1</div>
 <div class="seq-content">
@@ -1466,41 +1466,17 @@
 <div class="sms-label">Voicemail</div>
 <div class="script-block" style="font-size:13px;">"Hi [Name], it's Declan — I'm a local agent in [suburb]. I just helped your neighbours on [street] sell and wanted to share how it went, as it's good news for the area. Give me a call back when you get a sec on [number] — that's [number]. Cheers, [Name]."</div>
 <div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
-<div class="sms-bubble">Hi [Name], Declan here — just left you a quick voicemail 😊 Just helped your neighbours on [street] sell and had a result worth sharing. Happy to chat whenever suits 👍</div></div>
+<div class="sms-bubble">Hi [Name], Declan here — just left you a quick voicemail. Just helped your neighbours on [street] sell and had a result worth sharing. Happy to chat whenever suits 😊</div></div>
 </div>
 </div>
 <div class="seq-item">
-<div class="seq-day">Day 3</div>
+<div class="seq-day">Day 7</div>
 <div class="seq-content">
-<h4>SMS only — give value</h4>
-<div class="sms-bubble">Hi [Name], Declan here. In case it's handy — [address] just sold for [$X / X% above reserve] in [X days]. Based on that, places like yours in [suburb] are sitting around [price range]. No need to reply — just thought you'd want to know 😊</div>
+<h4>Final SMS — the result, then hand to nurture</h4>
+<div class="sms-bubble">Hi [Name], Declan here — I won't keep pestering you. In case it's handy: [address] sold for [$X] in [X days], which puts places like yours around [range]. If you ever think about selling, even down the track, I'd love to be the first you call. I'll send the odd [suburb] update so you stay in the loop — happy to stop anytime, just say the word 😊</div>
 </div>
 </div>
-<div class="seq-item">
-<div class="seq-day">Day 6</div>
-<div class="seq-content">
-<h4>Voicemail + SMS</h4>
-<div class="sms-label">Voicemail</div>
-<div class="script-block" style="font-size:13px;">"Hi [Name], Declan again — no stress at all, just wanted to put a friendly voice to the texts. If you'd ever like a quick, no-obligation idea of what your place is worth, I'm happy to help. [number] whenever suits."</div>
-<div style="margin-top:8px;"><div class="sms-label">SMS straight after</div>
-<div class="sms-bubble">Hi [Name], Declan here — left you another quick voicemail 😊 No pressure at all. Just here if you ever want a chat about the street or your place. 👍</div></div>
-</div>
-</div>
-<div class="seq-item">
-<div class="seq-day">Day 9</div>
-<div class="seq-content">
-<h4>SMS only — soft check in</h4>
-<div class="sms-bubble">Hi [Name], Declan here. Just checking in — happy to answer anything about the [suburb] market or what your place might be worth. No rush at all 😊</div>
-</div>
-</div>
-<div class="seq-item">
-<div class="seq-day">Day 12</div>
-<div class="seq-content">
-<h4>Final SMS — hand to nurture</h4>
-<div class="sms-bubble">Hi [Name], Declan here — I won't keep pestering you 😊 If you ever think about selling, even down the track, I'd love to be the first you call. I'll drop you the odd [suburb] market update so you stay in the loop. Happy to stop anytime — just say the word 👍</div>
-</div>
-</div>
-<div class="tip-box"><strong>The long game:</strong> 80% of listings come after the 5th contact — most agents quit after 2. After Day 12, move them into the COLD nurture track.</div>
+<div class="tip-box"><strong>After Day 7:</strong> they move to the COLD nurture track — the odd market update, no chasing.</div>
 </div>
 <!-- ANSWERED — INTERESTED -->
 <div id="jsf-interested" class="jsf-track" style="display:none;">
@@ -1523,9 +1499,9 @@
 <div class="seq-day">Day 3</div>
 <div class="seq-content">
 <h4>Call — lock in the appraisal</h4>
-<div class="script-block" style="font-size:13px;">"Hi [Name], Declan here — just following up on my text. I'm in [suburb] this week anyway, so it'd be easy to swing past and give you an accurate figure. Would Tuesday morning or Wednesday afternoon suit better?"</div>
+<div class="script-block" style="font-size:13px;">"Hi [Name], Declan here — just following up on my text. I'm in [suburb] this week anyway, so it'd be easy to swing past and give you an accurate figure. Is that something you'd want me to do? … What does your week look like?"</div>
 <div style="margin-top:8px;"><div class="sms-label">SMS if no answer</div>
-<div class="sms-bubble">Hi [Name], Declan here — tried to give you a quick call 😊 Happy to pop past this week for that no-obligation figure. Which works better — Tues morning or Weds arvo? 👍</div></div>
+<div class="sms-bubble">Hi [Name], Declan here — tried to give you a quick call. Happy to pop past this week for that no-obligation figure. Let me know what suits and I'll work around you 😊</div></div>
 </div>
 </div>
 <div class="seq-item">
@@ -1558,14 +1534,14 @@
 <div class="seq-day">Day 7</div>
 <div class="seq-content">
 <h4>SMS — light value, zero pressure</h4>
-<div class="sms-bubble">Hi [Name], Declan here. No agenda at all — just thought you'd like to know the [suburb] market's been [trending well / very active] lately. Happy to keep you posted now and then if that's useful. Hope you're well! 👋</div>
+<div class="sms-bubble">Hi [Name], Declan here. No agenda at all — just thought you'd like to know the [suburb] market's been [trending well / very active] lately. Happy to keep you posted now and then if that's useful. Hope you're well! 😊</div>
 </div>
 </div>
 <div class="seq-item">
 <div class="seq-day">Day 30</div>
 <div class="seq-content">
 <h4>SMS — permission to stay in touch → nurture</h4>
-<div class="sms-bubble">Hi [Name], Declan here 😊 I won't crowd your inbox — would it be alright if I sent the occasional [suburb] update so you've always got the numbers if anything ever changes? Totally fine to say no 👍</div>
+<div class="sms-bubble">Hi [Name], Declan here 😊 I won't crowd your inbox — would it be alright if I sent the occasional [suburb] update so you've always got the numbers if anything ever changes? Totally fine to say no.</div>
 </div>
 </div>
 <div class="tip-box"><strong>Tip:</strong> A "no" today is rarely a "no" forever. The agent who stays warm and useful without pushing is the one they call when life changes. From here, move them into the WARM or COLD nurture track.</div>
@@ -3094,7 +3070,7 @@ document.addEventListener('DOMContentLoaded', objInit);
 /* ===== Contact tracker engine ===== */
 var METHODS = {
   justsold:{ label:'Just sold street', sheet:'Just Sold Street', chipBg:'var(--blue-bg)', chipFg:'var(--blue)', ms:{
-    noanswer:[{d:1,t:'Voicemail + SMS'},{d:3,t:'SMS — value'},{d:6,t:'Voicemail + SMS'},{d:9,t:'SMS — check in'},{d:12,t:'Final SMS → nurture'},{d:60,t:'Nurture touch'},{d:120,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
+    noanswer:[{d:1,t:'Voicemail + SMS'},{d:7,t:'Final SMS → nurture'},{d:60,t:'Nurture touch'},{d:120,t:'Nurture touch'},{d:180,t:'Nurture touch'}],
     interested:[{d:0,t:'Recap SMS'},{d:1,t:'Deliver data SMS'},{d:3,t:'Call — lock in appraisal'},{d:6,t:'Confirm appointment SMS'},{d:8,t:'Post-appraisal thank-you SMS'}],
     notinterested:[{d:0,t:'Gracious SMS + data'},{d:7,t:'SMS — light value'},{d:30,t:'SMS — permission → nurture'},{d:90,t:'Nurture touch'},{d:180,t:'Nurture touch'}]
   }},
