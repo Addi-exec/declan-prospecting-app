@@ -487,14 +487,15 @@ topbar CSS is left in place as a historical layer.
    breaking changes, **MINOR** = small new features, **PATCH** = fixes/tweaks. (Pre‑1.0 used a
    looser decimal scheme; the 0.x changelog rows are historical.) Update the version in THREE
    places when you ship: the header `#app-version` span, the About page `#about-version`, and
-   `package.json` "version". Add a changelog entry on the About page. Current: **7.1.0**.
+   `package.json` "version". Add a changelog entry on the About page. Current: **7.2.0**.
    NB dates: STORED as ISO `yyyy-mm-dd` (schedule math, sorting, date inputs, GS sync) but
    always DISPLAYED dd/mm/yyyy via `fmtDate`/`fmtDMY` (v1.3.1). `parseDate` + the Excel
    import accept both; never show a raw ISO string in the UI or an export.
 2. **Theming**: every colour MUST be a CSS variable. Since v1.2.0 there are selectable
-   theme palettes (Settings ⚙️ → Appearance) — five as of v1.3.0: `claude` (default),
-   `aston` (Racing Green), `noir` (pure greyscale), `mono` (Espresso), `classic`
-   (Classic Blue). The active palette is a `data-palette`
+   theme palettes (Settings ⚙️ → Appearance) — **two as of v7.2.0**: `claude`
+   ("Classic minimal", the default) and `noir` (pure greyscale). Racing Green,
+   Espresso and Classic Blue were REMOVED in v7.2.0 (the boot script rewrites any
+   stored palette other than those two to `claude`). The active palette is a `data-palette`
    attribute on `<html>` (absent/`claude` = default), persisted in `localStorage` key
    `declan-palette`; dark mode remains a separate `data-theme="dark"` attribute (header
    toggle, `localStorage` key `declan-theme`) and works WITH every palette. Each palette
@@ -502,7 +503,7 @@ topbar CSS is left in place as a historical layer.
    `[data-palette="X"][data-theme="dark"]` (dark); the Claude blocks are
    `:root, [data-palette="claude"]` + the dark pair. Never hardcode hex in markup/JS — new
    UI must work in light AND dark across ALL palettes automatically. If you add a NEW CSS
-   variable, define it in ALL palette blocks (10 total: 5 palettes × light/dark). New themes:
+   variable, define it in ALL palette blocks (4 total: 2 palettes × light/dark). New themes:
    add a palette block pair + a row in the `PALETTES` array (theme picker cards render from
    it; swatch chips scope previews via `data-palette`/`data-theme` attributes on the chip).
 3. **No emails in scripts**: all openers/objections/closes/follow-ups/nurture use
@@ -533,7 +534,7 @@ topbar CSS is left in place as a historical layer.
 **v6.0 (current):** the SKIN is still v5.0 — v6 only rearranged the app (sidebar shell, drawer
 forms, dashboard Tracker, master–detail lists, split Drops, sticky script tabs; see
 "Navigation + layout" above). Its CSS is one block at the END of `<style>` and introduces NO new
-palette variables — everything derives from existing vars/tokens, so all 5 palettes × light/dark
+palette variables — everything derives from existing vars/tokens, so both palettes × light/dark
 keep working automatically. Keep it that way: new layout CSS goes in that block, uses vars only.
 
 ### The skin (v5.0 "Claude-app minimal" — ui-ux-pro-max redesign)
@@ -564,7 +565,7 @@ type (the type's `due` play shown ONCE per group), one compact `.ddr` row per ad
 Undo toast. Tokens (radii `--r-xs/sm/md/pill`, glass recipes
 `--glass-*`, elevation `--e1/2/3`, `--hover-ink`/`--accent-tint`) are DERIVED from palette
 vars via color-mix and defined once in :root + one dark override — the documented exemption
-to the 10-palette-block rule. Buttons/nav/chips/filters are capsules (`--r-pill`);
+to the palette-block rule. Buttons/nav/chips/filters are capsules (`--r-pill`);
 `.crm-btn-primary` is the accent-filled capsule (ONE per panel), `.crm-btn-tint` the
 per-card primary (Copy SMS), ghosts for the rest; press = scale(.98) (the Material ripple
 was REMOVED in v4). ALL tab groups share one class-based active treatment (`.active` +
