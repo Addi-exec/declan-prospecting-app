@@ -190,8 +190,12 @@ async function macUpdateCheck(manual) {
   }
 }
 
-// Force en-AU locale so native <input type=date> renders dd/mm/yyyy (the app-wide format)
+// Force en-AU so native <input type=date> renders dd/mm/yyyy (the app-wide format).
+// --lang sets the UI/ICU locale; --accept-lang backs it up, because on a machine whose
+// system locale is en-US Chromium has been known to fall back to the OS format for the
+// date picker even with --lang set. Both are cheap and must run before app is ready.
 app.commandLine.appendSwitch('lang', 'en-AU');
+app.commandLine.appendSwitch('accept-lang', 'en-AU,en');
 
 app.whenReady().then(() => {
   createWindow();
