@@ -31,11 +31,11 @@ function dataFile() { return path.join(dataDir(), DATA_FILENAME); }
 function readData() {
   try {
     const p = dataFile();
-    if (!fs.existsSync(p)) return { contacts: [], buyers: [], properties: [], inspections: [], drops: [], activity: [] };
+    if (!fs.existsSync(p)) return { contacts: [], buyers: [], properties: [], inspections: [], drops: [], owners: [], activity: [] };
     const raw = JSON.parse(fs.readFileSync(p, 'utf8') || '{}');
-    if (Array.isArray(raw)) return { contacts: raw, buyers: [], properties: [], inspections: [], drops: [], activity: [] };
-    return { contacts: raw.contacts || [], buyers: raw.buyers || [], properties: raw.properties || [], inspections: raw.inspections || [], drops: raw.drops || [], activity: raw.activity || [] };
-  } catch (e) { return { contacts: [], buyers: [], properties: [], inspections: [], drops: [], activity: [] }; }
+    if (Array.isArray(raw)) return { contacts: raw, buyers: [], properties: [], inspections: [], drops: [], owners: [], activity: [] };
+    return { contacts: raw.contacts || [], buyers: raw.buyers || [], properties: raw.properties || [], inspections: raw.inspections || [], drops: raw.drops || [], owners: raw.owners || [], activity: raw.activity || [] };
+  } catch (e) { return { contacts: [], buyers: [], properties: [], inspections: [], drops: [], owners: [], activity: [] }; }
 }
 function updateData(mutate) {
   const d = readData(); mutate(d);
@@ -242,6 +242,10 @@ const CONTACT_HEADERS = ['id','method','outcome','first','last','address','mobil
 const BUYER_HEADERS = ['id','first','last','mobile','email','buyerType','budgetMin','budgetMax','types','bedsMin','bathsMin','carMin','landMin','suburbs','enquiries','archived','notes'];
 const PROPERTY_HEADERS = ['id','status','archiveReason','address','suburb','postcode','type','price','priceType','priceMax','beds','baths','car','land','salePrice','saleDate','listingUrl','listedDate','listingMeta','notes'];
 const INSPECTION_HEADERS = ['id','propertyId','date','startTime','attendees','notes','createdAt','archived'];
+/* Owners (v8.0.0): people you know own property, however you came by them. `props` is the
+   list of properties they own — each either a link to a Properties record or a plain address
+   typed in here, so an owner can be tracked before the property ever enters the inventory. */
+const OWNER_HEADERS = ['id','first','last','mobile','email','address','props','linkType','linkId','archived','notes','createdAt'];
 const DROP_HEADERS = ['id','type','address','lastDropped','intervalDays','timesDropped','archived','notes','lat','lng','geoAddr'];
 // Per-request timeout so a hung network never freezes contacts:load / contacts:save —
 // the callers all fall back to the local JSON file when a Sheets call rejects.
@@ -276,9 +280,9 @@ function getAuthClient() {
    single comma-separated cell; numeric/boolean fields are coerced back on load.
    gsLoadTab THROWS on a missing tab or API error so callers fall back to local
    data instead of mirroring an empty result over it. */
-const GS_TABS = ['Contacts', 'Buyers', 'Properties', 'Inspections', 'Drops'];
+const GS_TABS = ['Contacts', 'Buyers', 'Properties', 'Inspections', 'Drops', 'Owners'];
 const GS_ARRAY_FIELDS = { types: 1, suburbs: 1 };
-const GS_JSON_FIELDS = { enquiries: 1, attendees: 1 }; // arrays of objects → stored as JSON in one cell
+const GS_JSON_FIELDS = { enquiries: 1, attendees: 1, props: 1 }; // arrays of objects → stored as JSON in one cell
 const GS_JSON_OBJ_FIELDS = { listingMeta: 1 }; // single objects → stored as JSON in one cell ('' when absent)
 const GS_NUM_FIELDS = { stepsDone:1, budgetMin:1, budgetMax:1, bedsMin:1, bathsMin:1, carMin:1, landMin:1, price:1, priceMax:1, beds:1, baths:1, car:1, land:1, salePrice:1, intervalDays:1, timesDropped:1, lat:1, lng:1 };
 const GS_BOOL_FIELDS = { archived: 1 };
@@ -464,14 +468,16 @@ makeCollectionHandlers('buyers', 'Buyers', BUYER_HEADERS);
 makeCollectionHandlers('properties', 'Properties', PROPERTY_HEADERS);
 makeCollectionHandlers('inspections', 'Inspections', INSPECTION_HEADERS);
 makeCollectionHandlers('drops', 'Drops', DROP_HEADERS);
+makeCollectionHandlers('owners', 'Owners', OWNER_HEADERS);
 
-/* The five synced collections, in one place, so syncNow can walk them. */
+/* The six synced collections, in one place, so syncNow can walk them. */
 const GS_COLLECTIONS = [
   { key: 'contacts',    tab: 'Contacts',    headers: CONTACT_HEADERS },
   { key: 'buyers',      tab: 'Buyers',      headers: BUYER_HEADERS },
   { key: 'properties',  tab: 'Properties',  headers: PROPERTY_HEADERS },
   { key: 'inspections', tab: 'Inspections', headers: INSPECTION_HEADERS },
-  { key: 'drops',       tab: 'Drops',       headers: DROP_HEADERS }
+  { key: 'drops',       tab: 'Drops',       headers: DROP_HEADERS },
+  { key: 'owners',      tab: 'Owners',      headers: OWNER_HEADERS }
 ];
 
 /* What the UI needs to tell the truth about syncing (v6.1). */
