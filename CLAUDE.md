@@ -264,6 +264,9 @@ scripts method `buyerdb` (`id="buyerdb"`). Don't confuse the two.
   `ownerImport('contact'|'buyer')` opens a picker that COPIES contact details into a new owner and
   records `linkType`/`linkId` (rows already imported show "Already an owner" instead of an Add
   button). Importing a contact seeds `props` with that contact's address — the door you knocked on.
+  The Tracker picker lists EVERY contact — all four methods, archived included (an archived
+  follow-up sequence says nothing about who owns the house) — with addressed contacts sorted
+  first and no truncation (`.own-imp-rows` scrolls).
   Deleting an owner never touches the source record.
 - The detail pane is `.own-split`: properties owned on the left, a live-editable `.own-notes`
   textarea on the right. `ownerSetNotes` saves WITHOUT re-rendering (a re-render mid-typing
